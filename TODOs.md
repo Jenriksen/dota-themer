@@ -23,8 +23,14 @@
 ### Testing
 - [x] Created `test_core.py` with 57 unit tests
 - [x] Created `test_bot.py` with 15 unit tests
+- [x] Added 14 more tests for enhanced theme selection (86 total)
 - [x] Fixed data inconsistency (clockwerk -> rattletrap)
 - [x] Added .gitignore for Python artifacts
+
+### Enhanced Theme Selection
+- [x] Implemented filter_themes() for party size filtering
+- [x] Implemented weighted random selection
+- [x] Implemented position coverage validation
 
 ### Discord Bot Integration
 - [x] Created `bot.py` using discord.py
@@ -46,9 +52,9 @@
 ## Next Steps (Priority Order)
 
 ### 1. Enhanced Theme Selection (High Priority)
-- [ ] Filter themes to ensure minimum hero count for party size
-- [ ] Add weighted random selection (favor themes with more heroes)
-- [ ] Validate themes have good position coverage
+- [x] Filter themes to ensure minimum hero count for party size
+- [x] Add weighted random selection (favor themes with more heroes)
+- [x] Validate themes have good position coverage
 - [ ] Option: let users request new theme if unhappy with selection
 
 ### 2. Position-Based Features (Medium Priority)
