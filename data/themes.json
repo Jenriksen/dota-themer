@@ -3,121 +3,121 @@
     "name": "Rides a Steed",
     "description": "Heroes that ride mounts or animals into battle",
     "hero_ids": [
-      "npc_dota_hero_keeper_of_the_light",
-      "npc_dota_hero_snapfire",
-      "npc_dota_hero_spirit_breaker",
-      "npc_dota_hero_chaos_knight",
-      "npc_dota_hero_dragon_knight"
+      "keeper_of_the_light",
+      "snapfire",
+      "spirit_breaker",
+      "chaos_knight",
+      "dragon_knight"
     ]
   },
   {
     "name": "Blue Heroes",
     "description": "Heroes with predominantly blue color schemes",
     "hero_ids": [
-      "npc_dota_hero_zuus",
-      "npc_dota_hero_crystal_maiden",
-      "npc_dota_hero_morphling",
-      "npc_dota_hero_keeper_of_the_light",
-      "npc_dota_hero_snapfire"
+      "zuus",
+      "crystal_maiden",
+      "morphling",
+      "keeper_of_the_light",
+      "snapfire"
     ]
   },
   {
     "name": "Beards",
     "description": "Heroes with facial hair",
     "hero_ids": [
-      "npc_dota_hero_axe",
-      "npc_dota_hero_bristleback",
-      "npc_dota_hero_centaur",
-      "npc_dota_hero_dragon_knight",
-      "npc_dota_hero_kunkka",
-      "npc_dota_hero_sven",
-      "npc_dota_hero_tidehunter",
-      "npc_dota_hero_timbersaw"
+      "axe",
+      "bristleback",
+      "centaur",
+      "dragon_knight",
+      "kunkka",
+      "sven",
+      "tidehunter",
+      "timbersaw"
     ]
   },
   {
     "name": "Visible Teeth",
     "description": "Heroes that show their teeth prominently",
     "hero_ids": [
-      "npc_dota_hero_bloodseeker",
-      "npc_dota_hero_legion_commander",
-      "npc_dota_hero_phantom_assassin",
-      "npc_dota_hero_phantom_lancer",
-      "npc_dota_hero_razor",
-      "npc_dota_hero_slardar",
-      "npc_dota_hero_tidehunter"
+      "bloodseeker",
+      "legion_commander",
+      "phantom_assassin",
+      "phantom_lancer",
+      "razor",
+      "slardar",
+      "tidehunter"
     ]
   },
   {
     "name": "Poor Eyesight",
     "description": "Heroes wearing glasses or with vision-related lore",
     "hero_ids": [
-      "npc_dota_hero_dazzle",
-      "npc_dota_hero_keeper_of_the_light",
-      "npc_dota_hero_zuus",
-      "npc_dota_hero_lina"
+      "dazzle",
+      "keeper_of_the_light",
+      "zuus",
+      "lina"
     ]
   },
   {
     "name": "Melee Strength",
     "description": "Heroes that are melee and have strength as primary attribute",
     "hero_ids": [
-      "npc_dota_hero_axe",
-      "npc_dota_hero_bristleback",
-      "npc_dota_hero_centaur",
-      "npc_dota_hero_chaos_knight",
-      "npc_dota_hero_rattletrap",
-      "npc_dota_hero_dragon_knight",
-      "npc_dota_hero_earthshaker",
-      "npc_dota_hero_juggernaut",
-      "npc_dota_hero_kunkka",
-      "npc_dota_hero_legion_commander",
-      "npc_dota_hero_pudge",
-      "npc_dota_hero_sand_king",
-      "npc_dota_hero_slardar",
-      "npc_dota_hero_spirit_breaker",
-      "npc_dota_hero_sven",
-      "npc_dota_hero_tidehunter",
-      "npc_dota_hero_tiny"
+      "axe",
+      "bristleback",
+      "centaur",
+      "chaos_knight",
+      "rattletrap",
+      "dragon_knight",
+      "earthshaker",
+      "juggernaut",
+      "kunkka",
+      "legion_commander",
+      "pudge",
+      "sand_king",
+      "slardar",
+      "spirit_breaker",
+      "sven",
+      "tidehunter",
+      "tiny"
     ]
   },
   {
     "name": "Ranged Agility",
     "description": "Heroes that are ranged and have agility as primary attribute",
     "hero_ids": [
-      "npc_dota_hero_bloodseeker",
-      "npc_dota_hero_drow_ranger",
-      "npc_dota_hero_luna",
-      "npc_dota_hero_mirana",
-      "npc_dota_hero_morphling",
-      "npc_dota_hero_phantom_assassin",
-      "npc_dota_hero_phantom_lancer",
-      "npc_dota_hero_razor",
-      "npc_dota_hero_sniper",
-      "npc_dota_hero_viper",
-      "npc_dota_hero_windrunner"
+      "bloodseeker",
+      "drow_ranger",
+      "luna",
+      "mirana",
+      "morphling",
+      "phantom_assassin",
+      "phantom_lancer",
+      "razor",
+      "sniper",
+      "viper",
+      "windrunner"
     ]
   },
   {
     "name": "Support Heroes",
     "description": "Heroes with Support as primary role",
     "hero_ids": [
-      "npc_dota_hero_bane",
-      "npc_dota_hero_crystal_maiden",
-      "npc_dota_hero_dazzle",
-      "npc_dota_hero_disruptor",
-      "npc_dota_hero_earthshaker",
-      "npc_dota_hero_keeper_of_the_light",
-      "npc_dota_hero_lichen",
-      "npc_dota_hero_lina",
-      "npc_dota_hero_lion",
-      "npc_dota_hero_mirana",
-      "npc_dota_hero_snapfire",
-      "npc_dota_hero_shadow_shaman",
-      "npc_dota_hero_vengefulspirit",
-      "npc_dota_hero_warlock",
-      "npc_dota_hero_windrunner",
-      "npc_dota_hero_zuus"
+      "bane",
+      "crystal_maiden",
+      "dazzle",
+      "disruptor",
+      "earthshaker",
+      "keeper_of_the_light",
+      "lichen",
+      "lina",
+      "lion",
+      "mirana",
+      "snapfire",
+      "shadow_shaman",
+      "vengefulspirit",
+      "warlock",
+      "windrunner",
+      "zuus"
     ]
   }
 ]
