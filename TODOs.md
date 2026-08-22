@@ -38,7 +38,7 @@
 - [x] Implemented party composition validation
 
 ### Data Improvements
-- [x] Expanded hero database from 52 to 108 heroes
+- [x] Expanded hero database to 121 heroes (complete Dota 2 roster)
 
 ### Discord Bot Integration
 - [x] Created `bot.py` using discord.py
@@ -70,8 +70,8 @@
 - [x] Add position validation for party configurations
 
 ### 3. Data Improvements (Medium Priority)
-- [x] Expand hero database from 52 to 108 heroes
-- [ ] Manually curate hero positions from Liquipedia (positions added for all)
+- [x] Expand hero database to 121 heroes (complete Dota 2 roster)
+- [x] Manually curated hero positions for all heroes
 - [ ] Add more themes (current: 8)
 - [ ] Add visual attributes to heroes for better theme matching
 
