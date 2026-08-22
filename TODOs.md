@@ -32,6 +32,11 @@
 - [x] Implemented weighted random selection
 - [x] Implemented position coverage validation
 
+### Position-Based Features
+- [x] Implemented lane-based hero grouping
+- [x] Implemented balanced team suggestions
+- [x] Implemented party composition validation
+
 ### Discord Bot Integration
 - [x] Created `bot.py` using discord.py
 - [x] Implemented `!theme [party_size]` command
@@ -55,12 +60,11 @@
 - [x] Filter themes to ensure minimum hero count for party size
 - [x] Add weighted random selection (favor themes with more heroes)
 - [x] Validate themes have good position coverage
-- [ ] Option: let users request new theme if unhappy with selection
 
 ### 2. Position-Based Features (Medium Priority)
-- [ ] Implement lane-based hero grouping in output
-- [ ] Suggest balanced compositions (e.g., for party of 3: 2 safelane + 1 mid)
-- [ ] Add position validation for party configurations
+- [x] Implement lane-based hero grouping in output
+- [x] Suggest balanced compositions (e.g., for party of 3: 2 safelane + 1 mid)
+- [x] Add position validation for party configurations
 
 ### 3. Data Improvements (Medium Priority)
 - [ ] Manually curate hero positions from Liquipedia
