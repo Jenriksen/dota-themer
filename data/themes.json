@@ -591,5 +591,549 @@
       "vengefulspirit",
       "windrunner"
     ]
+  },
+  {
+    "name": "Has a Hat",
+    "description": "Heroes that wear fabulous hats",
+    "hero_ids": [
+      "crystal_maiden",
+      "lina",
+      "zuus",
+      "keeper_of_the_light",
+      "dazzle",
+      "oracle",
+      "chen",
+      "warlock"
+    ]
+  },
+  {
+    "name": "Bald Heroes",
+    "description": "Heroes with no hair at all",
+    "hero_ids": [
+      "juggernaut",
+      "antimage",
+      "phantom_assassin",
+      "vengefulspirit",
+      "wraith_king",
+      "sven",
+      "earthshaker",
+      "omniknight"
+    ]
+  },
+  {
+    "name": "Cape Wearers",
+    "description": "Heroes rocking capes like superheroes",
+    "hero_ids": [
+      "legion_commander",
+      "phantom_lancer",
+      "templar_assassin",
+      "drow_ranger",
+      "mirana",
+      "morphling",
+      "terrorblade",
+      "spectre"
+    ]
+  },
+  {
+    "name": "One-Eyed Heroes",
+    "description": "Heroes with an eye patch or missing an eye",
+    "hero_ids": [
+      "kunkka",
+      "tidehunter",
+      "slardar",
+      "snapfire"
+    ]
+  },
+  {
+    "name": "Tiny Heroes",
+    "description": "Heroes that are surprisingly small",
+    "hero_ids": [
+      "meepo",
+      "pugna",
+      "rattletrap",
+      "techies",
+      "clinkz",
+      "bounty_hunter"
+    ]
+  },
+  {
+    "name": "Scary Faces",
+    "description": "Heroes with terrifying visages",
+    "hero_ids": [
+      "doombringer",
+      "nevermore",
+      "terrorblade",
+      "abaddon",
+      "life_stealer",
+      "shadow_demon",
+      "night_stalker",
+      "undying"
+    ]
+  },
+  {
+    "name": "Robots and Machines",
+    "description": "Mechanical heroes and constructs",
+    "hero_ids": [
+      "rattletrap",
+      "tinker",
+      "gyrocopter",
+      "techies",
+      "alchemist"
+    ]
+  },
+  {
+    "name": "Fire Themed",
+    "description": "Heroes associated with fire and flames",
+    "hero_ids": [
+      "ember_spirit",
+      "phoenix",
+      "doombringer",
+      "jakiro",
+      "ogre_magi",
+      "dragon_knight",
+      "lina",
+      "zuus"
+    ]
+  },
+  {
+    "name": "Ice Themed",
+    "description": "Heroes associated with ice and frost",
+    "hero_ids": [
+      "crystal_maiden",
+      "ancient_apparition",
+      "lichen",
+      "winter_wyvern",
+      "drow_ranger"
+    ]
+  },
+  {
+    "name": "Nature Themed",
+    "description": "Heroes connected to nature and plants",
+    "hero_ids": [
+      "furion",
+      "treant",
+      "enchantress",
+      "lone_druid",
+      "lycan",
+      "naga_siren",
+      "venomancer",
+      "broodmother"
+    ]
+  },
+  {
+    "name": "Has a Sword",
+    "description": "Heroes that wield swords",
+    "hero_ids": [
+      "juggernaut",
+      "legion_commander",
+      "phantom_assassin",
+      "sven",
+      "kunkka",
+      "chaos_knight",
+      "dragon_knight",
+      "templar_assassin",
+      "troll_warlord"
+    ]
+  },
+  {
+    "name": "Has a Staff",
+    "description": "Heroes that use staffs or staves",
+    "hero_ids": [
+      "crystal_maiden",
+      "lichen",
+      "dazzle",
+      "oracle",
+      "zuus",
+      "lina",
+      "warlock",
+      "keeper_of_the_light"
+    ]
+  },
+  {
+    "name": "Flying Heroes",
+    "description": "Heroes that can fly or have flight abilities",
+    "hero_ids": [
+      "gyrocopter",
+      "phoenix",
+      "windrunner",
+      "drow_ranger",
+      "medusa",
+      "morphling",
+      "queenofpain"
+    ]
+  },
+  {
+    "name": "Invisible Heroes",
+    "description": "Heroes with stealth or invisibility abilities",
+    "hero_ids": [
+      "clinkz",
+      "bounty_hunter",
+      "weaver",
+      "phantom_assassin",
+      "broodmother"
+    ]
+  },
+  {
+    "name": "Summoners",
+    "description": "Heroes that can summon units",
+    "hero_ids": [
+      "warlock",
+      "beastmaster",
+      "enchantress",
+      "chen",
+      "furion",
+      "lone_druid",
+      "lycan",
+      "meepo",
+      "broodmother"
+    ]
+  },
+  {
+    "name": "Healers",
+    "description": "Heroes with healing abilities",
+    "hero_ids": [
+      "dazzle",
+      "oracle",
+      "omniknight",
+      "chen",
+      "abaddon",
+      "warlock",
+      "keeper_of_the_light"
+    ]
+  },
+  {
+    "name": "Tanky Heroes",
+    "description": "Heroes that can take a beating",
+    "hero_ids": [
+      "centaur",
+      "tidehunter",
+      "timbersaw",
+      "bristleback",
+      "alchemist",
+      "dragon_knight",
+      "abaddon",
+      "omniknight",
+      "wraith_king",
+      "underlord"
+    ]
+  },
+  {
+    "name": "Squishy Heroes",
+    "description": "Heroes that die easily",
+    "hero_ids": [
+      "crystal_maiden",
+      "lina",
+      "zuus",
+      "invoker",
+      "pugna",
+      "silencer",
+      "outworld_devourer",
+      "drow_ranger"
+    ]
+  },
+  {
+    "name": "Fast Heroes",
+    "description": "Heroes known for their speed",
+    "hero_ids": [
+      "ember_spirit",
+      "storm_spirit",
+      "windrunner",
+      "phantom_lancer",
+      "clinkz",
+      "bounty_hunter",
+      "lycan",
+      "void_spirit"
+    ]
+  },
+  {
+    "name": "Slow Heroes",
+    "description": "Heroes that are... not so fast",
+    "hero_ids": [
+      "tidehunter",
+      "wraith_king",
+      "centaur",
+      "earthshaker",
+      "sven",
+      "tiny",
+      "magnataur"
+    ]
+  },
+  {
+    "name": "Bald and Beautiful",
+    "description": "Heroes with no hair, just pure confidence",
+    "hero_ids": [
+      "juggernaut",
+      "antimage",
+      "phantom_assassin",
+      "vengefulspirit",
+      "wraith_king",
+      "sven",
+      "earthshaker",
+      "omniknight"
+    ]
+  },
+  {
+    "name": "Cape Crusaders",
+    "description": "Heroes with capes - the mark of true heroes",
+    "hero_ids": [
+      "legion_commander",
+      "phantom_lancer",
+      "templar_assassin",
+      "drow_ranger",
+      "mirana",
+      "morphling",
+      "terrorblade",
+      "spectre"
+    ]
+  },
+  {
+    "name": "One-Eyed Pirates",
+    "description": "Arrr! Heroes with eye patches",
+    "hero_ids": [
+      "kunkka",
+      "tidehunter",
+      "slardar",
+      "snapfire"
+    ]
+  },
+  {
+    "name": "Tiny but Mighty",
+    "description": "Small heroes, big impact",
+    "hero_ids": [
+      "meepo",
+      "pugna",
+      "rattletrap",
+      "techies",
+      "clinkz",
+      "bounty_hunter"
+    ]
+  },
+  {
+    "name": "Face Only a Mother Could Love",
+    "description": "Heroes with terrifying or ugly faces",
+    "hero_ids": [
+      "doombringer",
+      "nevermore",
+      "terrorblade",
+      "abaddon",
+      "life_stealer",
+      "shadow_demon",
+      "night_stalker",
+      "undying"
+    ]
+  },
+  {
+    "name": "Robots with Feelings",
+    "description": "Mechanical heroes who probably have emotions",
+    "hero_ids": [
+      "rattletrap",
+      "tinker",
+      "gyrocopter",
+      "techies",
+      "alchemist"
+    ]
+  },
+  {
+    "name": "Hot Stuff",
+    "description": "Heroes that bring the heat",
+    "hero_ids": [
+      "ember_spirit",
+      "phoenix",
+      "doombringer",
+      "jakiro",
+      "ogre_magi",
+      "dragon_knight",
+      "lina",
+      "zuus"
+    ]
+  },
+  {
+    "name": "Cool as Ice",
+    "description": "Heroes that keep their cool",
+    "hero_ids": [
+      "crystal_maiden",
+      "ancient_apparition",
+      "lichen",
+      "winter_wyvern"
+    ]
+  },
+  {
+    "name": "Tree Huggers",
+    "description": "Heroes who love nature a little too much",
+    "hero_ids": [
+      "furion",
+      "treant",
+      "enchantress",
+      "lone_druid",
+      "lycan",
+      "naga_siren",
+      "venomancer",
+      "broodmother"
+    ]
+  },
+  {
+    "name": "Sword Masters",
+    "description": "Heroes who know their way around a blade",
+    "hero_ids": [
+      "juggernaut",
+      "legion_commander",
+      "phantom_assassin",
+      "sven",
+      "kunkka",
+      "chaos_knight",
+      "dragon_knight",
+      "templar_assassin",
+      "troll_warlord"
+    ]
+  },
+  {
+    "name": "Staff Only",
+    "description": "Heroes who prefer the magical touch of a staff",
+    "hero_ids": [
+      "crystal_maiden",
+      "lichen",
+      "dazzle",
+      "oracle",
+      "zuus",
+      "lina",
+      "warlock",
+      "keeper_of_the_light"
+    ]
+  },
+  {
+    "name": "Sky High",
+    "description": "Heroes that can fly or love the skies",
+    "hero_ids": [
+      "gyrocopter",
+      "phoenix",
+      "windrunner",
+      "drow_ranger",
+      "medusa",
+      "morphling",
+      "queenofpain"
+    ]
+  },
+  {
+    "name": "Now You See Me",
+    "description": "Heroes that can disappear in a flash",
+    "hero_ids": [
+      "clinkz",
+      "bounty_hunter",
+      "weaver",
+      "phantom_assassin",
+      "broodmother"
+    ]
+  },
+  {
+    "name": "Summoner Supreme",
+    "description": "Heroes who love to summon an army",
+    "hero_ids": [
+      "warlock",
+      "beastmaster",
+      "enchantress",
+      "chen",
+      "furion",
+      "lone_druid",
+      "lycan",
+      "meepo",
+      "broodmother"
+    ]
+  },
+  {
+    "name": "Medic!",
+    "description": "Heroes who keep their teammates alive",
+    "hero_ids": [
+      "dazzle",
+      "oracle",
+      "omniknight",
+      "chen",
+      "abaddon",
+      "warlock",
+      "keeper_of_the_light"
+    ]
+  },
+  {
+    "name": "Tank Mode Activated",
+    "description": "Heroes built like brick walls",
+    "hero_ids": [
+      "centaur",
+      "tidehunter",
+      "timbersaw",
+      "bristleback",
+      "alchemist",
+      "dragon_knight",
+      "abaddon",
+      "omniknight",
+      "wraith_king",
+      "underlord"
+    ]
+  },
+  {
+    "name": "Glass Cannons",
+    "description": "Heroes that hit hard but die fast",
+    "hero_ids": [
+      "crystal_maiden",
+      "lina",
+      "zuus",
+      "invoker",
+      "pugna",
+      "silencer",
+      "outworld_devourer",
+      "drow_ranger"
+    ]
+  },
+  {
+    "name": "Zoomies",
+    "description": "Heroes that move faster than your eyes can track",
+    "hero_ids": [
+      "ember_spirit",
+      "storm_spirit",
+      "windrunner",
+      "phantom_lancer",
+      "clinkz",
+      "bounty_hunter",
+      "lycan",
+      "void_spirit"
+    ]
+  },
+  {
+    "name": "Slowpokes",
+    "description": "Heroes that move at their own pace",
+    "hero_ids": [
+      "tidehunter",
+      "wraith_king",
+      "centaur",
+      "earthshaker",
+      "sven",
+      "tiny",
+      "magnataur"
+    ]
+  },
+  {
+    "name": "Hats Off to You",
+    "description": "Heroes who prefer to go hatless",
+    "hero_ids": [
+      "juggernaut",
+      "antimage",
+      "phantom_assassin",
+      "vengefulspirit",
+      "wraith_king",
+      "sven"
+    ]
+  },
+  {
+    "name": "Glowing with Rage",
+    "description": "Heroes that literally glow when angry",
+    "hero_ids": [
+      "crystal_maiden",
+      "dazzle",
+      "keeper_of_the_light",
+      "lina",
+      "oracle",
+      "outworld_devourer",
+      "phoenix",
+      "queenofpain",
+      "zuus"
+    ]
   }
 ]
