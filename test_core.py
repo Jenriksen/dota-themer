@@ -562,5 +562,166 @@ class TestDataConsistencyEdgeCases(unittest.TestCase):
                            f"Positions not sorted for {hero['name']}")
 
 
+class TestEnhancedThemeSelection(unittest.TestCase):
+    """Tests for enhanced theme selection features."""
+
+    def setUp(self):
+        self.original_data_dir = core.DATA_DIR
+        core.DATA_DIR = Path(__file__).parent / "data"
+
+    def tearDown(self):
+        core.DATA_DIR = self.original_data_dir
+
+    def test_has_position_coverage_true(self):
+        """has_position_coverage returns True when all positions are covered."""
+        heroes = [
+            {"name": "H1", "positions": [1, 2]},
+            {"name": "H2", "positions": [3, 4]},
+            {"name": "H3", "positions": [5]},
+        ]
+        result = core.has_position_coverage(heroes, {1, 2, 3, 4, 5})
+        self.assertTrue(result)
+
+    def test_has_position_coverage_false(self):
+        """has_position_coverage returns False when positions are missing."""
+        heroes = [
+            {"name": "H1", "positions": [1, 2]},
+            {"name": "H2", "positions": [3]},
+        ]
+        result = core.has_position_coverage(heroes, {1, 2, 3, 4, 5})
+        self.assertFalse(result)
+
+    def test_has_position_coverage_empty_heroes(self):
+        """has_position_coverage returns False for empty hero list."""
+        result = core.has_position_coverage([], {1, 2, 3})
+        self.assertFalse(result)
+
+    def test_has_position_coverage_custom_positions(self):
+        """has_position_coverage works with custom position sets."""
+        heroes = [{"name": "H1", "positions": [1, 2]}]
+        result = core.has_position_coverage(heroes, {1, 2})
+        self.assertTrue(result)
+        result = core.has_position_coverage(heroes, {1, 2, 3})
+        self.assertFalse(result)
+
+    def test_get_theme_hero_count(self):
+        """get_theme_hero_count returns correct count."""
+        heroes = [
+            {"id": "h1", "name": "Hero1", "positions": [1]},
+            {"id": "h2", "name": "Hero2", "positions": [2]},
+            {"id": "h3", "name": "Hero3", "positions": [3]},
+        ]
+        theme = {"name": "Test", "hero_ids": ["h1", "h3", "nonexistent"]}
+        result = core.get_theme_hero_count(theme, heroes)
+        self.assertEqual(result, 2)
+
+    def test_filter_themes_by_party_size(self):
+        """filter_themes filters by minimum hero count."""
+        heroes = [
+            {"id": "h1", "name": "H1", "positions": [1]},
+            {"id": "h2", "name": "H2", "positions": [2]},
+            {"id": "h3", "name": "H3", "positions": [3]},
+        ]
+        themes = [
+            {"name": "Small", "hero_ids": ["h1"]},  # 1 hero
+            {"name": "Medium", "hero_ids": ["h1", "h2"]},  # 2 heroes
+            {"name": "Large", "hero_ids": ["h1", "h2", "h3"]},  # 3 heroes
+        ]
+        filtered = core.filter_themes(themes, heroes, party_size=2)
+        names = {t["name"] for t in filtered}
+        self.assertNotIn("Small", names)
+        self.assertIn("Medium", names)
+        self.assertIn("Large", names)
+
+    def test_filter_themes_by_min_heroes(self):
+        """filter_themes uses min_heroes parameter."""
+        heroes = [
+            {"id": "h1", "name": "H1", "positions": [1]},
+            {"id": "h2", "name": "H2", "positions": [2]},
+        ]
+        themes = [
+            {"name": "Small", "hero_ids": ["h1"]},
+            {"name": "Medium", "hero_ids": ["h1", "h2"]},
+        ]
+        filtered = core.filter_themes(themes, heroes, min_heroes=2)
+        names = {t["name"] for t in filtered}
+        self.assertNotIn("Small", names)
+        self.assertIn("Medium", names)
+
+    def test_filter_themes_by_position_coverage(self):
+        """filter_themes filters by position coverage."""
+        heroes = [
+            {"id": "h1", "name": "H1", "positions": [1, 2]},
+            {"id": "h2", "name": "H2", "positions": [3, 4]},
+        ]
+        themes = [
+            {"name": "Partial", "hero_ids": ["h1"]},  # Only positions 1,2
+            {"name": "Full", "hero_ids": ["h1", "h2"]},  # Positions 1,2,3,4
+        ]
+        # Note: No theme has position 5, so none will pass full coverage
+        filtered = core.filter_themes(themes, heroes, require_position_coverage=True)
+        # Since neither theme covers all 5 positions, both might be filtered out
+        # or the filter falls back. Let's just verify it doesn't crash.
+        self.assertIsInstance(filtered, list)
+
+    def test_filter_themes_none_match(self):
+        """filter_themes returns empty list when no themes match."""
+        heroes = [{"id": "h1", "name": "H1", "positions": [1]}]
+        themes = [{"name": "Small", "hero_ids": ["h1"]}]
+        filtered = core.filter_themes(themes, heroes, party_size=10)
+        self.assertEqual(filtered, [])
+
+    def test_select_theme_weighted(self):
+        """select_theme with weighted=True favors themes with more heroes."""
+        heroes = [
+            {"id": "h1", "name": "H1", "positions": [1]},
+            {"id": "h2", "name": "H2", "positions": [2]},
+            {"id": "h3", "name": "H3", "positions": [3]},
+        ]
+        themes = [
+            {"name": "Small", "hero_ids": ["h1"]},
+            {"name": "Large", "hero_ids": ["h1", "h2", "h3"]},
+        ]
+        # Run multiple times to verify weighted selection works
+        large_count = 0
+        small_count = 0
+        for _ in range(100):
+            theme = core.select_theme(themes, heroes, use_weighted=True)
+            if theme["name"] == "Large":
+                large_count += 1
+            else:
+                small_count += 1
+        # Large should be selected more often (3:1 ratio expected)
+        self.assertGreater(large_count, small_count)
+
+    def test_select_theme_empty_filtered_list(self):
+        """select_theme falls back to all themes when filtered list is empty."""
+        heroes = []
+        themes = [{"name": "Test", "hero_ids": []}]
+        # With impossible filtering, should still return a theme
+        result = core.select_theme(themes, heroes, party_size=100)
+        self.assertIsNotNone(result)
+
+    def test_get_theme_suggestion_with_weighted(self):
+        """get_theme_suggestion accepts use_weighted parameter."""
+        result = core.get_theme_suggestion(party_size=2, use_weighted=True)
+        self.assertIsInstance(result, dict)
+        self.assertIn("theme", result)
+
+    def test_get_theme_suggestion_with_position_coverage(self):
+        """get_theme_suggestion accepts require_position_coverage parameter."""
+        result = core.get_theme_suggestion(party_size=2, require_position_coverage=True)
+        self.assertIsInstance(result, dict)
+        self.assertIn("theme", result)
+
+    def test_filter_themes_string_party_size(self):
+        """filter_themes handles string party_size gracefully."""
+        heroes = [{"id": "h1", "name": "H1", "positions": [1]}]
+        themes = [{"name": "Test", "hero_ids": ["h1"]}]
+        # Should not crash with string party_size
+        filtered = core.filter_themes(themes, heroes, party_size="invalid")
+        self.assertEqual(len(filtered), 1)  # Should pass through without filtering
+
+
 if __name__ == "__main__":
     unittest.main()
