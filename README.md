@@ -12,6 +12,7 @@ See [CONTEXT.md](CONTEXT.md) for the full domain model, glossary, and resolved d
 - **Hero Filtering**: Lists all heroes that match the selected theme
 - **Position Information**: Shows each hero's viable positions in parentheses
 - **Party Size Support**: Accepts party size input (1-5 players) for future lane-based features
+- **Discord Bot**: `!theme [party_size]` command for Discord integration
 
 ## Data Structure
 
@@ -48,6 +49,23 @@ Heroes: Chaos Knight (1,3), Dragon Knight (1,3), Keeper of the Light (4,5), Snap
 (5 heroes match this theme)
 ```
 
+### Discord Bot
+```bash
+# Install dependencies
+uv pip install discord.py
+
+# Set your Discord token
+export DISCORD_TOKEN='your-bot-token-here'
+
+# Run the bot
+python bot.py
+```
+
+**Discord Commands:**
+- `!theme` or `!theme 3` - Get a theme suggestion (party size optional, default: 2)
+- `!tr 3` - Short alias for `!theme 3`
+- `!helptheme` - Show help information
+
 ## Lane-Position Mapping
 
 Based on your requirements:
@@ -66,7 +84,7 @@ Party configurations prefer pairs:
 - [ ] Filter themes by minimum hero count for party size
 - [ ] Validate themes have good position coverage
 - [ ] Weighted random theme selection
-- [ ] Discord bot integration
+- [x] Discord bot integration
 - [ ] Position-based hero suggestions for balanced teams
 - [ ] Custom theme creation
 - [ ] Hero data curation from Liquipedia
@@ -78,15 +96,27 @@ dota-themer/
 ├── CONTEXT.md          # Domain model and design decisions
 ├── README.md           # This file
 ├── core.py             # Core logic
+├── bot.py              # Discord bot
+├── test_core.py        # Core unit tests (57 tests)
+├── test_bot.py         # Bot unit tests (15 tests)
+├── .gitignore          # Git ignore rules
 └── data/
-    ├── heroes.json      # Hero definitions
-    └── themes.json      # Theme definitions
+    ├── heroes.json      # Hero definitions (46 heroes)
+    └── themes.json      # Theme definitions (8 themes)
 ```
 
 ## Testing
 
-Run the core script with different party sizes to verify:
+### Running Tests
 ```bash
+# Run all tests
+python -m unittest discover
+
+# Run specific test files
+python -m unittest test_core
+python -m unittest test_bot
+
+# Test core CLI functionality
 python core.py 1
 python core.py 2
 python core.py 3
@@ -95,3 +125,10 @@ python core.py 5
 ```
 
 Each run should output a random theme with its matching heroes and their positions.
+
+### Test Coverage
+- **72 total tests** covering:
+  - Core functionality (data loading, theme selection, hero filtering)
+  - Edge cases (empty inputs, invalid data, boundaries)
+  - Error handling (file errors, invalid inputs)
+  - Discord bot structure and commands

@@ -1,6 +1,6 @@
 # Dota Themer - Next Steps
 
-## Completed Today ✅
+## Completed ✅
 
 ### Domain Modeling (grill-with-docs)
 - [x] Conducted 4 rounds of grilling to resolve domain questions
@@ -20,40 +20,49 @@
 - [x] Tested with all party sizes (1-5)
 - [x] Output matches required format: `HeroName (pos1,pos2)`
 
+### Testing
+- [x] Created `test_core.py` with 57 unit tests
+- [x] Created `test_bot.py` with 15 unit tests
+- [x] Fixed data inconsistency (clockwerk -> rattletrap)
+- [x] Added .gitignore for Python artifacts
+
+### Discord Bot Integration
+- [x] Created `bot.py` using discord.py
+- [x] Implemented `!theme [party_size]` command
+- [x] Wrapped `get_theme_suggestion()` from core.py
+- [x] Added error handling for invalid inputs
+- [x] Added `!tr` alias and `!helptheme` command
+- [ ] Configure Discord bot token (user action required)
+- [ ] Deploy to Discord server (user action required)
+
 ### Documentation
 - [x] Created CONTEXT.md (domain model)
 - [x] Created README.md (usage, structure, examples)
+- [x] Updated README.md with Discord bot info
+- [x] Updated TODOs.md with progress
 
 ---
 
 ## Next Steps (Priority Order)
 
-### 1. Discord Bot Integration (High Priority)
-- [ ] Create `bot.py` using discord.py
-- [ ] Implement `!theme [party_size]` command
-- [ ] Wrap `get_theme_suggestion()` from core.py
-- [ ] Add error handling for invalid inputs
-- [ ] Configure Discord bot token
-- [ ] Deploy to Discord server
-
-### 2. Enhanced Theme Selection (Medium Priority)
+### 1. Enhanced Theme Selection (High Priority)
 - [ ] Filter themes to ensure minimum hero count for party size
 - [ ] Add weighted random selection (favor themes with more heroes)
 - [ ] Validate themes have good position coverage
 - [ ] Option: let users request new theme if unhappy with selection
 
-### 3. Position-Based Features (Medium Priority)
+### 2. Position-Based Features (Medium Priority)
 - [ ] Implement lane-based hero grouping in output
 - [ ] Suggest balanced compositions (e.g., for party of 3: 2 safelane + 1 mid)
 - [ ] Add position validation for party configurations
 
-### 4. Data Improvements (Low Priority)
+### 3. Data Improvements (Medium Priority)
 - [ ] Manually curate hero positions from Liquipedia
-- [ ] Expand hero database to all Dota 2 heroes (currently ~46)
+- [ ] Expand hero database to all Dota 2 heroes (currently 46)
 - [ ] Add more themes (current: 8)
 - [ ] Add visual attributes to heroes for better theme matching
 
-### 5. Advanced Features (Backlog)
+### 4. Advanced Features (Backlog)
 - [ ] Custom theme creation via Discord commands
 - [ ] Theme categories (visual, lore, mechanical)
 - [ ] Winrate-based position recommendations
@@ -63,24 +72,31 @@
 
 ---
 
-## Quick Start for Tomorrow
+## Quick Start
 
-To continue where we left off:
+To run the bot locally:
 
 ```bash
-# Test current core functionality
-python core.py 3
-
-# To start Discord bot development:
+# Install dependencies
 uv pip install discord.py
-```
 
-Then create `bot.py` with basic structure.
+# Set your Discord token
+export DISCORD_TOKEN='your-bot-token-here'
+
+# Run the bot
+python bot.py
+
+# Or test the core functionality
+python core.py 3
+```
 
 ---
 
 ## Files to Review
 - `CONTEXT.md` - Domain model (complete)
 - `core.py` - Core logic (complete, tested)
-- `data/heroes.json` - Hero data (MVP complete)
-- `data/themes.json` - Theme data (MVP complete)
+- `bot.py` - Discord bot (complete, needs token)
+- `test_core.py` - Core unit tests (57 tests)
+- `test_bot.py` - Bot unit tests (15 tests)
+- `data/heroes.json` - Hero data (MVP complete, 46 heroes)
+- `data/themes.json` - Theme data (MVP complete, 8 themes)
