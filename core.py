@@ -9,6 +9,11 @@ import sys
 from pathlib import Path
 from itertools import combinations
 
+import logging_config
+
+# Get logger for this module
+logger = logging_config.get_logger(logging_config.LOGGER_CORE)
+
 # Load data files
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -28,13 +33,33 @@ LANE_NAMES = {
 
 def load_heroes():
     """Load heroes from JSON file."""
-    with open(DATA_DIR / "heroes.json", "r") as f:
-        return json.load(f)
+    logger.debug("Loading heroes from heroes.json")
+    try:
+        with open(DATA_DIR / "heroes.json", "r") as f:
+            heroes = json.load(f)
+        logger.info(f"Loaded {len(heroes)} heroes")
+        return heroes
+    except FileNotFoundError as e:
+        logger.error(f"Heroes file not found: {e}")
+        raise
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in heroes file: {e}")
+        raise
 
 def load_themes():
     """Load themes from JSON file."""
-    with open(DATA_DIR / "themes.json", "r") as f:
-        return json.load(f)
+    logger.debug("Loading themes from themes.json")
+    try:
+        with open(DATA_DIR / "themes.json", "r") as f:
+            themes = json.load(f)
+        logger.info(f"Loaded {len(themes)} themes")
+        return themes
+    except FileNotFoundError as e:
+        logger.error(f"Themes file not found: {e}")
+        raise
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in themes file: {e}")
+        raise
 
 def get_heroes_by_ids(hero_ids, all_heroes):
     """Get hero objects for a list of hero IDs."""
@@ -129,6 +154,11 @@ def select_theme(themes, heroes, party_size=None, use_weighted=False, require_po
     Raises:
         ValueError: If no themes match the criteria
     """
+    logger.debug(f"Filtering {len(themes)} themes", extra={
+        "party_size": party_size,
+        "require_position_coverage": require_position_coverage
+    })
+    
     # Filter themes first
     filtered_themes = filter_themes(
         themes, 
@@ -138,13 +168,18 @@ def select_theme(themes, heroes, party_size=None, use_weighted=False, require_po
     )
     
     if not filtered_themes:
+        logger.warning("No themes matched filter criteria, falling back to all themes")
         # Fall back to all themes if filtering removed everything
         filtered_themes = themes
+    
+    logger.debug(f"Selecting from {len(filtered_themes)} filtered themes")
     
     if use_weighted:
         # Weighted selection: themes with more heroes have higher probability
         weights = [get_theme_hero_count(t, heroes) for t in filtered_themes]
-        return random.choices(filtered_themes, weights=weights, k=1)[0]
+        selected = random.choices(filtered_themes, weights=weights, k=1)[0]
+        logger.debug(f"Weighted selection chose theme with {get_theme_hero_count(selected, heroes)} heroes")
+        return selected
     else:
         return random.choice(filtered_themes)
 
@@ -385,6 +420,11 @@ def get_theme_suggestion(party_size=2, use_weighted=False, require_position_cove
     Returns:
         dict: {"theme": theme_name, "description": theme_desc, "heroes": formatted_hero_list, "hero_count": int}
     """
+    logger.info(f"Generating theme suggestion for party size {party_size}", extra={
+        "use_weighted": use_weighted,
+        "require_position_coverage": require_position_coverage
+    })
+    
     heroes = load_heroes()
     themes = load_themes()
     
@@ -397,11 +437,15 @@ def get_theme_suggestion(party_size=2, use_weighted=False, require_position_cove
         require_position_coverage=require_position_coverage
     )
     
+    logger.debug(f"Selected theme: {theme['name']}")
+    
     # Get matching heroes
     matching_heroes = get_heroes_by_ids(theme["hero_ids"], heroes)
     
     # Sort heroes by name for consistent output
     matching_heroes.sort(key=lambda h: h["name"])
+    
+    logger.info(f"Found {len(matching_heroes)} matching heroes for theme '{theme['name']}'")
     
     return {
         "theme": theme["name"],

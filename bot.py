@@ -8,6 +8,10 @@ import os
 from discord.ext import commands
 
 import core
+import logging_config
+
+# Get logger for this module
+logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 
 # Configure bot
 intents = discord.Intents.default()
@@ -19,6 +23,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     """Called when the bot connects to Discord."""
+    logger.info(f"Discord bot logged in as {bot.user.name} (ID: {bot.user.id})")
     print(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
     print("------")
 
@@ -79,6 +84,11 @@ async def help_theme_command(ctx):
 @theme_command.error
 async def theme_error_handler(ctx, error):
     """Handle errors in theme command."""
+    logger.error(f"Error in theme command from {ctx.author}: {error}", extra={
+        "error_type": type(error).__name__,
+        "user_id": ctx.author.id
+    })
+    
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Usage: `!theme [party_size]` - Party size is optional (default: 2)")
     elif isinstance(error, commands.BadArgument):
@@ -88,13 +98,20 @@ async def theme_error_handler(ctx, error):
 
 
 if __name__ == "__main__":
+    # Setup logging from environment
+    logging_config.setup_logging_from_env()
+    
+    logger.info("Starting Dota Themer Discord bot")
+    
     # Load token from environment variable
     token = os.getenv("DISCORD_TOKEN")
     
     if not token:
+        logger.error("DISCORD_TOKEN environment variable not set")
         print("Error: DISCORD_TOKEN environment variable not set.")
         print("Set it with: export DISCORD_TOKEN='your-token-here'")
         exit(1)
     
+    logger.info("Discord token loaded, starting bot")
     print("Starting Dota Themer bot...")
     bot.run(token)
