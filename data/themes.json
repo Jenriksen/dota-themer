@@ -1,24 +1,56 @@
 [
   {
-    "name": "Rides a Steed",
-    "description": "Heroes that ride mounts or animals into battle",
+    "name": "Agility Heroes",
+    "description": "Heroes with Agility as primary attribute",
     "hero_ids": [
-      "keeper_of_the_light",
-      "snapfire",
-      "spirit_breaker",
-      "chaos_knight",
-      "dragon_knight"
+      "antimage",
+      "arc_warden",
+      "bloodseeker",
+      "bounty_hunter",
+      "broodmother",
+      "clinkz",
+      "drow_ranger",
+      "ember_spirit",
+      "gyrocopter",
+      "hoodwink",
+      "juggernaut",
+      "luna",
+      "medusa",
+      "meepo",
+      "mirana",
+      "monkey_king",
+      "morphling",
+      "naga_siren",
+      "nyx_assassin",
+      "phantom_assassin",
+      "phantom_lancer",
+      "razor",
+      "stealth_assassin",
+      "nevermore",
+      "slark",
+      "sniper",
+      "spectre",
+      "storm_spirit",
+      "templar_assassin",
+      "terrorblade",
+      "troll_warlord",
+      "venomancer",
+      "viper",
+      "weaver",
+      "windrunner"
     ]
   },
   {
-    "name": "Blue Heroes",
-    "description": "Heroes with predominantly blue color schemes",
+    "name": "Animal Companions",
+    "description": "Heroes that have animal companions or summons",
     "hero_ids": [
-      "zuus",
-      "crystal_maiden",
-      "morphling",
-      "keeper_of_the_light",
-      "snapfire"
+      "beastmaster",
+      "chen",
+      "enchantress",
+      "furion",
+      "lone_druid",
+      "lycan",
+      "meepo"
     ]
   },
   {
@@ -36,26 +68,256 @@
     ]
   },
   {
-    "name": "Visible Teeth",
-    "description": "Heroes that show their teeth prominently",
+    "name": "Black Heroes",
+    "description": "Heroes with predominantly black or dark color schemes",
     "hero_ids": [
-      "bloodseeker",
-      "legion_commander",
-      "phantom_assassin",
-      "phantom_lancer",
-      "razor",
-      "slardar",
-      "tidehunter"
+      "abaddon",
+      "antimage",
+      "doombringer",
+      "nevermore",
+      "night_stalker",
+      "spectre",
+      "terrorblade"
     ]
   },
   {
-    "name": "Poor Eyesight",
-    "description": "Heroes wearing glasses or with vision-related lore",
+    "name": "Blue Heroes",
+    "description": "Heroes with predominantly blue color schemes",
     "hero_ids": [
+      "zuus",
+      "crystal_maiden",
+      "morphling",
+      "keeper_of_the_light",
+      "snapfire"
+    ]
+  },
+  {
+    "name": "Demonic Heroes",
+    "description": "Heroes with demonic or infernal themes",
+    "hero_ids": [
+      "abaddon",
+      "doombringer",
+      "leshrac",
+      "life_stealer",
+      "nevermore",
+      "pugna",
+      "queenofpain",
+      "shadow_demon",
+      "terrorblade",
+      "warlock"
+    ]
+  },
+  {
+    "name": "Dwarven Heroes",
+    "description": "Heroes with dwarven or stout appearance",
+    "hero_ids": [
+      "bounty_hunter",
+      "brewmaster",
+      "rattletrap",
+      "ogre_magi",
+      "sniper",
+      "tinker"
+    ]
+  },
+  {
+    "name": "Elven Heroes",
+    "description": "Heroes with elven appearance",
+    "hero_ids": [
+      "drow_ranger",
+      "luna",
+      "mirana",
+      "templar_assassin",
+      "windrunner"
+    ]
+  },
+  {
+    "name": "Giant Heroes",
+    "description": "Large or giant heroes",
+    "hero_ids": [
+      "centaur",
+      "earthshaker",
+      "magnataur",
+      "meepo",
+      "sven",
+      "tiny",
+      "tidehunter",
+      "wraith_king"
+    ]
+  },
+  {
+    "name": "Glowing Heroes",
+    "description": "Heroes with glowing or magical auras",
+    "hero_ids": [
+      "crystal_maiden",
       "dazzle",
       "keeper_of_the_light",
-      "zuus",
-      "lina"
+      "lina",
+      "oracle",
+      "outworld_devourer",
+      "phoenix",
+      "queenofpain",
+      "zuus"
+    ]
+  },
+  {
+    "name": "Green Heroes",
+    "description": "Heroes with predominantly green color schemes",
+    "hero_ids": [
+      "clinkz",
+      "furion",
+      "invoker",
+      "leshrac",
+      "lycan",
+      "naga_siren",
+      "treant",
+      "venomancer"
+    ]
+  },
+  {
+    "name": "Hooded Heroes",
+    "description": "Heroes that wear hoods or cloaks",
+    "hero_ids": [
+      "clinkz",
+      "drow_ranger",
+      "grimstroke",
+      "hoodwink",
+      "lina",
+      "medusa",
+      "mirana",
+      "phantom_assassin",
+      "puck",
+      "rubick",
+      "nevermore",
+      "silencer"
+    ]
+  },
+  {
+    "name": "Horns",
+    "description": "Heroes with visible horns",
+    "hero_ids": [
+      "alchemist",
+      "beastmaster",
+      "chaos_knight",
+      "doombringer",
+      "earthshaker",
+      "kunkka",
+      "legion_commander",
+      "life_stealer",
+      "ogre_magi",
+      "shadow_demon",
+      "slardar",
+      "tidehunter",
+      "underlord",
+      "wraith_king"
+    ]
+  },
+  {
+    "name": "Intelligence Heroes",
+    "description": "Heroes with Intelligence as primary attribute",
+    "hero_ids": [
+      "ancient_apparition",
+      "bane",
+      "chen",
+      "crystal_maiden",
+      "dark_seer",
+      "dark_willow",
+      "dazzle",
+      "death_prophet",
+      "disruptor",
+      "enchantress",
+      "grimstroke",
+      "invoker",
+      "jakiro",
+      "keeper_of_the_light",
+      "lichen",
+      "lina",
+      "lion",
+      "muerta",
+      "necrolyte",
+      "ogre_magi",
+      "oracle",
+      "outworld_devourer",
+      "pugna",
+      "queenofpain",
+      "rubick",
+      "shadow_shaman",
+      "silencer",
+      "skywrath_mage",
+      "techies",
+      "tinker",
+      "visage",
+      "warlock",
+      "winter_wyvern",
+      "witch_doctor",
+      "zuus"
+    ]
+  },
+  {
+    "name": "Masked Heroes",
+    "description": "Heroes that wear masks",
+    "hero_ids": [
+      "bounty_hunter",
+      "clinkz",
+      "rattletrap",
+      "dark_seer",
+      "grimstroke",
+      "hoodwink",
+      "invoker",
+      "juggernaut",
+      "monkey_king",
+      "morphling",
+      "night_stalker",
+      "outworld_devourer",
+      "pudge",
+      "snapfire"
+    ]
+  },
+  {
+    "name": "Melee Heroes",
+    "description": "Heroes with melee attacks",
+    "hero_ids": [
+      "abaddon",
+      "alchemist",
+      "axe",
+      "beastmaster",
+      "bloodseeker",
+      "bristleback",
+      "centaur",
+      "chaos_knight",
+      "rattletrap",
+      "dawnbreaker",
+      "doombringer",
+      "dragon_knight",
+      "earthshaker",
+      "elder_titan",
+      "huskar",
+      "juggernaut",
+      "kunkka",
+      "legion_commander",
+      "life_stealer",
+      "lone_druid",
+      "magnataur",
+      "mars",
+      "night_stalker",
+      "nyx_assassin",
+      "omniknight",
+      "pudge",
+      "sand_king",
+      "timbersaw",
+      "slardar",
+      "snapfire",
+      "spirit_breaker",
+      "storm_spirit",
+      "sven",
+      "tidehunter",
+      "tiny",
+      "treant",
+      "troll_warlord",
+      "tusk",
+      "underlord",
+      "undying",
+      "ursa",
+      "wraith_king"
     ]
   },
   {
@@ -82,6 +344,28 @@
     ]
   },
   {
+    "name": "Poor Eyesight",
+    "description": "Heroes wearing glasses or with vision-related lore",
+    "hero_ids": [
+      "dazzle",
+      "keeper_of_the_light",
+      "zuus",
+      "lina"
+    ]
+  },
+  {
+    "name": "Purple Heroes",
+    "description": "Heroes with predominantly purple color schemes",
+    "hero_ids": [
+      "death_prophet",
+      "disruptor",
+      "pugna",
+      "shadow_demon",
+      "silencer",
+      "void_spirit"
+    ]
+  },
+  {
     "name": "Ranged Agility",
     "description": "Heroes that are ranged and have agility as primary attribute",
     "hero_ids": [
@@ -96,6 +380,116 @@
       "sniper",
       "viper",
       "windrunner"
+    ]
+  },
+  {
+    "name": "Ranged Heroes",
+    "description": "Heroes with ranged attacks",
+    "hero_ids": [
+      "ancient_apparition",
+      "bane",
+      "broodmother",
+      "clinkz",
+      "crystal_maiden",
+      "dazzle",
+      "death_prophet",
+      "drow_ranger",
+      "ember_spirit",
+      "enchantress",
+      "gyrocopter",
+      "jakiro",
+      "keeper_of_the_light",
+      "lina",
+      "lion",
+      "luna",
+      "medusa",
+      "meepo",
+      "mirana",
+      "morphling",
+      "naga_siren",
+      "pugna",
+      "queenofpain",
+      "razor",
+      "nevermore",
+      "silencer",
+      "skywrath_mage",
+      "sniper",
+      "spectre",
+      "storm_spirit",
+      "templar_assassin",
+      "terrorblade",
+      "vengefulspirit",
+      "venomancer",
+      "viper",
+      "warlock",
+      "weaver",
+      "windrunner",
+      "witch_doctor",
+      "zuus"
+    ]
+  },
+  {
+    "name": "Red Heroes",
+    "description": "Heroes with predominantly red color schemes",
+    "hero_ids": [
+      "bloodseeker",
+      "juggernaut",
+      "life_stealer",
+      "phoenix",
+      "queenofpain",
+      "nevermore",
+      "vengefulspirit"
+    ]
+  },
+  {
+    "name": "Rides a Steed",
+    "description": "Heroes that ride mounts or animals into battle",
+    "hero_ids": [
+      "keeper_of_the_light",
+      "snapfire",
+      "spirit_breaker",
+      "chaos_knight",
+      "dragon_knight"
+    ]
+  },
+  {
+    "name": "Strength Heroes",
+    "description": "Heroes with Strength as primary attribute",
+    "hero_ids": [
+      "abaddon",
+      "alchemist",
+      "axe",
+      "beastmaster",
+      "bristleback",
+      "centaur",
+      "chaos_knight",
+      "rattletrap",
+      "dawnbreaker",
+      "doombringer",
+      "dragon_knight",
+      "earthshaker",
+      "huskar",
+      "kunkka",
+      "legion_commander",
+      "life_stealer",
+      "magnataur",
+      "night_stalker",
+      "omniknight",
+      "pudge",
+      "sand_king",
+      "timbersaw",
+      "slardar",
+      "spirit_breaker",
+      "sven",
+      "tidehunter",
+      "tiny",
+      "treant",
+      "troll_warlord",
+      "tusk",
+      "underlord",
+      "undying",
+      "ursa",
+      "wraith_king"
     ]
   },
   {
@@ -118,6 +512,84 @@
       "warlock",
       "windrunner",
       "zuus"
+    ]
+  },
+  {
+    "name": "Tails",
+    "description": "Heroes with tails",
+    "hero_ids": [
+      "broodmother",
+      "clinkz",
+      "dark_seer",
+      "dragon_knight",
+      "gyrocopter",
+      "jakiro",
+      "kunkka",
+      "lone_druid",
+      "lycan",
+      "naga_siren",
+      "queenofpain",
+      "stealth_assassin",
+      "shadow_demon",
+      "slark",
+      "tidehunter"
+    ]
+  },
+  {
+    "name": "Undead Heroes",
+    "description": "Undead or skeletal heroes",
+    "hero_ids": [
+      "abaddon",
+      "clinkz",
+      "death_prophet",
+      "drow_ranger",
+      "lichen",
+      "necrolyte",
+      "pugna",
+      "wraith_king",
+      "undying",
+      "vengefulspirit"
+    ]
+  },
+  {
+    "name": "Visible Teeth",
+    "description": "Heroes that show their teeth prominently",
+    "hero_ids": [
+      "bloodseeker",
+      "legion_commander",
+      "phantom_assassin",
+      "phantom_lancer",
+      "razor",
+      "slardar",
+      "tidehunter"
+    ]
+  },
+  {
+    "name": "White Heroes",
+    "description": "Heroes with predominantly white or light color schemes",
+    "hero_ids": [
+      "ancient_apparition",
+      "crystal_maiden",
+      "dazzle",
+      "keeper_of_the_light",
+      "omniknight",
+      "oracle"
+    ]
+  },
+  {
+    "name": "Wings",
+    "description": "Heroes with wings",
+    "hero_ids": [
+      "ancient_apparition",
+      "drow_ranger",
+      "gyrocopter",
+      "medusa",
+      "morphling",
+      "phoenix",
+      "queenofpain",
+      "skywrath_mage",
+      "vengefulspirit",
+      "windrunner"
     ]
   }
 ]
