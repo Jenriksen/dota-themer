@@ -1,0 +1,366 @@
+[
+  {
+    "id": "npc_dota_hero_antimage",
+    "name": "Anti-Mage",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_axe",
+    "name": "Axe",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_bane",
+    "name": "Bane",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_bloodseeker",
+    "name": "Bloodseeker",
+    "primary_role": "Carry",
+    "positions": [1, 3],
+    "positions_display": "1,3"
+  },
+  {
+    "id": "npc_dota_hero_bristleback",
+    "name": "Bristleback",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_centaur",
+    "name": "Centaur Warrunner",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_chaos_knight",
+    "name": "Chaos Knight",
+    "primary_role": "Carry",
+    "positions": [1, 3],
+    "positions_display": "1,3"
+  },
+  {
+    "id": "npc_dota_hero_rattletrap",
+    "name": "Clockwerk",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_crystal_maiden",
+    "name": "Crystal Maiden",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_dark_seer",
+    "name": "Dark Seer",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_dazzle",
+    "name": "Dazzle",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_death_prophet",
+    "name": "Death Prophet",
+    "primary_role": "Pusher",
+    "positions": [2, 3],
+    "positions_display": "2,3"
+  },
+  {
+    "id": "npc_dota_hero_disruptor",
+    "name": "Disruptor",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_doombringer",
+    "name": "Doom Bringer",
+    "primary_role": "Carry",
+    "positions": [1, 2, 3],
+    "positions_display": "1,2,3"
+  },
+  {
+    "id": "npc_dota_hero_dragon_knight",
+    "name": "Dragon Knight",
+    "primary_role": "Carry",
+    "positions": [1, 3],
+    "positions_display": "1,3"
+  },
+  {
+    "id": "npc_dota_hero_drow_ranger",
+    "name": "Drow Ranger",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_earthshaker",
+    "name": "Earthshaker",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_juggernaut",
+    "name": "Juggernaut",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_keeper_of_the_light",
+    "name": "Keeper of the Light",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_kunkka",
+    "name": "Kunkka",
+    "primary_role": "Initiator",
+    "positions": [1, 3],
+    "positions_display": "1,3"
+  },
+  {
+    "id": "npc_dota_hero_legion_commander",
+    "name": "Legion Commander",
+    "primary_role": "Carry",
+    "positions": [1, 3],
+    "positions_display": "1,3"
+  },
+  {
+    "id": "npc_dota_hero_lichen",
+    "name": "Lich",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_life_stealer",
+    "name": "Lifestealer",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_lina",
+    "name": "Lina",
+    "primary_role": "Support",
+    "positions": [2, 4],
+    "positions_display": "2,4"
+  },
+  {
+    "id": "npc_dota_hero_lion",
+    "name": "Lion",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_luna",
+    "name": "Luna",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_mirana",
+    "name": "Mirana",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_morphling",
+    "name": "Morphling",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_nevermore",
+    "name": "Shadow Fiend",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_phantom_assassin",
+    "name": "Phantom Assassin",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_phantom_lancer",
+    "name": "Phantom Lancer",
+    "primary_role": "Carry",
+    "positions": [1, 3],
+    "positions_display": "1,3"
+  },
+  {
+    "id": "npc_dota_hero_puck",
+    "name": "Puck",
+    "primary_role": "Initiator",
+    "positions": [2, 3],
+    "positions_display": "2,3"
+  },
+  {
+    "id": "npc_dota_hero_pudge",
+    "name": "Pudge",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_razor",
+    "name": "Razor",
+    "primary_role": "Carry",
+    "positions": [1, 2, 3],
+    "positions_display": "1,2,3"
+  },
+  {
+    "id": "npc_dota_hero_sand_king",
+    "name": "Sand King",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_slardar",
+    "name": "Slardar",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_snapfire",
+    "name": "Snapfire",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_sniper",
+    "name": "Sniper",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_spirit_breaker",
+    "name": "Spirit Breaker",
+    "primary_role": "Initiator",
+    "positions": [1, 4],
+    "positions_display": "1,4"
+  },
+  {
+    "id": "npc_dota_hero_stealth_assassin",
+    "name": "Riki",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_storm_spirit",
+    "name": "Storm Spirit",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_sven",
+    "name": "Sven",
+    "primary_role": "Carry",
+    "positions": [1, 2, 3],
+    "positions_display": "1,2,3"
+  },
+  {
+    "id": "npc_dota_hero_tidehunter",
+    "name": "Tidehunter",
+    "primary_role": "Initiator",
+    "positions": [3, 4],
+    "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_shadow_shaman",
+    "name": "Shadow Shaman",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_timbersaw",
+    "name": "Timbersaw",
+    "primary_role": "Initiator",
+    "positions": [2, 3],
+    "positions_display": "2,3"
+  },
+  {
+    "id": "npc_dota_hero_tinker",
+    "name": "Tinker",
+    "primary_role": "Carry",
+    "positions": [1, 2],
+    "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_tiny",
+    "name": "Tiny",
+    "primary_role": "Initiator",
+    "positions": [1, 2, 3],
+    "positions_display": "1,2,3"
+  },
+  {
+    "id": "npc_dota_hero_vengefulspirit",
+    "name": "Vengeful Spirit",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_viper",
+    "name": "Viper",
+    "primary_role": "Carry",
+    "positions": [1, 2, 3],
+    "positions_display": "1,2,3"
+  },
+  {
+    "id": "npc_dota_hero_warlock",
+    "name": "Warlock",
+    "primary_role": "Support",
+    "positions": [4, 5],
+    "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_windrunner",
+    "name": "Windranger",
+    "primary_role": "Support",
+    "positions": [1, 2, 4],
+    "positions_display": "1,2,4"
+  },
+  {
+    "id": "npc_dota_hero_zuus",
+    "name": "Zeus",
+    "primary_role": "Support",
+    "positions": [2, 4],
+    "positions_display": "2,4"
+  }
+]
