@@ -3,8 +3,9 @@ Dota Themer - Discord Bot
 Provides theme suggestions via Discord commands.
 """
 
-import discord
 import os
+
+import discord
 from discord.ext import commands
 
 import core
@@ -32,11 +33,11 @@ async def on_ready():
 async def theme_command(ctx, party_size: int = 2):
     """
     Get a theme suggestion.
-    
+
     Usage:
     !theme - Default party size of 2
     !theme 3 - For a party of 3 players
-    
+
     Args:
         party_size: Number of players (1-5)
     """
@@ -45,18 +46,22 @@ async def theme_command(ctx, party_size: int = 2):
         return
 
     suggestion = core.get_theme_suggestion(party_size)
-    
+
     # Format the response
     response = f"**Theme:** {suggestion['theme']}"
     if suggestion["description"]:
         response += f"\n**Description:** {suggestion['description']}"
     response += f"\n**Heroes:** {suggestion['heroes']}"
     response += f"\n*({suggestion['hero_count']} heroes match this theme)*"
-    
+
     await ctx.send(response)
 
 
-@bot.command(name="themeroll", aliases=["tr"], help="Get a new theme suggestion (alias for !theme)")
+@bot.command(
+    name="themeroll",
+    aliases=["tr"],
+    help="Get a new theme suggestion (alias for !theme)",
+)
 async def themeroll_command(ctx, party_size: int = 2):
     """Alias for !theme command."""
     await theme_command.callback(ctx, party_size=party_size)
@@ -84,13 +89,15 @@ async def help_theme_command(ctx):
 @theme_command.error
 async def theme_error_handler(ctx, error):
     """Handle errors in theme command."""
-    logger.error(f"Error in theme command from {ctx.author}: {error}", extra={
-        "error_type": type(error).__name__,
-        "user_id": ctx.author.id
-    })
-    
+    logger.error(
+        f"Error in theme command from {ctx.author}: {error}",
+        extra={"error_type": type(error).__name__, "user_id": ctx.author.id},
+    )
+
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("Usage: `!theme [party_size]` - Party size is optional (default: 2)")
+        await ctx.send(
+            "Usage: `!theme [party_size]` - Party size is optional (default: 2)"
+        )
     elif isinstance(error, commands.BadArgument):
         await ctx.send("Party size must be a number between 1 and 5.")
     else:
@@ -100,18 +107,18 @@ async def theme_error_handler(ctx, error):
 if __name__ == "__main__":
     # Setup logging from environment
     logging_config.setup_logging_from_env()
-    
+
     logger.info("Starting Dota Themer Discord bot")
-    
+
     # Load token from environment variable
     token = os.getenv("DISCORD_TOKEN")
-    
+
     if not token:
         logger.error("DISCORD_TOKEN environment variable not set")
         print("Error: DISCORD_TOKEN environment variable not set.")
         print("Set it with: export DISCORD_TOKEN='your-token-here'")
         exit(1)
-    
+
     logger.info("Discord token loaded, starting bot")
     print("Starting Dota Themer bot...")
     bot.run(token)

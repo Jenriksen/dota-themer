@@ -3,12 +3,12 @@ Unit tests for Dota Themer core functionality.
 Ensures functionality survives through refactorings.
 """
 
-import unittest
 import json
 import sys
+import unittest
 from io import StringIO
 from pathlib import Path
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
 import core
 
@@ -68,14 +68,17 @@ class TestGetHeroesByIds(unittest.TestCase):
         self.heroes = [
             {"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]},
             {"id": "npc_dota_hero_bane", "name": "Bane", "positions": [4, 5]},
-            {"id": "npc_dota_hero_chaos_knight", "name": "Chaos Knight", "positions": [1, 3]},
+            {
+                "id": "npc_dota_hero_chaos_knight",
+                "name": "Chaos Knight",
+                "positions": [1, 3],
+            },
         ]
 
     def test_returns_matching_heroes(self):
         """Returns heroes whose IDs match the input list."""
         result = core.get_heroes_by_ids(
-            ["npc_dota_hero_axe", "npc_dota_hero_chaos_knight"],
-            self.heroes
+            ["npc_dota_hero_axe", "npc_dota_hero_chaos_knight"], self.heroes
         )
         self.assertEqual(len(result), 2)
         names = {h["name"] for h in result}
@@ -84,8 +87,7 @@ class TestGetHeroesByIds(unittest.TestCase):
     def test_ignores_non_existent_ids(self):
         """Non-existent hero IDs are silently ignored."""
         result = core.get_heroes_by_ids(
-            ["npc_dota_hero_axe", "npc_dota_hero_nonexistent"],
-            self.heroes
+            ["npc_dota_hero_axe", "npc_dota_hero_nonexistent"], self.heroes
         )
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["name"], "Axe")
@@ -294,8 +296,9 @@ class TestDataIntegrity(unittest.TestCase):
         for theme in themes:
             for hero_id in theme["hero_ids"]:
                 self.assertIn(
-                    hero_id, hero_ids,
-                    f"Theme '{theme['name']}' references non-existent hero: {hero_id}"
+                    hero_id,
+                    hero_ids,
+                    f"Theme '{theme['name']}' references non-existent hero: {hero_id}",
                 )
 
     def test_all_heroes_have_valid_positions(self):
@@ -306,8 +309,9 @@ class TestDataIntegrity(unittest.TestCase):
         for hero in heroes:
             for pos in hero["positions"]:
                 self.assertIn(
-                    pos, valid_positions,
-                    f"Hero '{hero['name']}' has invalid position: {pos}"
+                    pos,
+                    valid_positions,
+                    f"Hero '{hero['name']}' has invalid position: {pos}",
                 )
 
 
@@ -318,8 +322,7 @@ class TestEdgeCases(unittest.TestCase):
         """All requested hero IDs don't exist - returns empty list."""
         heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]}]
         result = core.get_heroes_by_ids(
-            ["npc_dota_hero_nonexistent1", "npc_dota_hero_nonexistent2"],
-            heroes
+            ["npc_dota_hero_nonexistent1", "npc_dota_hero_nonexistent2"], heroes
         )
         self.assertEqual(result, [])
 
@@ -330,8 +333,7 @@ class TestEdgeCases(unittest.TestCase):
             {"id": "npc_dota_hero_bane", "name": "Bane", "positions": [4, 5]},
         ]
         result = core.get_heroes_by_ids(
-            ["npc_dota_hero_axe", "npc_dota_hero_axe", "npc_dota_hero_bane"],
-            heroes
+            ["npc_dota_hero_axe", "npc_dota_hero_axe", "npc_dota_hero_bane"], heroes
         )
         # Current behavior: duplicates in input produce duplicates in output
         self.assertEqual(len(result), 3)
@@ -401,14 +403,15 @@ class TestDataFileErrors(unittest.TestCase):
     def test_load_heroes_malformed_json(self):
         """load_heroes raises json.JSONDecodeError for malformed JSON."""
         # Create a temporary directory with malformed JSON
-        import tempfile
         import os
+        import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             data_dir = Path(tmpdir)
             # Write malformed JSON
             with open(data_dir / "heroes.json", "w") as f:
                 f.write("{invalid json}")
-            
+
             core.DATA_DIR = data_dir
             with self.assertRaises(json.JSONDecodeError):
                 core.load_heroes()
@@ -416,6 +419,7 @@ class TestDataFileErrors(unittest.TestCase):
     def test_load_themes_malformed_json(self):
         """load_themes raises json.JSONDecodeError for malformed JSON."""
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmpdir:
             data_dir = Path(tmpdir)
             # Create valid heroes.json
@@ -424,7 +428,7 @@ class TestDataFileErrors(unittest.TestCase):
             # Write malformed themes.json
             with open(data_dir / "themes.json", "w") as f:
                 f.write("[invalid json}")
-            
+
             core.DATA_DIR = data_dir
             with self.assertRaises(json.JSONDecodeError):
                 core.load_themes()
@@ -511,23 +515,26 @@ class TestDataConsistencyEdgeCases(unittest.TestCase):
         """All hero IDs in heroes.json are unique."""
         heroes = core.load_heroes()
         hero_ids = [h["id"] for h in heroes]
-        self.assertEqual(len(hero_ids), len(set(hero_ids)),
-                        "Duplicate hero IDs found")
+        self.assertEqual(len(hero_ids), len(set(hero_ids)), "Duplicate hero IDs found")
 
     def test_theme_names_are_unique(self):
         """All theme names in themes.json are unique."""
         themes = core.load_themes()
         theme_names = [t["name"] for t in themes]
-        self.assertEqual(len(theme_names), len(set(theme_names)),
-                        "Duplicate theme names found")
+        self.assertEqual(
+            len(theme_names), len(set(theme_names)), "Duplicate theme names found"
+        )
 
     def test_theme_hero_ids_are_unique_within_theme(self):
         """Hero IDs within a single theme are unique (no duplicates)."""
         themes = core.load_themes()
         for theme in themes:
             hero_ids = theme["hero_ids"]
-            self.assertEqual(len(hero_ids), len(set(hero_ids)),
-                           f"Duplicate hero IDs in theme '{theme['name']}'")
+            self.assertEqual(
+                len(hero_ids),
+                len(set(hero_ids)),
+                f"Duplicate hero IDs in theme '{theme['name']}'",
+            )
 
     def test_get_positions_display_function(self):
         """get_positions_display correctly formats positions."""
@@ -728,7 +735,7 @@ class TestPositionBasedFeatures(unittest.TestCase):
             {"name": "Hard Support", "positions": [5]},  # Safelane
         ]
         lanes = core.group_heroes_by_lane(heroes)
-        
+
         self.assertEqual(len(lanes["Safelane"]), 2)
         self.assertEqual(len(lanes["Mid"]), 1)
         self.assertEqual(len(lanes["Offlane"]), 2)
