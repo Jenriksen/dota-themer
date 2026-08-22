@@ -7,9 +7,24 @@ import json
 import random
 import sys
 from pathlib import Path
+from itertools import combinations
 
 # Load data files
 DATA_DIR = Path(__file__).parent / "data"
+
+# Lane-position mapping (from CONTEXT.md)
+SAFELANE_POSITIONS = {1, 5}  # Carry + Hard Support
+MID_POSITIONS = {2}         # Midlaner
+OFFLANE_POSITIONS = {3, 4} # Offlaner + Soft Support
+
+# Lane names for display
+LANE_NAMES = {
+    1: "Safelane",
+    2: "Mid",
+    3: "Offlane",
+    4: "Offlane",
+    5: "Safelane"
+}
 
 def load_heroes():
     """Load heroes from JSON file."""
@@ -132,6 +147,231 @@ def select_theme(themes, heroes, party_size=None, use_weighted=False, require_po
         return random.choices(filtered_themes, weights=weights, k=1)[0]
     else:
         return random.choice(filtered_themes)
+
+
+def get_lane_for_position(position):
+    """
+    Get the lane name for a given position (1-5).
+    
+    Args:
+        position: Position number (1-5)
+        
+    Returns:
+        str: Lane name ("Safelane", "Mid", or "Offlane")
+    """
+    return LANE_NAMES.get(position, "Unknown")
+
+
+def group_heroes_by_lane(heroes):
+    """
+    Group heroes by their lane assignments.
+    
+    Args:
+        heroes: List of hero dicts with 'positions' field
+        
+    Returns:
+        dict: {lane_name: [heroes]} with lanes as keys
+    """
+    lanes = {"Safelane": [], "Mid": [], "Offlane": []}
+    for hero in heroes:
+        for position in hero["positions"]:
+            lane = get_lane_for_position(position)
+            if lane in lanes and hero not in lanes[lane]:
+                lanes[lane].append(hero)
+    return lanes
+
+
+def format_lane_grouping(heroes):
+    """
+    Format heroes grouped by lane for display.
+    
+    Args:
+        heroes: List of hero dicts
+        
+    Returns:
+        str: Formatted string with heroes grouped by lane
+    """
+    lanes = group_heroes_by_lane(heroes)
+    parts = []
+    for lane, lane_heroes in sorted(lanes.items()):
+        if lane_heroes:
+            hero_names = [h["name"] for h in sorted(lane_heroes, key=lambda h: h["name"])]
+            parts.append(f"{lane}: {', '.join(hero_names)}")
+    return "; ".join(parts)
+
+
+def get_party_configurations(party_size):
+    """
+    Get valid lane configurations for a given party size.
+    
+    Based on CONTEXT.md:
+    - Party of 2: safelane(2) OR offlane(2)
+    - Party of 3: safelane(2) + mid(1) OR offlane(2) + mid(1)
+    - Party of 4: safelane(2) + offlane(2)
+    - Party of 5: safelane(2) + mid(1) + offlane(2)
+    
+    Args:
+        party_size: Number of players (1-5)
+        
+    Returns:
+        list: List of dict with lane assignments, e.g.
+              [{"Safelane": 2, "Mid": 0, "Offlane": 0}, ...]
+    """
+    configs = []
+    
+    if party_size == 1:
+        # Single player can go anywhere
+        configs = [
+            {"Safelane": 1, "Mid": 0, "Offlane": 0},
+            {"Safelane": 0, "Mid": 1, "Offlane": 0},
+            {"Safelane": 0, "Mid": 0, "Offlane": 1},
+        ]
+    elif party_size == 2:
+        # Two players: safelane pair OR offlane pair
+        configs = [
+            {"Safelane": 2, "Mid": 0, "Offlane": 0},
+            {"Safelane": 0, "Mid": 0, "Offlane": 2},
+        ]
+    elif party_size == 3:
+        # Three players: safelane pair + mid OR offlane pair + mid
+        configs = [
+            {"Safelane": 2, "Mid": 1, "Offlane": 0},
+            {"Safelane": 0, "Mid": 1, "Offlane": 2},
+        ]
+    elif party_size == 4:
+        # Four players: safelane pair + offlane pair
+        configs = [
+            {"Safelane": 2, "Mid": 0, "Offlane": 2},
+        ]
+    elif party_size == 5:
+        # Five players: safelane(2) + mid(1) + offlane(2)
+        configs = [
+            {"Safelane": 2, "Mid": 1, "Offlane": 2},
+        ]
+    
+    return configs
+
+
+def validate_party_composition(heroes, party_size):
+    """
+    Validate if a set of heroes can form a valid party composition.
+    
+    Checks if there are enough heroes for each lane in at least one
+    valid configuration for the party size.
+    
+    Args:
+        heroes: List of hero dicts with 'positions' field
+        party_size: Number of players (1-5)
+        
+    Returns:
+        tuple: (bool, str) - (is_valid, reason)
+    """
+    if len(heroes) < party_size:
+        return (False, f"Not enough heroes: {len(heroes)} < {party_size}")
+    
+    configs = get_party_configurations(party_size)
+    
+    for config in configs:
+        # Check if we can assign heroes to satisfy this configuration
+        safelane_heroes = [h for h in heroes if SAFELANE_POSITIONS.intersection(set(h["positions"]))]
+        mid_heroes = [h for h in heroes if MID_POSITIONS.intersection(set(h["positions"]))]
+        offlane_heroes = [h for h in heroes if OFFLANE_POSITIONS.intersection(set(h["positions"]))]
+        
+        if (config["Safelane"] <= len(safelane_heroes) and
+            config["Mid"] <= len(mid_heroes) and
+            config["Offlane"] <= len(offlane_heroes)):
+            return (True, f"Valid configuration: {config}")
+    
+    return (False, "No valid lane configuration found")
+
+
+def suggest_balanced_team(heroes, party_size):
+    """
+    Suggest a balanced team composition from a set of heroes.
+    
+    Tries to select heroes that fit a valid lane configuration.
+    
+    Args:
+        heroes: List of hero dicts
+        party_size: Number of players (1-5)
+        
+    Returns:
+        dict: {"heroes": [selected_heroes], "configuration": config, "by_lane": {lane: [heroes]}}
+              or None if no valid composition found
+    """
+    if len(heroes) < party_size:
+        return None
+    
+    configs = get_party_configurations(party_size)
+    
+    for config in configs:
+        result = _try_configuration(heroes, config)
+        if result:
+            return result
+    
+    return None
+
+
+def _try_configuration(heroes, config):
+    """
+    Try to select heroes that fit a specific lane configuration.
+    
+    Args:
+        heroes: List of hero dicts
+        config: Dict with lane counts, e.g., {"Safelane": 2, "Mid": 1, "Offlane": 0}
+        
+    Returns:
+        dict or None: Result with selected heroes and lane grouping
+    """
+    # Categorize heroes by which lanes they can play
+    safelane_heroes = [h for h in heroes if SAFELANE_POSITIONS.intersection(set(h["positions"]))]
+    mid_heroes = [h for h in heroes if MID_POSITIONS.intersection(set(h["positions"]))]
+    offlane_heroes = [h for h in heroes if OFFLANE_POSITIONS.intersection(set(h["positions"]))]
+    
+    # Check if we have enough heroes for each lane
+    if (config["Safelane"] > len(safelane_heroes) or
+        config["Mid"] > len(mid_heroes) or
+        config["Offlane"] > len(offlane_heroes)):
+        return None
+    
+    # Select heroes for each lane
+    selected = []
+    remaining = list(heroes)
+    
+    # Safelane heroes
+    for _ in range(config["Safelane"]):
+        for h in safelane_heroes:
+            if h in remaining:
+                selected.append(h)
+                remaining.remove(h)
+                break
+    
+    # Mid heroes
+    for _ in range(config["Mid"]):
+        for h in mid_heroes:
+            if h in remaining:
+                selected.append(h)
+                remaining.remove(h)
+                break
+    
+    # Offlane heroes
+    for _ in range(config["Offlane"]):
+        for h in offlane_heroes:
+            if h in remaining:
+                selected.append(h)
+                remaining.remove(h)
+                break
+    
+    if len(selected) == sum(config.values()):
+        # Group by lane for display
+        by_lane = group_heroes_by_lane(selected)
+        return {
+            "heroes": selected,
+            "configuration": config,
+            "by_lane": by_lane
+        }
+    
+    return None
 
 def get_theme_suggestion(party_size=2, use_weighted=False, require_position_coverage=False):
     """

@@ -723,5 +723,139 @@ class TestEnhancedThemeSelection(unittest.TestCase):
         self.assertEqual(len(filtered), 1)  # Should pass through without filtering
 
 
+class TestPositionBasedFeatures(unittest.TestCase):
+    """Tests for lane and position-based features."""
+
+    def test_get_lane_for_position(self):
+        """get_lane_for_position returns correct lane names."""
+        self.assertEqual(core.get_lane_for_position(1), "Safelane")
+        self.assertEqual(core.get_lane_for_position(2), "Mid")
+        self.assertEqual(core.get_lane_for_position(3), "Offlane")
+        self.assertEqual(core.get_lane_for_position(4), "Offlane")
+        self.assertEqual(core.get_lane_for_position(5), "Safelane")
+        self.assertEqual(core.get_lane_for_position(99), "Unknown")
+
+    def test_group_heroes_by_lane(self):
+        """group_heroes_by_lane correctly categorizes heroes."""
+        heroes = [
+            {"name": "Carry", "positions": [1]},  # Safelane
+            {"name": "Midlaner", "positions": [2]},  # Mid
+            {"name": "Offlaner", "positions": [3]},  # Offlane
+            {"name": "Soft Support", "positions": [4]},  # Offlane
+            {"name": "Hard Support", "positions": [5]},  # Safelane
+        ]
+        lanes = core.group_heroes_by_lane(heroes)
+        
+        self.assertEqual(len(lanes["Safelane"]), 2)
+        self.assertEqual(len(lanes["Mid"]), 1)
+        self.assertEqual(len(lanes["Offlane"]), 2)
+
+    def test_format_lane_grouping(self):
+        """format_lane_grouping returns formatted string."""
+        heroes = [
+            {"name": "Axe", "positions": [3, 4]},
+            {"name": "Bane", "positions": [4, 5]},
+            {"name": "Lina", "positions": [2]},
+        ]
+        result = core.format_lane_grouping(heroes)
+        self.assertIn("Mid", result)
+        self.assertIn("Offlane", result)
+        self.assertIn("Safelane", result)
+        self.assertIn("Axe", result)
+        self.assertIn("Bane", result)
+        self.assertIn("Lina", result)
+
+    def test_get_party_configurations_all_sizes(self):
+        """get_party_configurations returns configs for all party sizes."""
+        for size in range(1, 6):
+            configs = core.get_party_configurations(size)
+            self.assertIsInstance(configs, list)
+            self.assertGreater(len(configs), 0)
+            for config in configs:
+                total = sum(config.values())
+                self.assertEqual(total, size, f"Config sum mismatch for size {size}")
+
+    def test_get_party_configurations_size_2(self):
+        """Party of 2 has safelane pair and offlane pair configs."""
+        configs = core.get_party_configurations(2)
+        config_names = [str(c) for c in configs]
+        self.assertIn("{'Safelane': 2, 'Mid': 0, 'Offlane': 0}", config_names)
+        self.assertIn("{'Safelane': 0, 'Mid': 0, 'Offlane': 2}", config_names)
+
+    def test_get_party_configurations_size_3(self):
+        """Party of 3 has safelane+mid and offlane+mid configs."""
+        configs = core.get_party_configurations(3)
+        config_names = [str(c) for c in configs]
+        self.assertIn("{'Safelane': 2, 'Mid': 1, 'Offlane': 0}", config_names)
+        self.assertIn("{'Safelane': 0, 'Mid': 1, 'Offlane': 2}", config_names)
+
+    def test_get_party_configurations_size_4(self):
+        """Party of 4 has safelane pair + offlane pair config."""
+        configs = core.get_party_configurations(4)
+        self.assertEqual(len(configs), 1)
+        self.assertEqual(configs[0], {"Safelane": 2, "Mid": 0, "Offlane": 2})
+
+    def test_get_party_configurations_size_5(self):
+        """Party of 5 has safelane(2) + mid(1) + offlane(2) config."""
+        configs = core.get_party_configurations(5)
+        self.assertEqual(len(configs), 1)
+        self.assertEqual(configs[0], {"Safelane": 2, "Mid": 1, "Offlane": 2})
+
+    def test_validate_party_composition_valid(self):
+        """validate_party_composition returns True for valid composition."""
+        # Need heroes that can form valid configs for party of 3:
+        # Config 1: 2 Safelane + 1 Mid, or Config 2: 1 Mid + 2 Offlane
+        heroes = [
+            {"name": "Carry", "positions": [1]},  # Safelane
+            {"name": "Hard Support", "positions": [5]},  # Safelane (position 5)
+            {"name": "Midlaner", "positions": [2]},  # Mid
+        ]
+        is_valid, reason = core.validate_party_composition(heroes, party_size=3)
+        self.assertTrue(is_valid)
+
+    def test_validate_party_composition_not_enough_heroes(self):
+        """validate_party_composition returns False when not enough heroes."""
+        heroes = [{"name": "H1", "positions": [1]}]
+        is_valid, reason = core.validate_party_composition(heroes, party_size=3)
+        self.assertFalse(is_valid)
+        self.assertIn("Not enough heroes", reason)
+
+    def test_validate_party_composition_no_valid_config(self):
+        """validate_party_composition returns False when no valid lane config."""
+        # For party of 4, we need 2 safelane + 2 offlane
+        # If all heroes can only play mid, no valid config exists
+        heroes = [
+            {"name": "H1", "positions": [2]},  # Only Mid
+            {"name": "H2", "positions": [2]},  # Only Mid
+            {"name": "H3", "positions": [2]},  # Only Mid
+            {"name": "H4", "positions": [2]},  # Only Mid
+        ]
+        is_valid, reason = core.validate_party_composition(heroes, party_size=4)
+        self.assertFalse(is_valid)
+        self.assertIn("No valid lane configuration found", reason)
+
+    def test_suggest_balanced_team_valid(self):
+        """suggest_balanced_team returns valid team for party of 3."""
+        heroes = [
+            {"name": "Carry", "positions": [1]},  # Safelane
+            {"name": "Carry2", "positions": [1]},  # Safelane
+            {"name": "Mid", "positions": [2]},  # Mid
+            {"name": "Offlane", "positions": [3]},  # Offlane
+            {"name": "Offlane2", "positions": [3]},  # Offlane
+        ]
+        result = core.suggest_balanced_team(heroes, party_size=3)
+        self.assertIsNotNone(result)
+        self.assertIn("heroes", result)
+        self.assertIn("configuration", result)
+        self.assertIn("by_lane", result)
+        self.assertEqual(len(result["heroes"]), 3)
+
+    def test_suggest_balanced_team_not_enough_heroes(self):
+        """suggest_balanced_team returns None when not enough heroes."""
+        heroes = [{"name": "H1", "positions": [1]}]
+        result = core.suggest_balanced_team(heroes, party_size=3)
+        self.assertIsNone(result)
+
+
 if __name__ == "__main__":
     unittest.main()
