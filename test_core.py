@@ -323,5 +323,244 @@ class TestDataIntegrity(unittest.TestCase):
             )
 
 
+class TestEdgeCases(unittest.TestCase):
+    """Tests for edge cases and things that shouldn't work."""
+
+    def test_get_heroes_by_ids_with_all_nonexistent(self):
+        """All requested hero IDs don't exist - returns empty list."""
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        result = core.get_heroes_by_ids(
+            ["npc_dota_hero_nonexistent1", "npc_dota_hero_nonexistent2"],
+            heroes
+        )
+        self.assertEqual(result, [])
+
+    def test_get_heroes_by_ids_with_duplicates(self):
+        """Duplicate hero IDs in input - returns duplicates (current behavior)."""
+        heroes = [
+            {"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"},
+            {"id": "npc_dota_hero_bane", "name": "Bane", "positions_display": "4,5"},
+        ]
+        result = core.get_heroes_by_ids(
+            ["npc_dota_hero_axe", "npc_dota_hero_axe", "npc_dota_hero_bane"],
+            heroes
+        )
+        # Current behavior: duplicates in input produce duplicates in output
+        self.assertEqual(len(result), 3)
+        names = [h["name"] for h in result]
+        self.assertEqual(names, ["Axe", "Axe", "Bane"])
+
+    def test_format_hero_list_with_special_characters_in_name(self):
+        """Hero names with special characters are formatted correctly."""
+        heroes = [{"name": "Anti-Mage", "positions_display": "1,2"}]
+        result = core.format_hero_list(heroes)
+        self.assertEqual(result, "Anti-Mage (1,2)")
+
+    def test_format_hero_list_with_multi_digit_positions(self):
+        """Positions like 10 would break display - but positions are only 1-5."""
+        # This tests the display logic doesn't break with edge case data
+        heroes = [{"name": "Test", "positions_display": "1,2,3,4,5"}]
+        result = core.format_hero_list(heroes)
+        self.assertEqual(result, "Test (1,2,3,4,5)")
+
+    def test_select_theme_empty_list(self):
+        """select_theme with empty themes list raises IndexError."""
+        heroes = []
+        with self.assertRaises(IndexError):
+            core.select_theme([], heroes, party_size=2)
+
+    def test_get_theme_suggestion_party_size_boundaries(self):
+        """Party sizes exactly at boundaries (1 and 5) work."""
+        for size in [1, 5]:
+            result = core.get_theme_suggestion(party_size=size)
+            self.assertIsInstance(result, dict)
+            self.assertIn("theme", result)
+
+    def test_get_heroes_by_ids_none_in_list(self):
+        """Passing None as hero_ids list."""
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        # This should handle None gracefully or raise a clear error
+        with self.assertRaises(TypeError):
+            core.get_heroes_by_ids(None, heroes)
+
+    def test_format_hero_list_none_input(self):
+        """Passing None to format_hero_list raises TypeError."""
+        with self.assertRaises(TypeError):
+            core.format_hero_list(None)
+
+
+class TestDataFileErrors(unittest.TestCase):
+    """Tests for file loading errors and malformed data."""
+
+    def setUp(self):
+        self.original_data_dir = core.DATA_DIR
+
+    def tearDown(self):
+        core.DATA_DIR = self.original_data_dir
+
+    def test_load_heroes_file_not_found(self):
+        """load_heroes raises FileNotFoundError for missing file."""
+        core.DATA_DIR = Path("/nonexistent/path")
+        with self.assertRaises(FileNotFoundError):
+            core.load_heroes()
+
+    def test_load_themes_file_not_found(self):
+        """load_themes raises FileNotFoundError for missing file."""
+        core.DATA_DIR = Path("/nonexistent/path")
+        with self.assertRaises(FileNotFoundError):
+            core.load_themes()
+
+    def test_load_heroes_malformed_json(self):
+        """load_heroes raises json.JSONDecodeError for malformed JSON."""
+        # Create a temporary directory with malformed JSON
+        import tempfile
+        import os
+        with tempfile.TemporaryDirectory() as tmpdir:
+            data_dir = Path(tmpdir)
+            # Write malformed JSON
+            with open(data_dir / "heroes.json", "w") as f:
+                f.write("{invalid json}")
+            
+            core.DATA_DIR = data_dir
+            with self.assertRaises(json.JSONDecodeError):
+                core.load_heroes()
+
+    def test_load_themes_malformed_json(self):
+        """load_themes raises json.JSONDecodeError for malformed JSON."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            data_dir = Path(tmpdir)
+            # Create valid heroes.json
+            with open(data_dir / "heroes.json", "w") as f:
+                json.dump([{"id": "test", "name": "Test", "positions": [1], "positions_display": "1"}], f)
+            # Write malformed themes.json
+            with open(data_dir / "themes.json", "w") as f:
+                f.write("[invalid json}")
+            
+            core.DATA_DIR = data_dir
+            with self.assertRaises(json.JSONDecodeError):
+                core.load_themes()
+
+
+class TestEmptyAndNullData(unittest.TestCase):
+    """Tests for empty data structures and null values."""
+
+    def test_get_heroes_by_ids_empty_heroes_list(self):
+        """Empty heroes list returns empty result."""
+        result = core.get_heroes_by_ids(["any_id"], [])
+        self.assertEqual(result, [])
+
+    def test_format_hero_list_empty_list(self):
+        """Empty hero list returns empty string."""
+        result = core.format_hero_list([])
+        self.assertEqual(result, "")
+
+    def test_theme_with_no_matching_heroes(self):
+        """Theme with hero_ids that don't match any heroes."""
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        theme = {"name": "Empty Theme", "hero_ids": ["npc_dota_hero_nonexistent"]}
+        matching = core.get_heroes_by_ids(theme["hero_ids"], heroes)
+        self.assertEqual(len(matching), 0)
+
+    def test_theme_with_empty_hero_ids_list(self):
+        """Theme with empty hero_ids list."""
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        matching = core.get_heroes_by_ids([], heroes)
+        self.assertEqual(len(matching), 0)
+
+    def test_hero_with_empty_positions(self):
+        """Hero with empty positions list has empty display."""
+        hero = {"name": "Test", "positions": [], "positions_display": ""}
+        result = core.format_hero_list([hero])
+        self.assertEqual(result, "Test ()")
+
+    def test_hero_with_single_position(self):
+        """Hero with single position formatted without comma."""
+        hero = {"name": "Test", "positions": [1], "positions_display": "1"}
+        result = core.format_hero_list([hero])
+        self.assertEqual(result, "Test (1)")
+
+
+class TestInvalidInputs(unittest.TestCase):
+    """Tests for invalid inputs that should be rejected or handled."""
+
+    def test_get_theme_suggestion_party_size_0(self):
+        """Party size 0 is accepted by get_theme_suggestion (validation in main only)."""
+        # The function itself doesn't validate, only main() does
+        result = core.get_theme_suggestion(party_size=0)
+        self.assertIsInstance(result, dict)
+        self.assertIn("theme", result)
+
+    def test_get_theme_suggestion_party_size_6(self):
+        """Party size 6 is accepted by get_theme_suggestion (validation in main only)."""
+        result = core.get_theme_suggestion(party_size=6)
+        self.assertIsInstance(result, dict)
+        self.assertIn("theme", result)
+
+    def test_get_theme_suggestion_negative(self):
+        """Negative party size is accepted by get_theme_suggestion."""
+        result = core.get_theme_suggestion(party_size=-1)
+        self.assertIsInstance(result, dict)
+
+    def test_get_theme_suggestion_float(self):
+        """Float party size is accepted (Python allows it)."""
+        result = core.get_theme_suggestion(party_size=2.5)
+        self.assertIsInstance(result, dict)
+
+    def test_get_theme_suggestion_string(self):
+        """String party size is accepted but ignored (no validation in function)."""
+        # Current behavior: get_theme_suggestion doesn't validate party_size type
+        # It only uses it for future filtering (not yet implemented)
+        result = core.get_theme_suggestion(party_size="two")
+        self.assertIsInstance(result, dict)
+        self.assertIn("theme", result)
+
+
+class TestDataConsistencyEdgeCases(unittest.TestCase):
+    """Tests for data consistency edge cases."""
+
+    def test_hero_ids_are_unique(self):
+        """All hero IDs in heroes.json are unique."""
+        heroes = core.load_heroes()
+        hero_ids = [h["id"] for h in heroes]
+        self.assertEqual(len(hero_ids), len(set(hero_ids)),
+                        "Duplicate hero IDs found")
+
+    def test_theme_names_are_unique(self):
+        """All theme names in themes.json are unique."""
+        themes = core.load_themes()
+        theme_names = [t["name"] for t in themes]
+        self.assertEqual(len(theme_names), len(set(theme_names)),
+                        "Duplicate theme names found")
+
+    def test_theme_hero_ids_are_unique_within_theme(self):
+        """Hero IDs within a single theme are unique (no duplicates)."""
+        themes = core.load_themes()
+        for theme in themes:
+            hero_ids = theme["hero_ids"]
+            self.assertEqual(len(hero_ids), len(set(hero_ids)),
+                           f"Duplicate hero IDs in theme '{theme['name']}'")
+
+    def test_positions_list_matches_positions_display(self):
+        """Each hero's positions list exactly matches positions_display."""
+        heroes = core.load_heroes()
+        for hero in heroes:
+            expected_display = ",".join(map(str, sorted(hero["positions"])))
+            self.assertEqual(
+                hero["positions_display"], expected_display,
+                f"Mismatch for {hero['name']}: positions={hero['positions']}, "
+                f"display={hero['positions_display']}"
+            )
+
+    def test_positions_are_sorted_in_display(self):
+        """positions_display has positions in sorted order."""
+        heroes = core.load_heroes()
+        for hero in heroes:
+            parts = hero["positions_display"].split(",")
+            int_parts = [int(p) for p in parts]
+            self.assertEqual(int_parts, sorted(int_parts),
+                           f"Positions not sorted for {hero['name']}")
+
+
 if __name__ == "__main__":
     unittest.main()
