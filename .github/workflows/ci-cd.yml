@@ -50,8 +50,7 @@ jobs:
           python-version: '3.12'
 
       - name: Run all unit tests
-        run: |
-          python -m unittest discover -v
+        run: python -m unittest discover -v
 
       - name: Run tests with coverage
         run: |
@@ -115,6 +114,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Install bot dependencies
+        run: pip install discord.py
 
       - name: Verify core functionality
         run: |

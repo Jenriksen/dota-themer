@@ -106,6 +106,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install bot dependencies
+        run: pip install discord.py
+
       - name: Test core functionality with all party sizes
         run: |
           python core.py 1
