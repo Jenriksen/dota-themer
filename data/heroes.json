@@ -6,7 +6,27 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "black"
+      ],
+      "features": [
+        "undead",
+        "glowing_eyes",
+        "cape"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "alchemist",
@@ -15,7 +35,28 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "beard",
+        "bald",
+        "tanky",
+        "chemical_rage"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "ancient_apparition",
@@ -24,7 +65,28 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "blue"
+      ],
+      "features": [
+        "ghostly",
+        "glowing",
+        "wings",
+        "ethereal"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "antimage",
@@ -33,7 +95,28 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "bald",
+        "mystical",
+        "mana_burn",
+        "blink"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "arc_warden",
@@ -43,7 +126,28 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "blue"
+      ],
+      "features": [
+        "arcane",
+        "glowing",
+        "duplicate",
+        "spark"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "axe",
@@ -52,7 +156,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "brown"
+      ],
+      "features": [
+        "beard",
+        "muscular",
+        "angry",
+        "berserk",
+        "counter_helix"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "bane",
@@ -61,7 +187,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "hooded",
+        "tentacles",
+        "brain",
+        "nightmare",
+        "fiend"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "beastmaster",
@@ -71,7 +219,29 @@
       1,
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "green"
+      ],
+      "features": [
+        "beard",
+        "animal_companions",
+        "horns",
+        "wild",
+        "primal_roar"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "bloodseeker",
@@ -80,7 +250,29 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "black"
+      ],
+      "features": [
+        "bald",
+        "blood",
+        "visible_teeth",
+        "thirst",
+        "rupture"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "bounty_hunter",
@@ -90,7 +282,29 @@
       1,
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "masked",
+        "cape",
+        "bounty",
+        "tracker",
+        "shuriken"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "brewmaster",
@@ -99,7 +313,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "brown"
+      ],
+      "features": [
+        "beard",
+        "dwarven",
+        "panda",
+        "drunk",
+        "primal_split"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "bristleback",
@@ -108,7 +344,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "beard",
+        "quills",
+        "tanky",
+        "porcupine",
+        "warpath"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "broodmother",
@@ -118,7 +376,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "spider",
+        "invisible",
+        "tails",
+        "web",
+        "spawn_spiderlings"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "centaur",
@@ -127,7 +407,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "blue"
+      ],
+      "features": [
+        "horse",
+        "beard",
+        "tanky",
+        "stampede",
+        "return"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "chaos_knight",
@@ -136,7 +438,29 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "black"
+      ],
+      "features": [
+        "armored",
+        "horse",
+        "chaos",
+        "illusion",
+        "reality_rift"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "chen",
@@ -145,7 +469,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "white"
+      ],
+      "features": [
+        "holy",
+        "serene",
+        "healer",
+        "summoner",
+        "penitence"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "clinkz",
@@ -155,7 +501,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "black"
+      ],
+      "features": [
+        "skeletal",
+        "invisible",
+        "bow",
+        "bone",
+        "strafe"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "rattletrap",
@@ -164,7 +532,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "mechanical",
+        "robot",
+        "hookshot",
+        "power_cogs",
+        "rocket_flare"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "crystal_maiden",
@@ -173,7 +563,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "ice",
+        "glowing",
+        "hat",
+        "frost",
+        "nova"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "dark_seer",
@@ -182,7 +594,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "masked",
+        "mystical",
+        "tails",
+        "wall",
+        "vacuum"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "dark_willow",
@@ -191,7 +625,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "mystical",
+        "fae",
+        "wings",
+        "shadow",
+        "bedlam"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "dawnbreaker",
@@ -200,7 +656,29 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "orange",
+        "gold"
+      ],
+      "features": [
+        "armored",
+        "sun",
+        "shield",
+        "light",
+        "celestial_hammer"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "dazzle",
@@ -209,7 +687,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "gold"
+      ],
+      "features": [
+        "glowing",
+        "healer",
+        "poor_eyesight",
+        "shadow",
+        "weave"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "death_prophet",
@@ -218,7 +718,29 @@
     "positions": [
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "blue"
+      ],
+      "features": [
+        "undead",
+        "ghostly",
+        "carrion",
+        "screech",
+        "silence"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "disruptor",
@@ -227,7 +749,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "electric",
+        "glowing",
+        "masked",
+        "thunder",
+        "glimpse"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "doombringer",
@@ -237,7 +781,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "black"
+      ],
+      "features": [
+        "demonic",
+        "scary_face",
+        "doom",
+        "infernal",
+        "devour"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "dragon_knight",
@@ -246,7 +812,32 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "green"
+      ],
+      "features": [
+        "dragon",
+        "rides_steed",
+        "armored",
+        "beard",
+        "horns",
+        "tails",
+        "fire",
+        "breathe_fire"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "drow_ranger",
@@ -255,7 +846,30 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "white"
+      ],
+      "features": [
+        "elven",
+        "hooded",
+        "wings",
+        "cape",
+        "frost_arrows",
+        "marksmanship"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "earth_spirit",
@@ -264,7 +878,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "stone",
+        "nature",
+        "fast",
+        "rolling",
+        "boulder"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "earthshaker",
@@ -273,7 +909,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "orange"
+      ],
+      "features": [
+        "muscular",
+        "totem",
+        "horns",
+        "earthquake",
+        "fissure"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "elder_titan",
@@ -282,7 +940,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "giant",
+        "nature",
+        "ancient",
+        "stomp",
+        "echo_stomp"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "ember_spirit",
@@ -292,7 +972,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "orange",
+        "red"
+      ],
+      "features": [
+        "fire",
+        "fast",
+        "flaming",
+        "sleight",
+        "flame_guard"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "enchantress",
@@ -301,7 +1003,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "white"
+      ],
+      "features": [
+        "nature",
+        "animal_companions",
+        "healer",
+        "enchant",
+        "untouchable"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "furion",
@@ -311,7 +1035,29 @@
       1,
       2,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "nature",
+        "tree_hugger",
+        "summoner",
+        "wrath",
+        "treants"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "grimstroke",
@@ -320,7 +1066,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "artistic",
+        "masked",
+        "ink",
+        "stroke",
+        "soul_chain"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "gyrocopter",
@@ -330,7 +1098,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "flying",
+        "mechanical",
+        "robot",
+        "bombs",
+        "call_down"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "hoodwink",
@@ -339,7 +1129,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "forest",
+        "hooded",
+        "sneaky",
+        "acorn",
+        "bushwhack"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "huskar",
@@ -349,7 +1161,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "red"
+      ],
+      "features": [
+        "tribal",
+        "spears",
+        "berserk",
+        "sacrifice",
+        "inner_fire"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "invoker",
@@ -359,7 +1193,30 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "gold"
+      ],
+      "features": [
+        "arcane",
+        "masked",
+        "elements",
+        "tornado",
+        "emp",
+        "alacrity"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "wisp",
@@ -368,7 +1225,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "ethereal",
+        "orb",
+        "fast",
+        "overcharge",
+        "relocate",
+        "tether"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "jakiro",
@@ -377,7 +1257,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "blue"
+      ],
+      "features": [
+        "dual_headed",
+        "fire",
+        "ice",
+        "tails",
+        "dragon",
+        "dual_breath"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "juggernaut",
@@ -386,7 +1289,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "gold"
+      ],
+      "features": [
+        "bald",
+        "sword",
+        "healing",
+        "omnislash",
+        "blade_fury"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "keeper_of_the_light",
@@ -395,7 +1320,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "gold"
+      ],
+      "features": [
+        "glowing",
+        "poor_eyesight",
+        "rides_steed",
+        "hat",
+        "illuminate",
+        "chakra"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "kunkka",
@@ -404,7 +1352,30 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "gold"
+      ],
+      "features": [
+        "pirate",
+        "one_eyed",
+        "sword",
+        "tide",
+        "boat",
+        "torrent"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "legion_commander",
@@ -413,7 +1384,30 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "gold"
+      ],
+      "features": [
+        "armored",
+        "cape",
+        "sword",
+        "visible_teeth",
+        "duel",
+        "overwhelming_odds"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "leshrac",
@@ -423,7 +1417,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "purple"
+      ],
+      "features": [
+        "demonic",
+        "split_personality",
+        "magic",
+        "pulse",
+        "diabolic_edict"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "lichen",
@@ -432,7 +1448,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "ice",
+        "undead",
+        "frost",
+        "sacrifice",
+        "chain_frost"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "life_stealer",
@@ -441,7 +1479,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "black"
+      ],
+      "features": [
+        "demonic",
+        "scary_face",
+        "infect",
+        "rage",
+        "open_wounds"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "lina",
@@ -450,7 +1510,30 @@
     "positions": [
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "white"
+      ],
+      "features": [
+        "fire",
+        "hat",
+        "glowing",
+        "poor_eyesight",
+        "laguna_blade",
+        "light_strike"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "lion",
@@ -459,7 +1542,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "maned",
+        "finger_mustache",
+        "magic",
+        "impale",
+        "voodoo"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "lone_druid",
@@ -469,7 +1574,30 @@
       1,
       3,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "nature",
+        "animal_companions",
+        "summoner",
+        "bear",
+        "true_form",
+        "savage_roar"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "luna",
@@ -478,7 +1606,30 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "elven",
+        "moon",
+        "wings",
+        "cape",
+        "lucent_beam",
+        "eclipse"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "lycan",
@@ -488,7 +1639,29 @@
       1,
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "green"
+      ],
+      "features": [
+        "werewolf",
+        "summoner",
+        "shapeshift",
+        "howl",
+        "wolves"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "magnataur",
@@ -497,7 +1670,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "silver"
+      ],
+      "features": [
+        "giant",
+        "magnetic",
+        "shockwave",
+        "reverse_polarity",
+        "skewer"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "mars",
@@ -506,7 +1701,29 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "gold"
+      ],
+      "features": [
+        "armored",
+        "spear",
+        "god_of_war",
+        "arena",
+        "gods_rebuke"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "medusa",
@@ -515,7 +1732,28 @@
     "positions": [
       1,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "gold"
+      ],
+      "features": [
+        "snake_hair",
+        "stone_gaze",
+        "mystic_snake",
+        "mana_shield"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "meepo",
@@ -525,7 +1763,29 @@
       1,
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "small",
+        "duplicate",
+        "poof",
+        "earthbind",
+        "ransack"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "mirana",
@@ -534,7 +1794,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "blue"
+      ],
+      "features": [
+        "elven",
+        "moon",
+        "wings",
+        "arrow",
+        "sacred_arrow",
+        "leap"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "monkey_king",
@@ -544,7 +1827,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "monkey",
+        "masked",
+        "staff",
+        "boundless_strike",
+        "tree_dance"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "morphling",
@@ -553,7 +1858,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "shapeshift",
+        "wave",
+        "adaptive_strike",
+        "morph",
+        "ethereal"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "muerta",
@@ -562,7 +1889,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "skeletal",
+        "gun",
+        "gunslinger",
+        "dead_shot",
+        "the_gunslinger"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "naga_siren",
@@ -572,7 +1921,29 @@
       1,
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "green"
+      ],
+      "features": [
+        "mermaid",
+        "song",
+        "ensnare",
+        "mirror_image",
+        "rip_tide"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "necrolyte",
@@ -581,7 +1952,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "black"
+      ],
+      "features": [
+        "undead",
+        "sadistic",
+        "heartstopper",
+        "death_pulse",
+        "reapers_scythe"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "night_stalker",
@@ -591,7 +1984,29 @@
       1,
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "dark",
+        "invisible",
+        "void",
+        "crippling_fear",
+        "hunter_in_the_night"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "nyx_assassin",
@@ -600,7 +2015,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "invisible",
+        "spiked",
+        "impale",
+        "mana_burn",
+        "vendetta"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "ogre_magi",
@@ -609,7 +2046,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "ogre",
+        "multi_armed",
+        "fire",
+        "bloodlust",
+        "ignite"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "omniknight",
@@ -618,7 +2077,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "gold"
+      ],
+      "features": [
+        "armored",
+        "healer",
+        "angelic",
+        "purification",
+        "repel"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "oracle",
@@ -627,7 +2108,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "blue"
+      ],
+      "features": [
+        "mystical",
+        "healer",
+        "false_promise",
+        "fates_edict",
+        "purifying_flames"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "outworld_devourer",
@@ -637,7 +2140,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "astral",
+        "intelligence",
+        "arcane_orb",
+        "essence_flux",
+        "sanity_eclipse"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "pangolier",
@@ -646,7 +2171,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "armored",
+        "tail",
+        "rolling",
+        "swash_buckle",
+        "shield_crash"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "phantom_assassin",
@@ -655,7 +2202,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "invisible",
+        "blur",
+        "visible_teeth",
+        "stifling_dagger",
+        "coup_de_grace"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "phantom_lancer",
@@ -664,7 +2233,29 @@
     "positions": [
       1,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "cape",
+        "illusions",
+        "juxtapose",
+        "doppelganger",
+        "phantom_rush"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": true
+    }
   },
   {
     "id": "phoenix",
@@ -673,7 +2264,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "orange"
+      ],
+      "features": [
+        "fire",
+        "wings",
+        "sun",
+        "supernova",
+        "icarus_dive",
+        "fire_spirits"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "puck",
@@ -682,7 +2296,30 @@
     "positions": [
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "fae",
+        "wings",
+        "orb",
+        "illusionary",
+        "phase_shift",
+        "dream_coil"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "pudge",
@@ -691,7 +2328,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "black"
+      ],
+      "features": [
+        "fat",
+        "hook",
+        "dismember",
+        "rot",
+        "meat_hook"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "pugna",
@@ -701,7 +2360,29 @@
       2,
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "nether",
+        "blast",
+        "ward",
+        "decrepify",
+        "nether_blast"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "pugo",
@@ -710,7 +2391,28 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "small",
+        "nether",
+        "swarm",
+        "nether_blast"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "queenofpain",
@@ -720,7 +2422,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "demonic",
+        "wings",
+        "scream",
+        "shadow_strike",
+        "sonic_wave"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "razor",
@@ -730,7 +2454,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "lightning",
+        "storm",
+        "visible_teeth",
+        "plasma_field",
+        "static_link"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "stealth_assassin",
@@ -739,7 +2485,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "invisible",
+        "blink",
+        "backstab",
+        "permanence",
+        "shadow_walk"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "ringmaster",
@@ -749,7 +2517,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "gold"
+      ],
+      "features": [
+        "circus",
+        "whip",
+        "tiger",
+        "ring_of_fire",
+        "tame_the_beast"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "rubick",
@@ -758,7 +2548,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "white"
+      ],
+      "features": [
+        "arcane",
+        "telekinetic",
+        "spell_steal",
+        "fade_bolt",
+        "null_field"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "sand_king",
@@ -767,7 +2579,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "yellow",
+        "brown"
+      ],
+      "features": [
+        "sand",
+        "burrow",
+        "caustic_finale",
+        "sand_storm",
+        "epicenter"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "shadow_demon",
@@ -776,7 +2610,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "demonic",
+        "shadow",
+        "disruption",
+        "soul_catcher",
+        "demonic_purge"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "nevermore",
@@ -785,7 +2641,30 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "red"
+      ],
+      "features": [
+        "demonic",
+        "wings",
+        "scary_face",
+        "shadow",
+        "requiem",
+        "necromastery"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "shadow_shaman",
@@ -794,7 +2673,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "shaman",
+        "hex",
+        "serpent_ward",
+        "voodoo",
+        "ether_shock"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "silencer",
@@ -804,7 +2705,29 @@
       1,
       2,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "muted",
+        "intelligence",
+        "last_word",
+        "global_silence",
+        "curse_of_the_silent"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "skywrath_mage",
@@ -814,7 +2737,29 @@
       2,
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "dragon",
+        "wings",
+        "mystic_flare",
+        "concussive_shot",
+        "arcane_bolt"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "slardar",
@@ -823,7 +2768,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "fish",
+        "one_eyed",
+        "crush",
+        "slithereen_crush",
+        "bash"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "slark",
@@ -833,7 +2800,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "black"
+      ],
+      "features": [
+        "fish",
+        "dark",
+        "pounce",
+        "essence_shift",
+        "shadow_dance"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "snapfire",
@@ -842,7 +2831,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "old",
+        "dragon",
+        "rides_steed",
+        "one_eyed",
+        "scatterblast",
+        "firesnap_cookie"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "sniper",
@@ -851,7 +2863,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "dwarven",
+        "snipe",
+        "shrapnel",
+        "headshot",
+        "assassinate"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "spectre",
@@ -860,7 +2894,29 @@
     "positions": [
       1,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "blue"
+      ],
+      "features": [
+        "ghostly",
+        "spectral",
+        "dispersion",
+        "reality",
+        "haunt"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "spirit_breaker",
@@ -869,7 +2925,29 @@
     "positions": [
       1,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "white"
+      ],
+      "features": [
+        "rides_steed",
+        "charge",
+        "greater_bash",
+        "empowering_haste",
+        "nether_strike"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "storm_spirit",
@@ -878,7 +2956,30 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "storm",
+        "fast",
+        "electric",
+        "remnant",
+        "ball_lightning",
+        "overload"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "sven",
@@ -888,7 +2989,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "gold",
+        "white"
+      ],
+      "features": [
+        "armored",
+        "wings",
+        "storm_hammer",
+        "gods_strength",
+        "cleave"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "techies",
@@ -897,7 +3020,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "red",
+        "brown"
+      ],
+      "features": [
+        "mechanical",
+        "explosive",
+        "land_mines",
+        "suicide",
+        "remote_mines"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "templar_assassin",
@@ -907,7 +3052,29 @@
       1,
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "elven",
+        "cape",
+        "psi_blades",
+        "refraction",
+        "meld"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "terrorblade",
@@ -916,7 +3083,30 @@
     "positions": [
       1,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "red"
+      ],
+      "features": [
+        "demonic",
+        "wings",
+        "scary_face",
+        "metamorphosis",
+        "sunder",
+        "conjure_image"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": true
+    }
   },
   {
     "id": "tidehunter",
@@ -925,7 +3115,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "black"
+      ],
+      "features": [
+        "crab",
+        "one_eyed",
+        "anchor",
+        "kraken_shell",
+        "ravage"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "timbersaw",
@@ -934,7 +3146,29 @@
     "positions": [
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "mechanical",
+        "chainsaw",
+        "timber_chain",
+        "whirling_death",
+        "reactive_armor"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "tinker",
@@ -943,7 +3177,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "mechanical",
+        "robot",
+        "laser",
+        "heat_seeking_missile",
+        "march_of_the_machines"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "tiny",
@@ -953,7 +3209,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gray"
+      ],
+      "features": [
+        "stone",
+        "giant",
+        "toss",
+        "avalanche",
+        "grow"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "treant",
@@ -962,7 +3240,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "brown"
+      ],
+      "features": [
+        "tree",
+        "nature",
+        "roots",
+        "leech_seed",
+        "overgrowth",
+        "living_armor"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "troll_warlord",
@@ -971,7 +3272,29 @@
     "positions": [
       1,
       2
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "gold"
+      ],
+      "features": [
+        "troll",
+        "axes",
+        "berserk",
+        "whirling_axes",
+        "rampage"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "tusk",
@@ -980,7 +3303,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "walrus",
+        "ice",
+        "tusks",
+        "snowball",
+        "ice_shards"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "underlord",
@@ -989,7 +3334,29 @@
     "positions": [
       3,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "demonic",
+        "pit",
+        "fire",
+        "atrophy_aura",
+        "firestorm"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "undying",
@@ -999,7 +3366,29 @@
       3,
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "black"
+      ],
+      "features": [
+        "undead",
+        "zombie",
+        "decay",
+        "soul_rip",
+        "tombstone"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "ursa",
@@ -1009,7 +3398,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "black"
+      ],
+      "features": [
+        "bear",
+        "fur",
+        "enrage",
+        "earthshock",
+        "overpower"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "vengefulspirit",
@@ -1018,7 +3429,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "black"
+      ],
+      "features": [
+        "ghostly",
+        "wings",
+        "swap",
+        "command_aura",
+        "nether_toxin"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "venomancer",
@@ -1028,7 +3461,29 @@
       3,
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "black"
+      ],
+      "features": [
+        "plague",
+        "venom",
+        "ward",
+        "poison_nova",
+        "gale"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "viper",
@@ -1038,7 +3493,29 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "black"
+      ],
+      "features": [
+        "snake",
+        "venom",
+        "corrosive_skin",
+        "poison_attack",
+        "viper_strike"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "visage",
@@ -1047,7 +3524,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "ghostly",
+        "familiars",
+        "soul_assumption",
+        "grave_chill",
+        "gravekeepers_cloak"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": true,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "void_spirit",
@@ -1057,7 +3556,28 @@
       1,
       2,
       3
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "astral",
+        "dissimilate",
+        "resonant_pulse",
+        "aether_remnant"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "warlock",
@@ -1066,7 +3586,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "black"
+      ],
+      "features": [
+        "demonic",
+        "golem",
+        "summoner",
+        "fatal_bonds",
+        "shadow_word"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "weaver",
@@ -1076,7 +3618,29 @@
       1,
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "blue"
+      ],
+      "features": [
+        "insect",
+        "invisible",
+        "geminate",
+        "swarm",
+        "time_lapse"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "windrunner",
@@ -1086,7 +3650,30 @@
       1,
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "wind",
+        "wings",
+        "fast",
+        "shackleshot",
+        "powershot",
+        "focus_fire"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "winter_wyvern",
@@ -1095,7 +3682,30 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "dragon",
+        "wings",
+        "ice",
+        "arctic_burn",
+        "cold_embrace",
+        "splinter_blast"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    }
   },
   {
     "id": "witch_doctor",
@@ -1104,7 +3714,29 @@
     "positions": [
       4,
       5
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "black"
+      ],
+      "features": [
+        "voodoo",
+        "masked",
+        "cask",
+        "paralyzing_cask",
+        "voodoo_restoration"
+      ],
+      "has_hair": true,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": true,
+      "has_mask": true,
+      "has_staff": true,
+      "has_sword": false
+    }
   },
   {
     "id": "wraith_king",
@@ -1112,7 +3744,29 @@
     "primary_role": "Carry",
     "positions": [
       1
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "skeletal",
+        "king",
+        "reincarnation",
+        "hellfire_blast",
+        "vampiric_aura"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": true
+    }
   },
   {
     "id": "zuus",
@@ -1121,6 +3775,30 @@
     "positions": [
       2,
       4
-    ]
+    ],
+    "visual_attributes": {
+      "colors": [
+        "blue",
+        "white"
+      ],
+      "features": [
+        "god",
+        "lightning",
+        "hat",
+        "glowing",
+        "poor_eyesight",
+        "arc_lightning",
+        "static_field"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": true,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": true,
+      "has_sword": false
+    }
   }
 ]
