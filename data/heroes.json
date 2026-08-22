@@ -286,6 +286,16 @@
     "positions_display": "1,2"
   },
   {
+    "id": "npc_dota_hero_earth_spirit",
+    "name": "Earth Spirit",
+    "primary_role": "Support",
+    "positions": [
+      4,
+      5
+    ],
+    "positions_display": "4,5"
+  },
+  {
     "id": "npc_dota_hero_earthshaker",
     "name": "Earthshaker",
     "primary_role": "Support",
@@ -294,6 +304,16 @@
       5
     ],
     "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_elder_titan",
+    "name": "Elder Titan",
+    "primary_role": "Initiator",
+    "positions": [
+      3,
+      4
+    ],
+    "positions_display": "3,4"
   },
   {
     "id": "npc_dota_hero_ember_spirit",
@@ -441,6 +461,17 @@
     "positions_display": "1,3"
   },
   {
+    "id": "npc_dota_hero_leshrac",
+    "name": "Leshrac",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      2,
+      3
+    ],
+    "positions_display": "1,2,3"
+  },
+  {
     "id": "npc_dota_hero_lichen",
     "name": "Lich",
     "primary_role": "Support",
@@ -533,6 +564,16 @@
     "positions_display": "1,3"
   },
   {
+    "id": "npc_dota_hero_medusa",
+    "name": "Medusa",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      5
+    ],
+    "positions_display": "1,5"
+  },
+  {
     "id": "npc_dota_hero_meepo",
     "name": "Meepo",
     "primary_role": "Carry",
@@ -575,6 +616,16 @@
     "positions_display": "1,2"
   },
   {
+    "id": "npc_dota_hero_muerta",
+    "name": "Muerta",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      2
+    ],
+    "positions_display": "1,2"
+  },
+  {
     "id": "npc_dota_hero_naga_siren",
     "name": "Naga Siren",
     "primary_role": "Carry",
@@ -594,6 +645,17 @@
       2
     ],
     "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_night_stalker",
+    "name": "Night Stalker",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      3,
+      4
+    ],
+    "positions_display": "1,3,4"
   },
   {
     "id": "npc_dota_hero_nyx_assassin",
@@ -718,6 +780,16 @@
     "positions_display": "2,4,5"
   },
   {
+    "id": "npc_dota_hero_pugo",
+    "name": "Pugo",
+    "primary_role": "Support",
+    "positions": [
+      4,
+      5
+    ],
+    "positions_display": "4,5"
+  },
+  {
     "id": "npc_dota_hero_queenofpain",
     "name": "Queen of Pain",
     "primary_role": "Carry",
@@ -750,6 +822,17 @@
     "positions_display": "1,2"
   },
   {
+    "id": "npc_dota_hero_ringmaster",
+    "name": "Ringmaster",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      2,
+      3
+    ],
+    "positions_display": "1,2,3"
+  },
+  {
     "id": "npc_dota_hero_rubick",
     "name": "Rubick",
     "primary_role": "Support",
@@ -768,6 +851,16 @@
       4
     ],
     "positions_display": "3,4"
+  },
+  {
+    "id": "npc_dota_hero_shadow_demon",
+    "name": "Shadow Demon",
+    "primary_role": "Support",
+    "positions": [
+      4,
+      5
+    ],
+    "positions_display": "4,5"
   },
   {
     "id": "npc_dota_hero_nevermore",
@@ -851,6 +944,16 @@
       2
     ],
     "positions_display": "1,2"
+  },
+  {
+    "id": "npc_dota_hero_spectre",
+    "name": "Spectre",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      5
+    ],
+    "positions_display": "1,5"
   },
   {
     "id": "npc_dota_hero_spirit_breaker",
@@ -976,6 +1079,16 @@
     "positions_display": "1,2"
   },
   {
+    "id": "npc_dota_hero_tusk",
+    "name": "Tusk",
+    "primary_role": "Initiator",
+    "positions": [
+      3,
+      4
+    ],
+    "positions_display": "3,4"
+  },
+  {
     "id": "npc_dota_hero_underlord",
     "name": "Underlord",
     "primary_role": "Initiator",
@@ -1040,6 +1153,16 @@
     "positions_display": "1,2,3"
   },
   {
+    "id": "npc_dota_hero_visage",
+    "name": "Visage",
+    "primary_role": "Support",
+    "positions": [
+      4,
+      5
+    ],
+    "positions_display": "4,5"
+  },
+  {
     "id": "npc_dota_hero_void_spirit",
     "name": "Void Spirit",
     "primary_role": "Carry",
@@ -1059,6 +1182,17 @@
       5
     ],
     "positions_display": "4,5"
+  },
+  {
+    "id": "npc_dota_hero_weaver",
+    "name": "Weaver",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      2,
+      4
+    ],
+    "positions_display": "1,2,4"
   },
   {
     "id": "npc_dota_hero_windrunner",
