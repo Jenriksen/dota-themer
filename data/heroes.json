@@ -6,8 +6,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "alchemist",
@@ -16,8 +15,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "ancient_apparition",
@@ -26,8 +24,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "antimage",
@@ -36,8 +33,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "arc_warden",
@@ -47,8 +43,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "axe",
@@ -57,8 +52,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "bane",
@@ -67,8 +61,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "beastmaster",
@@ -78,8 +71,7 @@
       1,
       3,
       4
-    ],
-    "positions_display": "1,3,4"
+    ]
   },
   {
     "id": "bloodseeker",
@@ -88,8 +80,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "bounty_hunter",
@@ -99,8 +90,7 @@
       1,
       2,
       4
-    ],
-    "positions_display": "1,2,4"
+    ]
   },
   {
     "id": "brewmaster",
@@ -109,8 +99,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "bristleback",
@@ -119,8 +108,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "broodmother",
@@ -130,8 +118,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "centaur",
@@ -140,8 +127,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "chaos_knight",
@@ -150,8 +136,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "chen",
@@ -160,8 +145,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "clinkz",
@@ -171,8 +155,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "rattletrap",
@@ -181,8 +164,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "crystal_maiden",
@@ -191,8 +173,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "dark_seer",
@@ -201,8 +182,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "dark_willow",
@@ -211,8 +191,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "dawnbreaker",
@@ -221,8 +200,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "dazzle",
@@ -231,8 +209,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "death_prophet",
@@ -241,8 +218,7 @@
     "positions": [
       2,
       3
-    ],
-    "positions_display": "2,3"
+    ]
   },
   {
     "id": "disruptor",
@@ -251,8 +227,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "doombringer",
@@ -262,8 +237,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "dragon_knight",
@@ -272,8 +246,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "drow_ranger",
@@ -282,8 +255,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "earth_spirit",
@@ -292,8 +264,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "earthshaker",
@@ -302,8 +273,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "elder_titan",
@@ -312,8 +282,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "ember_spirit",
@@ -323,8 +292,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "enchantress",
@@ -333,8 +301,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "furion",
@@ -344,8 +311,7 @@
       1,
       2,
       5
-    ],
-    "positions_display": "1,2,5"
+    ]
   },
   {
     "id": "grimstroke",
@@ -354,8 +320,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "gyrocopter",
@@ -365,8 +330,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "hoodwink",
@@ -375,8 +339,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "huskar",
@@ -386,8 +349,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "invoker",
@@ -397,8 +359,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "wisp",
@@ -407,8 +368,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "jakiro",
@@ -417,8 +377,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "juggernaut",
@@ -427,8 +386,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "keeper_of_the_light",
@@ -437,8 +395,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "kunkka",
@@ -447,8 +404,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "legion_commander",
@@ -457,8 +413,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "leshrac",
@@ -468,8 +423,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "lichen",
@@ -478,8 +432,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "life_stealer",
@@ -488,8 +441,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "lina",
@@ -498,8 +450,7 @@
     "positions": [
       2,
       4
-    ],
-    "positions_display": "2,4"
+    ]
   },
   {
     "id": "lion",
@@ -508,8 +459,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "lone_druid",
@@ -519,8 +469,7 @@
       1,
       3,
       5
-    ],
-    "positions_display": "1,3,5"
+    ]
   },
   {
     "id": "luna",
@@ -529,8 +478,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "lycan",
@@ -540,8 +488,7 @@
       1,
       3,
       4
-    ],
-    "positions_display": "1,3,4"
+    ]
   },
   {
     "id": "magnataur",
@@ -550,8 +497,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "mars",
@@ -560,8 +506,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "medusa",
@@ -570,8 +515,7 @@
     "positions": [
       1,
       5
-    ],
-    "positions_display": "1,5"
+    ]
   },
   {
     "id": "meepo",
@@ -581,8 +525,7 @@
       1,
       2,
       4
-    ],
-    "positions_display": "1,2,4"
+    ]
   },
   {
     "id": "mirana",
@@ -591,8 +534,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "monkey_king",
@@ -602,8 +544,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "morphling",
@@ -612,8 +553,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "muerta",
@@ -622,8 +562,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "naga_siren",
@@ -633,8 +572,7 @@
       1,
       2,
       4
-    ],
-    "positions_display": "1,2,4"
+    ]
   },
   {
     "id": "necrolyte",
@@ -643,8 +581,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "night_stalker",
@@ -654,8 +591,7 @@
       1,
       3,
       4
-    ],
-    "positions_display": "1,3,4"
+    ]
   },
   {
     "id": "nyx_assassin",
@@ -664,8 +600,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "ogre_magi",
@@ -674,8 +609,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "omniknight",
@@ -684,8 +618,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "oracle",
@@ -694,8 +627,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "outworld_devourer",
@@ -705,8 +637,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "pangolier",
@@ -715,8 +646,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "phantom_assassin",
@@ -725,8 +655,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "phantom_lancer",
@@ -735,8 +664,7 @@
     "positions": [
       1,
       3
-    ],
-    "positions_display": "1,3"
+    ]
   },
   {
     "id": "phoenix",
@@ -745,8 +673,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "puck",
@@ -755,8 +682,7 @@
     "positions": [
       2,
       3
-    ],
-    "positions_display": "2,3"
+    ]
   },
   {
     "id": "pudge",
@@ -765,8 +691,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "pugna",
@@ -776,8 +701,7 @@
       2,
       4,
       5
-    ],
-    "positions_display": "2,4,5"
+    ]
   },
   {
     "id": "pugo",
@@ -786,8 +710,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "queenofpain",
@@ -797,8 +720,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "razor",
@@ -808,8 +730,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "stealth_assassin",
@@ -818,8 +739,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "ringmaster",
@@ -829,8 +749,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "rubick",
@@ -839,8 +758,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "sand_king",
@@ -849,8 +767,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "shadow_demon",
@@ -859,8 +776,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "nevermore",
@@ -869,8 +785,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "shadow_shaman",
@@ -879,8 +794,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "silencer",
@@ -890,8 +804,7 @@
       1,
       2,
       5
-    ],
-    "positions_display": "1,2,5"
+    ]
   },
   {
     "id": "skywrath_mage",
@@ -901,8 +814,7 @@
       2,
       4,
       5
-    ],
-    "positions_display": "2,4,5"
+    ]
   },
   {
     "id": "slardar",
@@ -911,8 +823,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "slark",
@@ -922,8 +833,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "snapfire",
@@ -932,8 +842,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "sniper",
@@ -942,8 +851,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "spectre",
@@ -952,8 +860,7 @@
     "positions": [
       1,
       5
-    ],
-    "positions_display": "1,5"
+    ]
   },
   {
     "id": "spirit_breaker",
@@ -962,8 +869,7 @@
     "positions": [
       1,
       4
-    ],
-    "positions_display": "1,4"
+    ]
   },
   {
     "id": "storm_spirit",
@@ -972,8 +878,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "sven",
@@ -983,8 +888,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "techies",
@@ -993,8 +897,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "templar_assassin",
@@ -1004,8 +907,7 @@
       1,
       2,
       4
-    ],
-    "positions_display": "1,2,4"
+    ]
   },
   {
     "id": "terrorblade",
@@ -1014,8 +916,7 @@
     "positions": [
       1,
       5
-    ],
-    "positions_display": "1,5"
+    ]
   },
   {
     "id": "tidehunter",
@@ -1024,8 +925,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "timbersaw",
@@ -1034,8 +934,7 @@
     "positions": [
       2,
       3
-    ],
-    "positions_display": "2,3"
+    ]
   },
   {
     "id": "tinker",
@@ -1044,8 +943,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "tiny",
@@ -1055,8 +953,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "treant",
@@ -1065,8 +962,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "troll_warlord",
@@ -1075,8 +971,7 @@
     "positions": [
       1,
       2
-    ],
-    "positions_display": "1,2"
+    ]
   },
   {
     "id": "tusk",
@@ -1085,8 +980,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "underlord",
@@ -1095,8 +989,7 @@
     "positions": [
       3,
       4
-    ],
-    "positions_display": "3,4"
+    ]
   },
   {
     "id": "undying",
@@ -1106,8 +999,7 @@
       3,
       4,
       5
-    ],
-    "positions_display": "3,4,5"
+    ]
   },
   {
     "id": "ursa",
@@ -1117,8 +1009,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "vengefulspirit",
@@ -1127,8 +1018,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "venomancer",
@@ -1138,8 +1028,7 @@
       3,
       4,
       5
-    ],
-    "positions_display": "3,4,5"
+    ]
   },
   {
     "id": "viper",
@@ -1149,8 +1038,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "visage",
@@ -1159,8 +1047,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "void_spirit",
@@ -1170,8 +1057,7 @@
       1,
       2,
       3
-    ],
-    "positions_display": "1,2,3"
+    ]
   },
   {
     "id": "warlock",
@@ -1180,8 +1066,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "weaver",
@@ -1191,8 +1076,7 @@
       1,
       2,
       4
-    ],
-    "positions_display": "1,2,4"
+    ]
   },
   {
     "id": "windrunner",
@@ -1202,8 +1086,7 @@
       1,
       2,
       4
-    ],
-    "positions_display": "1,2,4"
+    ]
   },
   {
     "id": "winter_wyvern",
@@ -1212,8 +1095,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "witch_doctor",
@@ -1222,8 +1104,7 @@
     "positions": [
       4,
       5
-    ],
-    "positions_display": "4,5"
+    ]
   },
   {
     "id": "wraith_king",
@@ -1231,8 +1112,7 @@
     "primary_role": "Carry",
     "positions": [
       1
-    ],
-    "positions_display": "1"
+    ]
   },
   {
     "id": "zuus",
@@ -1241,7 +1121,6 @@
     "positions": [
       2,
       4
-    ],
-    "positions_display": "2,4"
+    ]
   }
 ]

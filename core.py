@@ -41,9 +41,22 @@ def get_heroes_by_ids(hero_ids, all_heroes):
     hero_map = {h["id"]: h for h in all_heroes}
     return [hero_map[hid] for hid in hero_ids if hid in hero_map]
 
+def get_positions_display(positions):
+    """
+    Convert a list of positions to a display string.
+    
+    Args:
+        positions: List of position integers (1-5)
+        
+    Returns:
+        str: Comma-separated sorted positions (e.g., "1,2,3")
+    """
+    return ",".join(map(str, sorted(positions)))
+
+
 def format_hero_list(heroes):
     """Format a list of heroes with their positions in parentheses."""
-    return ", ".join(f"{h['name']} ({h['positions_display']})" for h in heroes)
+    return ", ".join(f"{h['name']} ({get_positions_display(h['positions'])})" for h in heroes)
 
 def has_position_coverage(heroes, positions_needed={1, 2, 3, 4, 5}):
     """

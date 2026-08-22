@@ -32,14 +32,14 @@ class TestLoadFunctions(unittest.TestCase):
     def test_load_heroes_structure(self):
         """Each hero has required fields."""
         heroes = core.load_heroes()
-        required_fields = {"id", "name", "primary_role", "positions", "positions_display"}
+        required_fields = {"id", "name", "primary_role", "positions"}
         for hero in heroes:
             self.assertIsInstance(hero, dict)
             self.assertTrue(required_fields.issubset(hero.keys()))
             self.assertIsInstance(hero["id"], str)
             self.assertIsInstance(hero["name"], str)
             self.assertIsInstance(hero["positions"], list)
-            self.assertIsInstance(hero["positions_display"], str)
+            # positions_display is computed at runtime, not stored in data
 
     def test_load_themes_returns_list(self):
         """load_themes() returns a non-empty list of themes."""
@@ -66,9 +66,9 @@ class TestGetHeroesByIds(unittest.TestCase):
 
     def setUp(self):
         self.heroes = [
-            {"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"},
-            {"id": "npc_dota_hero_bane", "name": "Bane", "positions_display": "4,5"},
-            {"id": "npc_dota_hero_chaos_knight", "name": "Chaos Knight", "positions_display": "1,3"},
+            {"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]},
+            {"id": "npc_dota_hero_bane", "name": "Bane", "positions": [4, 5]},
+            {"id": "npc_dota_hero_chaos_knight", "name": "Chaos Knight", "positions": [1, 3]},
         ]
 
     def test_returns_matching_heroes(self):
@@ -101,15 +101,15 @@ class TestFormatHeroList(unittest.TestCase):
 
     def test_formats_single_hero(self):
         """Single hero formatted correctly."""
-        heroes = [{"name": "Axe", "positions_display": "3,4"}]
+        heroes = [{"name": "Axe", "positions": [3, 4]}]
         result = core.format_hero_list(heroes)
         self.assertEqual(result, "Axe (3,4)")
 
     def test_formats_multiple_heroes(self):
         """Multiple heroes joined with comma and space."""
         heroes = [
-            {"name": "Axe", "positions_display": "3,4"},
-            {"name": "Bane", "positions_display": "4,5"},
+            {"name": "Axe", "positions": [3, 4]},
+            {"name": "Bane", "positions": [4, 5]},
         ]
         result = core.format_hero_list(heroes)
         self.assertEqual(result, "Axe (3,4), Bane (4,5)")
@@ -310,25 +310,13 @@ class TestDataIntegrity(unittest.TestCase):
                     f"Hero '{hero['name']}' has invalid position: {pos}"
                 )
 
-    def test_positions_display_matches_positions(self):
-        """positions_display string matches positions list."""
-        heroes = core.load_heroes()
-
-        for hero in heroes:
-            expected_display = ",".join(map(str, sorted(hero["positions"])))
-            self.assertEqual(
-                hero["positions_display"], expected_display,
-                f"Hero '{hero['name']}' has mismatched positions_display. "
-                f"Expected: {expected_display}, Got: {hero['positions_display']}"
-            )
-
 
 class TestEdgeCases(unittest.TestCase):
     """Tests for edge cases and things that shouldn't work."""
 
     def test_get_heroes_by_ids_with_all_nonexistent(self):
         """All requested hero IDs don't exist - returns empty list."""
-        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]}]
         result = core.get_heroes_by_ids(
             ["npc_dota_hero_nonexistent1", "npc_dota_hero_nonexistent2"],
             heroes
@@ -338,8 +326,8 @@ class TestEdgeCases(unittest.TestCase):
     def test_get_heroes_by_ids_with_duplicates(self):
         """Duplicate hero IDs in input - returns duplicates (current behavior)."""
         heroes = [
-            {"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"},
-            {"id": "npc_dota_hero_bane", "name": "Bane", "positions_display": "4,5"},
+            {"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]},
+            {"id": "npc_dota_hero_bane", "name": "Bane", "positions": [4, 5]},
         ]
         result = core.get_heroes_by_ids(
             ["npc_dota_hero_axe", "npc_dota_hero_axe", "npc_dota_hero_bane"],
@@ -352,14 +340,14 @@ class TestEdgeCases(unittest.TestCase):
 
     def test_format_hero_list_with_special_characters_in_name(self):
         """Hero names with special characters are formatted correctly."""
-        heroes = [{"name": "Anti-Mage", "positions_display": "1,2"}]
+        heroes = [{"name": "Anti-Mage", "positions": [1, 2]}]
         result = core.format_hero_list(heroes)
         self.assertEqual(result, "Anti-Mage (1,2)")
 
     def test_format_hero_list_with_multi_digit_positions(self):
         """Positions like 10 would break display - but positions are only 1-5."""
         # This tests the display logic doesn't break with edge case data
-        heroes = [{"name": "Test", "positions_display": "1,2,3,4,5"}]
+        heroes = [{"name": "Test", "positions": [1, 2, 3, 4, 5]}]
         result = core.format_hero_list(heroes)
         self.assertEqual(result, "Test (1,2,3,4,5)")
 
@@ -378,7 +366,7 @@ class TestEdgeCases(unittest.TestCase):
 
     def test_get_heroes_by_ids_none_in_list(self):
         """Passing None as hero_ids list."""
-        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]}]
         # This should handle None gracefully or raise a clear error
         with self.assertRaises(TypeError):
             core.get_heroes_by_ids(None, heroes)
@@ -432,7 +420,7 @@ class TestDataFileErrors(unittest.TestCase):
             data_dir = Path(tmpdir)
             # Create valid heroes.json
             with open(data_dir / "heroes.json", "w") as f:
-                json.dump([{"id": "test", "name": "Test", "positions": [1], "positions_display": "1"}], f)
+                json.dump([{"id": "test", "name": "Test", "positions": [1]}], f)
             # Write malformed themes.json
             with open(data_dir / "themes.json", "w") as f:
                 f.write("[invalid json}")
@@ -457,26 +445,26 @@ class TestEmptyAndNullData(unittest.TestCase):
 
     def test_theme_with_no_matching_heroes(self):
         """Theme with hero_ids that don't match any heroes."""
-        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]}]
         theme = {"name": "Empty Theme", "hero_ids": ["npc_dota_hero_nonexistent"]}
         matching = core.get_heroes_by_ids(theme["hero_ids"], heroes)
         self.assertEqual(len(matching), 0)
 
     def test_theme_with_empty_hero_ids_list(self):
         """Theme with empty hero_ids list."""
-        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions_display": "3,4"}]
+        heroes = [{"id": "npc_dota_hero_axe", "name": "Axe", "positions": [3, 4]}]
         matching = core.get_heroes_by_ids([], heroes)
         self.assertEqual(len(matching), 0)
 
     def test_hero_with_empty_positions(self):
         """Hero with empty positions list has empty display."""
-        hero = {"name": "Test", "positions": [], "positions_display": ""}
+        hero = {"name": "Test", "positions": []}
         result = core.format_hero_list([hero])
         self.assertEqual(result, "Test ()")
 
     def test_hero_with_single_position(self):
         """Hero with single position formatted without comma."""
-        hero = {"name": "Test", "positions": [1], "positions_display": "1"}
+        hero = {"name": "Test", "positions": [1]}
         result = core.format_hero_list([hero])
         self.assertEqual(result, "Test (1)")
 
@@ -541,25 +529,20 @@ class TestDataConsistencyEdgeCases(unittest.TestCase):
             self.assertEqual(len(hero_ids), len(set(hero_ids)),
                            f"Duplicate hero IDs in theme '{theme['name']}'")
 
-    def test_positions_list_matches_positions_display(self):
-        """Each hero's positions list exactly matches positions_display."""
-        heroes = core.load_heroes()
-        for hero in heroes:
-            expected_display = ",".join(map(str, sorted(hero["positions"])))
-            self.assertEqual(
-                hero["positions_display"], expected_display,
-                f"Mismatch for {hero['name']}: positions={hero['positions']}, "
-                f"display={hero['positions_display']}"
-            )
+    def test_get_positions_display_function(self):
+        """get_positions_display correctly formats positions."""
+        self.assertEqual(core.get_positions_display([1, 2]), "1,2")
+        self.assertEqual(core.get_positions_display([3, 1, 2]), "1,2,3")  # Sorted
+        self.assertEqual(core.get_positions_display([5]), "5")
+        self.assertEqual(core.get_positions_display([]), "")
+        self.assertEqual(core.get_positions_display([1, 2, 3, 4, 5]), "1,2,3,4,5")
 
     def test_positions_are_sorted_in_display(self):
-        """positions_display has positions in sorted order."""
-        heroes = core.load_heroes()
-        for hero in heroes:
-            parts = hero["positions_display"].split(",")
-            int_parts = [int(p) for p in parts]
-            self.assertEqual(int_parts, sorted(int_parts),
-                           f"Positions not sorted for {hero['name']}")
+        """get_positions_display returns positions in sorted order."""
+        result = core.get_positions_display([3, 1, 2])
+        self.assertEqual(result, "1,2,3")
+        result = core.get_positions_display([5, 2, 4, 1, 3])
+        self.assertEqual(result, "1,2,3,4,5")
 
 
 class TestEnhancedThemeSelection(unittest.TestCase):
