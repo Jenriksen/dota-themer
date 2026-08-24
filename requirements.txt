@@ -1,0 +1,14 @@
+# Dota Themer - Python Dependencies
+# Core dependencies
+discord.py>=2.0.0
+
+# Testing (optional, for development)
+# unittest is included in Python standard library
+
+# For type checking (optional)
+# mypy>=1.0.0
+
+# For linting (optional)
+# black>=23.0.0
+# flake8>=6.0.0
+# isort>=5.12.0

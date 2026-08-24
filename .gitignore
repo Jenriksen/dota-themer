@@ -68,3 +68,17 @@ venv.bak/
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Project specific
+/.vibe/
+/vibe-scratchpad-*/
+
+# Docker
+.docker/
+
+# Mypy
+.mypy_cache/

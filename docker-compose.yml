@@ -1,0 +1,45 @@
+# Dota Themer - Docker Compose Configuration
+# For local development and testing
+
+version: '3.8'
+
+services:
+  dota-themer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dota-themer
+    restart: unless-stopped
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+      - LOG_FILE=/app/logs/dota-themer.log
+      - ENV=production
+    volumes:
+      # Persist logs
+      - ./logs:/app/logs
+      # Mount data directory for easy updates
+      - ./data:/app/data:ro
+    networks:
+      - dota-network
+
+  # Optional: Test service for running core.py CLI
+  dota-themer-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dota-themer-cli
+    command: ["python", "core.py", "2"]
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-DEBUG}
+      - LOG_FORMAT=${LOG_FORMAT:-text}
+      - ENV=development
+    volumes:
+      - ./data:/app/data:ro
+    networks:
+      - dota-network
+
+networks:
+  dota-network:
+    driver: bridge

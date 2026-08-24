@@ -259,6 +259,7 @@ class TestSetupLogging(unittest.TestCase):
         """Setup logging with file output works."""
         import os
         import tempfile
+        import logging
 
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".log") as f:
             temp_path = f.name
@@ -272,14 +273,20 @@ class TestSetupLogging(unittest.TestCase):
             )
 
             # Should have created file handler
-            import logging
-
             root_logger = logging.getLogger()
             file_handlers = [
                 h for h in root_logger.handlers if isinstance(h, logging.FileHandler)
             ]
             self.assertGreater(len(file_handlers), 0)
         finally:
+            # Close and remove file handlers to release file locks
+            root_logger = logging.getLogger()
+            for handler in root_logger.handlers[:]:
+                if isinstance(handler, logging.FileHandler):
+                    handler.close()
+                    root_logger.removeHandler(handler)
+            
+            # Now it's safe to delete the file
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
 
