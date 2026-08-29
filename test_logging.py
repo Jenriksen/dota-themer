@@ -285,7 +285,7 @@ class TestSetupLogging(unittest.TestCase):
                 if isinstance(handler, logging.FileHandler):
                     handler.close()
                     root_logger.removeHandler(handler)
-            
+
             # Now it's safe to delete the file
             if os.path.exists(temp_path):
                 os.unlink(temp_path)

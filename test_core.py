@@ -854,15 +854,16 @@ class TestThemeManagement(unittest.TestCase):
         self.original_data_dir = core.DATA_DIR
         # Use the actual data directory
         core.DATA_DIR = Path(__file__).parent / "data"
-        
+
         # Create backup copies of the data files
         self.themes_backup = Path(__file__).parent / "data" / "themes_backup.json"
         self.heroes_backup = Path(__file__).parent / "data" / "heroes_backup.json"
-        
+
         import shutil
+
         themes_path = core.DATA_DIR / "themes.json"
         heroes_path = core.DATA_DIR / "heroes.json"
-        
+
         if themes_path.exists():
             shutil.copy2(themes_path, self.themes_backup)
         if heroes_path.exists():
@@ -870,12 +871,13 @@ class TestThemeManagement(unittest.TestCase):
 
     def tearDown(self):
         core.DATA_DIR = self.original_data_dir
-        
+
         # Restore backup copies
         import shutil
+
         themes_path = Path(__file__).parent / "data" / "themes.json"
         heroes_path = Path(__file__).parent / "data" / "heroes.json"
-        
+
         if self.themes_backup.exists():
             shutil.copy2(self.themes_backup, themes_path)
             self.themes_backup.unlink()
@@ -904,22 +906,20 @@ class TestThemeManagement(unittest.TestCase):
     def test_add_theme_valid(self):
         """add_theme adds a new theme successfully."""
         themes_before = core.get_all_theme_names()
-        
+
         # Add a test theme
         success, message = core.add_theme(
-            "TestThemeForAddition",
-            "A test theme",
-            ["antimage", "juggernaut"]
+            "TestThemeForAddition", "A test theme", ["antimage", "juggernaut"]
         )
-        
+
         self.assertTrue(success)
         self.assertIn("added successfully", message)
-        
+
         # Verify it was added
         themes_after = core.get_all_theme_names()
         self.assertEqual(len(themes_after), len(themes_before) + 1)
         self.assertIn("TestThemeForAddition", themes_after)
-        
+
         # Clean up
         core.remove_theme("TestThemeForAddition")
 
@@ -941,9 +941,7 @@ class TestThemeManagement(unittest.TestCase):
     def test_add_theme_invalid_hero(self):
         """add_theme rejects invalid hero IDs."""
         success, message = core.add_theme(
-            "TestThemeInvalidHero",
-            "Description",
-            ["antimage", "nonexistent_hero"]
+            "TestThemeInvalidHero", "Description", ["antimage", "nonexistent_hero"]
         )
         self.assertFalse(success)
         self.assertIn("Invalid hero IDs", message)
@@ -954,22 +952,19 @@ class TestThemeManagement(unittest.TestCase):
         if themes:
             theme_name = themes[0]["name"]
             original_count = len(themes[0]["hero_ids"])
-            
+
             # Add a hero
-            success, message = core.update_theme(
-                theme_name,
-                add_hero_ids=["antimage"]
-            )
-            
+            success, message = core.update_theme(theme_name, add_hero_ids=["antimage"])
+
             self.assertTrue(success)
-            
+
             # Verify the hero was added
             themes_after = core.load_themes()
             for theme in themes_after:
                 if theme["name"] == theme_name:
                     self.assertGreaterEqual(len(theme["hero_ids"]), original_count)
                     break
-            
+
             # Clean up: remove the hero we added
             core.update_theme(theme_name, remove_hero_ids=["antimage"])
 
@@ -983,15 +978,14 @@ class TestThemeManagement(unittest.TestCase):
                     theme_name = theme["name"]
                     hero_to_remove = theme["hero_ids"][0]
                     original_count = len(theme["hero_ids"])
-                    
+
                     # Remove a hero
                     success, message = core.update_theme(
-                        theme_name,
-                        remove_hero_ids=[hero_to_remove]
+                        theme_name, remove_hero_ids=[hero_to_remove]
                     )
-                    
+
                     self.assertTrue(success)
-                    
+
                     # Verify the hero was removed
                     themes_after = core.load_themes()
                     for t in themes_after:
@@ -999,7 +993,7 @@ class TestThemeManagement(unittest.TestCase):
                             self.assertEqual(len(t["hero_ids"]), original_count - 1)
                             self.assertNotIn(hero_to_remove, t["hero_ids"])
                             break
-                    
+
                     # Restore the hero
                     core.update_theme(theme_name, add_hero_ids=[hero_to_remove])
                     break
@@ -1007,8 +1001,7 @@ class TestThemeManagement(unittest.TestCase):
     def test_update_theme_nonexistent(self):
         """update_theme rejects nonexistent theme."""
         success, message = core.update_theme(
-            "NonexistentTheme12345",
-            add_hero_ids=["antimage"]
+            "NonexistentTheme12345", add_hero_ids=["antimage"]
         )
         self.assertFalse(success)
         self.assertIn("not found", message)
@@ -1017,15 +1010,15 @@ class TestThemeManagement(unittest.TestCase):
         """remove_theme removes a theme successfully."""
         # Add a test theme first
         core.add_theme("TestThemeForRemoval", "Test description")
-        
+
         themes_before = core.get_all_theme_names()
         self.assertIn("TestThemeForRemoval", themes_before)
-        
+
         # Remove it
         success, message = core.remove_theme("TestThemeForRemoval")
         self.assertTrue(success)
         self.assertIn("removed successfully", message)
-        
+
         # Verify it was removed
         themes_after = core.get_all_theme_names()
         self.assertNotIn("TestThemeForRemoval", themes_after)

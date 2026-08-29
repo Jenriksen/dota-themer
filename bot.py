@@ -123,40 +123,40 @@ async def theme_error_handler(ctx, error):
 async def add_theme_command(ctx, theme_name: str, *args):
     """
     Create a new theme.
-    
+
     Usage:
     !addtheme <name> [description] <hero1> [hero2] ...
-    
+
     The first argument is the theme name, the second (optional) is the description,
     and all remaining arguments are hero names or IDs.
-    
+
     Example:
     !addtheme "My Theme" "My description" antimage juggernaut
     !addtheme "Strength Heroes" axe bristleback centaur
     """
     logger.info(f"Add theme command from {ctx.author}: {theme_name}")
-    
+
     # Parse arguments
     description = ""
     hero_names = []
-    
+
     if len(args) >= 1:
         # Check if the first arg looks like a description (has spaces or is quoted)
         # For simplicity, we'll treat the first arg as description if it doesn't match a hero
         hero_name_to_id = core.get_all_hero_names()
-        
+
         # If first arg is not a hero, it's the description
         if args[0].lower() not in hero_name_to_id:
             description = args[0]
             hero_names = list(args[1:])
         else:
             hero_names = list(args)
-    
+
     # Convert hero names to IDs
     hero_name_to_id = core.get_all_hero_names()
     hero_ids = []
     invalid_heroes = []
-    
+
     for name in hero_names:
         # Try exact match first (by name)
         hero_id = hero_name_to_id.get(name.lower())
@@ -173,17 +173,17 @@ async def add_theme_command(ctx, theme_name: str, *args):
                     invalid_heroes.append(name)
             except Exception:
                 invalid_heroes.append(name)
-    
+
     if invalid_heroes:
         await ctx.send(
             f"⚠️ Invalid hero names/IDs: {', '.join(invalid_heroes)}. "
             f"Valid heroes: {', '.join(sorted(hero_name_to_id.keys())[:10])}..."
         )
         return
-    
+
     # Add the theme
     success, message = core.add_theme(theme_name, description, hero_ids)
-    
+
     if success:
         logger.info(f"Theme added by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
@@ -196,17 +196,17 @@ async def add_theme_command(ctx, theme_name: str, *args):
 async def remove_theme_command(ctx, theme_name: str):
     """
     Remove a theme.
-    
+
     Usage:
     !removetheme <name>
-    
+
     Example:
     !removetheme "My Theme"
     """
     logger.info(f"Remove theme command from {ctx.author}: {theme_name}")
-    
+
     success, message = core.remove_theme(theme_name)
-    
+
     if success:
         logger.info(f"Theme removed by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
@@ -215,35 +215,37 @@ async def remove_theme_command(ctx, theme_name: str):
         await ctx.send(f"❌ {message}")
 
 
-@bot.command(name="updatetheme", help="Update a theme (add/remove heroes or change description)")
+@bot.command(
+    name="updatetheme", help="Update a theme (add/remove heroes or change description)"
+)
 async def update_theme_command(ctx, theme_name: str, action: str, *args):
     """
     Update an existing theme.
-    
+
     Usage:
     !updatetheme <name> add <hero1> [hero2] ... - Add heroes to theme
     !updatetheme <name> remove <hero1> [hero2] ... - Remove heroes from theme
-    
+
     Example:
     !updatetheme "Red Heroes" add crystal_maiden
     !updatetheme "Red Heroes" remove bloodseeker
     """
     logger.info(f"Update theme command from {ctx.author}: {theme_name} {action} {args}")
-    
+
     action = action.lower()
-    
+
     if action not in ["add", "remove"]:
         await ctx.send(
             f"❌ Invalid action: '{action}'. Use 'add' or 'remove'."
             f"\nExample: `!updatetheme ThemeName add hero1 hero2`"
         )
         return
-    
+
     # Convert hero names to IDs
     hero_name_to_id = core.get_all_hero_names()
     hero_ids = []
     invalid_heroes = []
-    
+
     for name in args:
         hero_id = hero_name_to_id.get(name.lower())
         if hero_id:
@@ -258,20 +260,20 @@ async def update_theme_command(ctx, theme_name: str, action: str, *args):
                     invalid_heroes.append(name)
             except Exception:
                 invalid_heroes.append(name)
-    
+
     if invalid_heroes:
         await ctx.send(
             f"⚠️ Invalid hero names/IDs: {', '.join(invalid_heroes)}. "
             f"Valid heroes: {', '.join(sorted(hero_name_to_id.keys())[:10])}..."
         )
         return
-    
+
     # Update the theme
     if action == "add":
         success, message = core.update_theme(theme_name, add_hero_ids=hero_ids)
     else:  # remove
         success, message = core.update_theme(theme_name, remove_hero_ids=hero_ids)
-    
+
     if success:
         logger.info(f"Theme updated by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
@@ -284,27 +286,27 @@ async def update_theme_command(ctx, theme_name: str, action: str, *args):
 async def list_themes_command(ctx):
     """List all available themes."""
     logger.info(f"List themes command from {ctx.author}")
-    
+
     theme_names = core.get_all_theme_names()
-    
+
     if not theme_names:
         await ctx.send("❌ No themes found.")
         return
-    
+
     # Paginate the response (Discord has a 2000 character limit)
     chunks = []
     current_chunk = "**Available Themes:**\n"
-    
+
     for i, name in enumerate(theme_names, 1):
         line = f"{i}. {name}\n"
         if len(current_chunk + line) > 1800:  # Leave room for more
             chunks.append(current_chunk)
             current_chunk = ""
         current_chunk += line
-    
+
     if current_chunk:
         chunks.append(current_chunk)
-    
+
     for chunk in chunks:
         await ctx.send(chunk)
 
@@ -313,7 +315,7 @@ async def list_themes_command(ctx):
 async def list_heroes_command(ctx):
     """List all available heroes."""
     logger.info(f"List heroes command from {ctx.author}")
-    
+
     try:
         heroes = core.load_heroes()
         hero_list = sorted([h["name"] for h in heroes])
@@ -321,21 +323,21 @@ async def list_heroes_command(ctx):
         logger.error(f"Failed to load heroes: {e}")
         await ctx.send(f"❌ Failed to load heroes: {str(e)}")
         return
-    
+
     # Paginate the response
     chunks = []
     current_chunk = "**Available Heroes:**\n"
-    
+
     for i, name in enumerate(hero_list, 1):
         line = f"{i}. {name}\n"
         if len(current_chunk + line) > 1800:
             chunks.append(current_chunk)
             current_chunk = ""
         current_chunk += line
-    
+
     if current_chunk:
         chunks.append(current_chunk)
-    
+
     for chunk in chunks:
         await ctx.send(chunk)
 

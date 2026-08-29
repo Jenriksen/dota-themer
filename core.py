@@ -509,23 +509,23 @@ def get_theme_suggestion(
 def add_theme(theme_name, description="", hero_ids=None):
     """
     Add a new theme to themes.json.
-    
+
     Args:
         theme_name: Name of the new theme
         description: Optional description of the theme
         hero_ids: List of hero IDs that match this theme
-    
+
     Returns:
         tuple: (success: bool, message: str)
     """
     logger.info(f"Attempting to add theme: {theme_name}")
-    
+
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
         return False, "Theme name cannot be empty"
-    
+
     theme_name = theme_name.strip()
-    
+
     # Load existing themes
     try:
         themes = load_themes()
@@ -533,76 +533,86 @@ def add_theme(theme_name, description="", hero_ids=None):
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
         return False, f"Failed to load data: {str(e)}"
-    
+
     # Check if theme already exists
     for theme in themes:
         if theme["name"].lower() == theme_name.lower():
             logger.warning(f"Theme '{theme_name}' already exists")
             return False, f"Theme '{theme_name}' already exists"
-    
+
     # Validate hero IDs if provided
     valid_hero_ids = {h["id"] for h in heroes}
     if hero_ids:
         # Filter out invalid hero IDs
         validated_hero_ids = [hid for hid in hero_ids if hid in valid_hero_ids]
         invalid_ids = set(hero_ids) - set(validated_hero_ids)
-        
+
         if invalid_ids:
             logger.warning(f"Ignoring invalid hero IDs: {invalid_ids}")
-            return False, f"Invalid hero IDs: {', '.join(sorted(invalid_ids))}. Valid IDs: {', '.join(sorted(valid_hero_ids)[:20])}..."
-        
+            return (
+                False,
+                f"Invalid hero IDs: {', '.join(sorted(invalid_ids))}. Valid IDs: {', '.join(sorted(valid_hero_ids)[:20])}...",
+            )
+
         # Remove duplicates
         validated_hero_ids = list(set(validated_hero_ids))
     else:
         validated_hero_ids = []
-    
+
     # Create new theme
     new_theme = {
         "name": theme_name,
         "description": description.strip() if description else "",
-        "hero_ids": validated_hero_ids
+        "hero_ids": validated_hero_ids,
     }
-    
+
     # Add to themes
     themes.append(new_theme)
-    
+
     # Sort themes by name
     themes.sort(key=lambda t: t["name"])
-    
+
     # Save back to file
     try:
         themes_path = DATA_DIR / "themes.json"
         with open(themes_path, "w") as f:
             json.dump(themes, f, indent=2)
-        
-        logger.info(f"Successfully added theme: {theme_name} with {len(validated_hero_ids)} heroes")
-        return True, f"Theme '{theme_name}' added successfully with {len(validated_hero_ids)} heroes"
+
+        logger.info(
+            f"Successfully added theme: {theme_name} with {len(validated_hero_ids)} heroes"
+        )
+        return (
+            True,
+            f"Theme '{theme_name}' added successfully with {len(validated_hero_ids)} heroes",
+        )
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
         return False, f"Failed to save theme: {str(e)}"
 
 
-def update_theme(theme_name, add_hero_ids=None, remove_hero_ids=None, new_description=None):
+def update_theme(
+    theme_name, add_hero_ids=None, remove_hero_ids=None, new_description=None
+):
     """
     Update an existing theme by adding/removing heroes or changing description.
-    
+
     Args:
         theme_name: Name of the theme to update
         add_hero_ids: List of hero IDs to add to the theme
         remove_hero_ids: List of hero IDs to remove from the theme
         new_description: New description for the theme
-    
+
     Returns:
         tuple: (success: bool, message: str)
     """
     logger.info(f"Attempting to update theme: {theme_name}")
-    
+
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
         return False, "Theme name cannot be empty"
-    
+
     theme_name = theme_name.strip()
-    
+
     # Load existing themes and heroes
     try:
         themes = load_themes()
@@ -610,23 +620,26 @@ def update_theme(theme_name, add_hero_ids=None, remove_hero_ids=None, new_descri
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
         return False, f"Failed to load data: {str(e)}"
-    
+
     # Find the theme to update
     theme_index = None
     for i, theme in enumerate(themes):
         if theme["name"].lower() == theme_name.lower():
             theme_index = i
             break
-    
+
     if theme_index is None:
         logger.warning(f"Theme '{theme_name}' not found")
-        return False, f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}..."
-    
+        return (
+            False,
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        )
+
     # Get valid hero IDs
     valid_hero_ids = {h["id"] for h in heroes}
     theme = themes[theme_index]
     current_hero_ids = set(theme["hero_ids"])
-    
+
     # Process additions
     if add_hero_ids:
         additions = set()
@@ -636,30 +649,33 @@ def update_theme(theme_name, add_hero_ids=None, remove_hero_ids=None, new_descri
             else:
                 logger.warning(f"Ignoring invalid hero ID: {hid}")
         current_hero_ids.update(additions)
-    
+
     # Process removals
     if remove_hero_ids:
         removals = set(remove_hero_ids) & current_hero_ids
         current_hero_ids.difference_update(removals)
-    
+
     # Update description if provided
     if new_description is not None:
         theme["description"] = new_description.strip()
-    
+
     # Update hero IDs
     theme["hero_ids"] = sorted(list(current_hero_ids))
-    
+
     # Sort themes by name
     themes.sort(key=lambda t: t["name"])
-    
+
     # Save back to file
     try:
         themes_path = DATA_DIR / "themes.json"
         with open(themes_path, "w") as f:
             json.dump(themes, f, indent=2)
-        
+
         logger.info(f"Successfully updated theme: {theme_name}")
-        return True, f"Theme '{theme_name}' updated successfully. Now has {len(current_hero_ids)} heroes"
+        return (
+            True,
+            f"Theme '{theme_name}' updated successfully. Now has {len(current_hero_ids)} heroes",
+        )
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
         return False, f"Failed to save theme: {str(e)}"
@@ -668,51 +684,54 @@ def update_theme(theme_name, add_hero_ids=None, remove_hero_ids=None, new_descri
 def remove_theme(theme_name):
     """
     Remove a theme from themes.json.
-    
+
     Args:
         theme_name: Name of the theme to remove
-    
+
     Returns:
         tuple: (success: bool, message: str)
     """
     logger.info(f"Attempting to remove theme: {theme_name}")
-    
+
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
         return False, "Theme name cannot be empty"
-    
+
     theme_name = theme_name.strip()
-    
+
     # Load existing themes
     try:
         themes = load_themes()
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
         return False, f"Failed to load themes: {str(e)}"
-    
+
     # Find and remove the theme
     theme_index = None
     for i, theme in enumerate(themes):
         if theme["name"].lower() == theme_name.lower():
             theme_index = i
             break
-    
+
     if theme_index is None:
         logger.warning(f"Theme '{theme_name}' not found")
-        return False, f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}..."
-    
+        return (
+            False,
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        )
+
     # Remove the theme
     removed_theme = themes.pop(theme_index)
-    
+
     # Sort themes by name
     themes.sort(key=lambda t: t["name"])
-    
+
     # Save back to file
     try:
         themes_path = DATA_DIR / "themes.json"
         with open(themes_path, "w") as f:
             json.dump(themes, f, indent=2)
-        
+
         logger.info(f"Successfully removed theme: {theme_name}")
         return True, f"Theme '{theme_name}' removed successfully"
     except Exception as e:
@@ -723,7 +742,7 @@ def remove_theme(theme_name):
 def get_all_theme_names():
     """
     Get a list of all theme names.
-    
+
     Returns:
         list: Sorted list of theme names
     """
@@ -738,7 +757,7 @@ def get_all_theme_names():
 def get_all_hero_names():
     """
     Get a list of all hero names with their IDs.
-    
+
     Returns:
         dict: Mapping of hero name (lowercase) to hero ID
     """
