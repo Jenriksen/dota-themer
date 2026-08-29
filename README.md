@@ -169,7 +169,8 @@ dota-themer/
     └── themes.json          # Theme definitions (71 themes)
 └── scripts/
     ├── add_themes.py        # Add new themes to themes.json
-    └── add_visual_attributes.py  # Add visual attributes to heroes
+    ├── add_visual_attributes.py  # Add visual attributes to heroes
+    └── pre-commit-hook.sh   # Git pre-commit hook for Black formatting
 ```
 
 ## Development Setup
@@ -218,6 +219,48 @@ python -m unittest discover
 
 # Run the application
 python core.py 3
+```
+
+## Code Quality
+
+### Pre-commit Hook
+
+A pre-commit hook is available to ensure all Python code complies with the Black formatter before allowing commits.
+
+**Installation:**
+
+To enable the pre-commit hook, run:
+
+```bash
+# Create the symlink
+ln -s ../../scripts/pre-commit-hook.sh .git/hooks/pre-commit
+
+# Make sure it's executable
+chmod +x .git/hooks/pre-commit
+```
+
+Or on Windows (Command Prompt):
+```cmd
+mklink .git\hooks\pre-commit scripts\pre-commit-hook.sh
+```
+
+The hook will automatically check all staged Python files with Black and block the commit if any files need reformatting, with clear instructions on how to fix them.
+
+**Requirements:**
+- Black must be installed (`pip install black`)
+- The hook requires Black 23.0.0+
+
+**To fix formatting issues:**
+```bash
+# Run Black on the files that need fixing
+black file1.py file2.py
+
+# Or format all Python files
+black .
+
+# Then stage and commit again
+git add .
+git commit -m "Your message"
 ```
 
 ## Testing

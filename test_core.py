@@ -847,5 +847,194 @@ class TestPositionBasedFeatures(unittest.TestCase):
         self.assertIsNone(result)
 
 
+class TestThemeManagement(unittest.TestCase):
+    """Tests for theme management functions."""
+
+    def setUp(self):
+        self.original_data_dir = core.DATA_DIR
+        # Use the actual data directory
+        core.DATA_DIR = Path(__file__).parent / "data"
+
+        # Create backup copies of the data files
+        self.themes_backup = Path(__file__).parent / "data" / "themes_backup.json"
+        self.heroes_backup = Path(__file__).parent / "data" / "heroes_backup.json"
+
+        import shutil
+
+        themes_path = core.DATA_DIR / "themes.json"
+        heroes_path = core.DATA_DIR / "heroes.json"
+
+        if themes_path.exists():
+            shutil.copy2(themes_path, self.themes_backup)
+        if heroes_path.exists():
+            shutil.copy2(heroes_path, self.heroes_backup)
+
+    def tearDown(self):
+        core.DATA_DIR = self.original_data_dir
+
+        # Restore backup copies
+        import shutil
+
+        themes_path = Path(__file__).parent / "data" / "themes.json"
+        heroes_path = Path(__file__).parent / "data" / "heroes.json"
+
+        if self.themes_backup.exists():
+            shutil.copy2(self.themes_backup, themes_path)
+            self.themes_backup.unlink()
+        if self.heroes_backup.exists():
+            shutil.copy2(self.heroes_backup, heroes_path)
+            self.heroes_backup.unlink()
+
+    def test_get_all_theme_names(self):
+        """get_all_theme_names returns sorted list of theme names."""
+        names = core.get_all_theme_names()
+        self.assertIsInstance(names, list)
+        self.assertGreater(len(names), 0)
+        # Should be sorted
+        self.assertEqual(names, sorted(names))
+
+    def test_get_all_hero_names(self):
+        """get_all_hero_names returns dict mapping hero names to IDs."""
+        hero_map = core.get_all_hero_names()
+        self.assertIsInstance(hero_map, dict)
+        self.assertGreater(len(hero_map), 0)
+        # All values should be strings (hero IDs)
+        for name, hero_id in hero_map.items():
+            self.assertIsInstance(name, str)
+            self.assertIsInstance(hero_id, str)
+
+    def test_add_theme_valid(self):
+        """add_theme adds a new theme successfully."""
+        themes_before = core.get_all_theme_names()
+
+        # Add a test theme
+        success, message = core.add_theme(
+            "TestThemeForAddition", "A test theme", ["antimage", "juggernaut"]
+        )
+
+        self.assertTrue(success)
+        self.assertIn("added successfully", message)
+
+        # Verify it was added
+        themes_after = core.get_all_theme_names()
+        self.assertEqual(len(themes_after), len(themes_before) + 1)
+        self.assertIn("TestThemeForAddition", themes_after)
+
+        # Clean up
+        core.remove_theme("TestThemeForAddition")
+
+    def test_add_theme_duplicate(self):
+        """add_theme rejects duplicate theme names."""
+        themes = core.get_all_theme_names()
+        if themes:
+            existing_theme = themes[0]
+            success, message = core.add_theme(existing_theme, "Description")
+            self.assertFalse(success)
+            self.assertIn("already exists", message)
+
+    def test_add_theme_empty_name(self):
+        """add_theme rejects empty theme name."""
+        success, message = core.add_theme("", "Description")
+        self.assertFalse(success)
+        self.assertIn("cannot be empty", message)
+
+    def test_add_theme_invalid_hero(self):
+        """add_theme rejects invalid hero IDs."""
+        success, message = core.add_theme(
+            "TestThemeInvalidHero", "Description", ["antimage", "nonexistent_hero"]
+        )
+        self.assertFalse(success)
+        self.assertIn("Invalid hero IDs", message)
+
+    def test_update_theme_add_heroes(self):
+        """update_theme adds heroes to existing theme."""
+        themes = core.load_themes()
+        if themes:
+            theme_name = themes[0]["name"]
+            original_count = len(themes[0]["hero_ids"])
+
+            # Add a hero
+            success, message = core.update_theme(theme_name, add_hero_ids=["antimage"])
+
+            self.assertTrue(success)
+
+            # Verify the hero was added
+            themes_after = core.load_themes()
+            for theme in themes_after:
+                if theme["name"] == theme_name:
+                    self.assertGreaterEqual(len(theme["hero_ids"]), original_count)
+                    break
+
+            # Clean up: remove the hero we added
+            core.update_theme(theme_name, remove_hero_ids=["antimage"])
+
+    def test_update_theme_remove_heroes(self):
+        """update_theme removes heroes from existing theme."""
+        themes = core.load_themes()
+        if themes:
+            # Find a theme with at least 2 heroes
+            for theme in themes:
+                if len(theme["hero_ids"]) >= 2:
+                    theme_name = theme["name"]
+                    hero_to_remove = theme["hero_ids"][0]
+                    original_count = len(theme["hero_ids"])
+
+                    # Remove a hero
+                    success, message = core.update_theme(
+                        theme_name, remove_hero_ids=[hero_to_remove]
+                    )
+
+                    self.assertTrue(success)
+
+                    # Verify the hero was removed
+                    themes_after = core.load_themes()
+                    for t in themes_after:
+                        if t["name"] == theme_name:
+                            self.assertEqual(len(t["hero_ids"]), original_count - 1)
+                            self.assertNotIn(hero_to_remove, t["hero_ids"])
+                            break
+
+                    # Restore the hero
+                    core.update_theme(theme_name, add_hero_ids=[hero_to_remove])
+                    break
+
+    def test_update_theme_nonexistent(self):
+        """update_theme rejects nonexistent theme."""
+        success, message = core.update_theme(
+            "NonexistentTheme12345", add_hero_ids=["antimage"]
+        )
+        self.assertFalse(success)
+        self.assertIn("not found", message)
+
+    def test_remove_theme_valid(self):
+        """remove_theme removes a theme successfully."""
+        # Add a test theme first
+        core.add_theme("TestThemeForRemoval", "Test description")
+
+        themes_before = core.get_all_theme_names()
+        self.assertIn("TestThemeForRemoval", themes_before)
+
+        # Remove it
+        success, message = core.remove_theme("TestThemeForRemoval")
+        self.assertTrue(success)
+        self.assertIn("removed successfully", message)
+
+        # Verify it was removed
+        themes_after = core.get_all_theme_names()
+        self.assertNotIn("TestThemeForRemoval", themes_after)
+
+    def test_remove_theme_nonexistent(self):
+        """remove_theme rejects nonexistent theme."""
+        success, message = core.remove_theme("NonexistentTheme54321")
+        self.assertFalse(success)
+        self.assertIn("not found", message)
+
+    def test_remove_theme_empty_name(self):
+        """remove_theme rejects empty theme name."""
+        success, message = core.remove_theme("")
+        self.assertFalse(success)
+        self.assertIn("cannot be empty", message)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -257,9 +257,9 @@ class TestSetupLogging(unittest.TestCase):
 
     def test_setup_logging_with_file_output(self):
         """Setup logging with file output works."""
+        import logging
         import os
         import tempfile
-        import logging
 
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".log") as f:
             temp_path = f.name
@@ -285,7 +285,7 @@ class TestSetupLogging(unittest.TestCase):
                 if isinstance(handler, logging.FileHandler):
                     handler.close()
                     root_logger.removeHandler(handler)
-            
+
             # Now it's safe to delete the file
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
