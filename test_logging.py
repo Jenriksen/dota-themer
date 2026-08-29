@@ -257,9 +257,9 @@ class TestSetupLogging(unittest.TestCase):
 
     def test_setup_logging_with_file_output(self):
         """Setup logging with file output works."""
+        import logging
         import os
         import tempfile
-        import logging
 
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".log") as f:
             temp_path = f.name
