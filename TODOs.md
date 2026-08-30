@@ -77,6 +77,13 @@
 
 ### 4. Advanced Features (Backlog)
 - [ ] Custom theme creation via Discord commands
+  - [ ] Bot Command Tests: No tests for the bot commands themselves (only core functions are tested)
+  - [ ] Input Validation: Could improve hero name matching (fuzzy matching?)
+  - [ ] Error Messages: Could be more user-friendly
+  - [ ] Confirmation: No confirmation before destructive operations (remove)
+  - [ ] Categories: Theme categories not yet implemented (mentioned in ROADMAP)
+  - [ ] Permissions: No permission system (any user can modify themes)
+  - [ ] Audit Log: No logging of who created/modified themes
 - [ ] Theme categories (visual, lore, mechanical)
 - [ ] Winrate-based position recommendations
 - [ ] Team composition validation
