@@ -82,6 +82,7 @@
 - [ ] Team composition validation
 - [ ] Multiple theme suggestions per request
 - [ ] Theme rotation / daily themes
+- [ ] Hero name hyperlinks in output (underline name, link to dota2.com/hero/{id})
 
 ---
 
