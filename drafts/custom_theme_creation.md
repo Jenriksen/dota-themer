@@ -10,6 +10,25 @@ This document describes the draft implementation for custom theme creation via D
 
 The core functionality for custom theme creation is already implemented in the codebase but may need additional testing and refinement.
 
+## Design Decision: Hide vs Delete
+
+**Users should NOT be able to delete themes, only hide them.**
+
+This is an important design consideration. The current implementation allows users to remove themes completely with `!removetheme`. However, this is destructive and can lead to data loss.
+
+**Recommended approach:**
+- Add an `is_hidden` or `is_active` boolean field to each theme in `themes.json`
+- Change `!removetheme` to `!hidetheme` (or add a new command)
+- Add `!unhidetheme` or `!showtheme` command
+- Modify `get_theme_suggestion()` and `select_theme()` to filter out hidden themes
+- Keep `remove_theme()` as an admin-only function (or remove it entirely)
+
+This ensures:
+- User-created themes can be hidden but not lost
+- Hidden themes can be restored
+- No accidental permanent data loss
+- Better user experience
+
 ## Implemented Components
 
 ### 1. Core Functions (`core.py`)
@@ -178,7 +197,7 @@ All changes are immediately saved to `data/themes.json`:
 1. **Bot Command Tests**: No tests for the bot commands themselves (only core functions are tested)
 2. **Input Validation**: Could improve hero name matching (fuzzy matching?)
 3. **Error Messages**: Could be more user-friendly
-4. **Confirmation**: No confirmation before destructive operations (remove)
+4. **Hide/UnHide Implementation**: Replace remove with hide functionality (users cannot delete, only hide from suggestions)
 5. **Categories**: Theme categories not yet implemented (mentioned in ROADMAP)
 6. **Permissions**: No permission system (any user can modify themes)
 7. **Audit Log**: No logging of who created/modified themes

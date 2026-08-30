@@ -80,7 +80,7 @@
   - [ ] Bot Command Tests: No tests for the bot commands themselves (only core functions are tested)
   - [ ] Input Validation: Could improve hero name matching (fuzzy matching?)
   - [ ] Error Messages: Could be more user-friendly
-  - [ ] Confirmation: No confirmation before destructive operations (remove)
+  - [ ] Hide/UnHide Themes: Replace remove with hide functionality (users cannot delete, only hide from suggestions)
   - [ ] Categories: Theme categories not yet implemented (mentioned in ROADMAP)
   - [ ] Permissions: No permission system (any user can modify themes)
   - [ ] Audit Log: No logging of who created/modified themes
