@@ -208,11 +208,13 @@
   - [ ] Theme popularity tracking
   - [ ] User statistics (themes used, heroes picked)
   - [ ] Leaderboard for most active users
-  - [ ] Feedback collection commands
+  - [ ] Feedback collection via reactions (:thumbsup:/:thumbsdown:)
+  - [ ] Theme feedback counters persisted in themes.json
 - **Success Criteria**:
   - Users can view their stats
   - Popular themes are visible
-  - Feedback mechanism in place
+  - Feedback mechanism in place via Discord reactions
+  - Theme feedback counters persist between application runs
 
 **Milestone M5.3: Documentation & Onboarding** 🎯
 - **Timeline**: Week 14-15
