@@ -84,6 +84,7 @@
 - [ ] Theme rotation / daily themes
 - [ ] Hero name hyperlinks in output (underline name, link to dota2.com/hero/{id})
 - [ ] Theme feedback via reactions (:thumbsup: +1, :thumbsdown: -1, persisted in themes.json)
+- [ ] Help command via `!theme help` for in-context assistance
 
 ---
 

@@ -178,11 +178,13 @@
   - [ ] Rich embed formatting for Discord
   - [ ] Hero images in suggestions
   - [ ] Hero name hyperlinks (underline name, link to https://www.dota2.com/hero/{id})
+  - [ ] Help command `!theme help` for in-context assistance
 - **Success Criteria**:
   - Users can request multiple themes at once
   - Daily theme feature functional
   - Discord messages use rich embeds
   - Hero names are clickable links to dota2.com hero pages
+  - Users can get help via `!theme help` command
 
 ---
 
