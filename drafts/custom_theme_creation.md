@@ -6,22 +6,27 @@ This document describes the draft implementation for custom theme creation via D
 
 ## Feature Status
 
-**Status:** ⚠️ IMPLEMENTED but NOT FULLY TESTED
+**Status:** ✅ IMPLEMENTED AND TESTED
 
-The core functionality for custom theme creation is already implemented in the codebase but may need additional testing and refinement.
+The core functionality for custom theme creation is implemented and tested. The hide/unhide feature has been fully implemented.
 
 ## Design Decision: Hide vs Delete
 
 **Users should NOT be able to delete themes, only hide them.**
 
-This is an important design consideration. The current implementation allows users to remove themes completely with `!removetheme`. However, this is destructive and can lead to data loss.
+This design decision has been implemented. Users can now hide themes from suggestions and unhide them later, but cannot permanently delete them.
 
-**Recommended approach:**
-- Add an `is_hidden` or `is_active` boolean field to each theme in `themes.json`
-- Change `!removetheme` to `!hidetheme` (or add a new command)
-- Add `!unhidetheme` or `!showtheme` command
-- Modify `get_theme_suggestion()` and `select_theme()` to filter out hidden themes
-- Keep `remove_theme()` as an admin-only function (or remove it entirely)
+**Implementation:**
+- Added `is_hidden` boolean field to each theme in `themes.json` (backward compatible)
+- Changed `!removetheme` to `!hidetheme` command
+- Added `!unhidetheme` command
+- Added `hide_theme()` and `unhide_theme()` functions in core.py
+- Modified `load_themes()` to support `include_hidden` parameter
+- Updated `filter_themes()` to filter out hidden themes by default
+- Updated `get_theme_suggestion()` and `select_theme()` to exclude hidden themes
+- Added `get_all_themes_with_status()` for listing with hidden status
+- Updated `!listthemes` to show hidden status (hidden themes marked with "(hidden)")
+- Updated help text with new commands
 
 This ensures:
 - User-created themes can be hidden but not lost
@@ -149,11 +154,18 @@ User: !updatetheme "My Favorite Heroes" remove juggernaut
 Bot: ✅ Theme 'My Favorite Heroes' updated successfully. Now has 3 heroes
 ```
 
-### Removing a Theme
+### Hiding a Theme
 
 ```
-User: !removetheme "My Favorite Heroes"
-Bot: ✅ Theme 'My Favorite Heroes' removed successfully
+User: !hidetheme "My Favorite Heroes"
+Bot: ✅ Theme 'My Favorite Heroes' hidden successfully. It will no longer appear in suggestions.
+```
+
+### Unhiding a Theme
+
+```
+User: !unhidetheme "My Favorite Heroes"
+Bot: ✅ Theme 'My Favorite Heroes' unhidden successfully. It will now appear in suggestions.
 ```
 
 ### Listing Themes
@@ -163,9 +175,12 @@ User: !listthemes
 Bot: **Available Themes:**
 1. Agility Heroes
 2. Animal Companions
-3. Beards
+3. Beards (hidden)
+4. Black Heroes
 ...
 ```
+
+Note: Hidden themes are marked with "(hidden)" in the list.
 
 ## Implementation Notes
 
@@ -197,10 +212,12 @@ All changes are immediately saved to `data/themes.json`:
 1. **Bot Command Tests**: No tests for the bot commands themselves (only core functions are tested)
 2. **Input Validation**: Could improve hero name matching (fuzzy matching?)
 3. **Error Messages**: Could be more user-friendly
-4. **Hide/UnHide Implementation**: Replace remove with hide functionality (users cannot delete, only hide from suggestions)
-5. **Categories**: Theme categories not yet implemented (mentioned in ROADMAP)
-6. **Permissions**: No permission system (any user can modify themes)
-7. **Audit Log**: No logging of who created/modified themes
+4. **Categories**: Theme categories not yet implemented (mentioned in ROADMAP)
+5. **Permissions**: No permission system (any user can modify themes)
+6. **Audit Log**: No logging of who created/modified themes
+
+**Completed:**
+- ✅ Hide/UnHide Implementation: Users can hide/unhide themes but cannot delete them
 
 ## Testing the Feature
 
