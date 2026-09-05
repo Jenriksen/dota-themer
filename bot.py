@@ -17,8 +17,13 @@ logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 # Configure bot
 intents = discord.Intents.default()
 intents.message_content = True
+intents.reactions = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+# Track theme suggestion messages for feedback
+# Maps message_id to theme_name
+theme_suggestion_messages = {}
 
 
 @bot.event
@@ -32,6 +37,48 @@ async def on_ready():
     await bot.change_presence(
         activity=discord.Game(name="Type !helptheme to get started")
     )
+
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    """Handle reactions to theme suggestion messages."""
+    # Don't respond to the bot's own reactions
+    if user == bot.user:
+        return
+
+    # Only handle reactions on our own messages
+    if reaction.message.author != bot.user:
+        return
+
+    # Check if this is a theme suggestion message
+    message_id = reaction.message.id
+    if message_id not in theme_suggestion_messages:
+        return
+
+    theme_name = theme_suggestion_messages[message_id]
+
+    # Handle thumbs up (👍) and thumbs down (👎) reactions
+    if str(reaction.emoji) == "👍":
+        delta = 1
+    elif str(reaction.emoji) == "👎":
+        delta = -1
+    else:
+        # Ignore other reactions
+        return
+
+    logger.info(
+        f"Feedback reaction from {user}: {reaction.emoji} on theme '{theme_name}'"
+    )
+
+    # Update the feedback score
+    success, message = core.update_theme_feedback(theme_name, delta)
+
+    if success:
+        logger.info(f"Feedback updated: {message}")
+        # Clean up the message tracking
+        del theme_suggestion_messages[message_id]
+    else:
+        logger.warning(f"Failed to update feedback: {message}")
 
 
 @bot.command(name="theme", help="Get a theme suggestion for hero selection")
@@ -57,9 +104,14 @@ async def theme_command(ctx, party_size: int = 2):
     if suggestion["description"]:
         response += f"\n**Description:** {suggestion['description']}"
     response += f"\n**Heroes:** {suggestion['heroes']}"
+    response += f"\n**Feedback:** {suggestion['feedback_score']} 👍👎"
     response += f"\n*({suggestion['hero_count']} heroes match this theme)*"
+    response += f"\n\nReact with 👍 to upvote this theme, or 👎 to downvote it!"
 
-    await ctx.send(response)
+    sent_message = await ctx.send(response)
+
+    # Store the message_id to theme_name mapping for reaction handling
+    theme_suggestion_messages[sent_message.id] = suggestion["theme"]
 
 
 @bot.command(
@@ -81,6 +133,7 @@ async def help_theme_command(ctx):
     **Theme Suggestions:**
     `!theme [party_size]` - Get a theme suggestion (default: 2 players)
     `!tr [party_size]` - Same as !theme (short alias)
+    React with 👍 to upvote or 👎 to downvote a theme suggestion
     
     **Theme Management:**
     `!addtheme <name> [description] <hero1> [hero2] ...` - Create a new theme
@@ -100,6 +153,9 @@ async def help_theme_command(ctx):
     `!updatetheme "Red Heroes" remove bloodseeker` - Remove a hero from an existing theme
     `!hidetheme "My Custom Theme"` - Hide from suggestions
     `!unhidetheme "My Custom Theme"` - Show in suggestions again
+    
+    **Feedback:**
+    React with 👍 to upvote a theme or 👎 to downvote it
     
     **Party Sizes:** 1-5 players
     """

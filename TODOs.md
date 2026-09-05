@@ -91,6 +91,11 @@
 - [ ] Theme rotation / daily themes
 - [ ] Hero name hyperlinks in output (underline name, link to dota2.com/hero/{id})
 - [ ] Theme feedback via reactions (:thumbsup: +1, :thumbsdown: -1, persisted in themes.json)
+  - [ ] Add feedback_score field to themes.json
+  - [ ] Implement on_reaction_add event handler in bot.py
+  - [ ] Add update_theme_feedback() function in core.py
+  - [ ] Display feedback score in theme suggestion messages
+  - [ ] Add description about reactions in theme message
 - [ ] Help command via `!theme help` for in-context assistance
 
 ---
