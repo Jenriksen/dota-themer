@@ -145,16 +145,18 @@
 
 **Milestone M4.1: Custom Theme Creation** 🎯
 - **Timeline**: Week 8-9
-- **Goals**: Allow users to create custom themes
+- **Goals**: Allow users to create and modify custom themes
 - **Deliverables**:
-  - [ ] Discord command: `!addtheme <name> <hero1> <hero2> ...`
-  - [ ] Theme persistence (save to themes.json)
-  - [ ] Theme validation (minimum heroes, unique names)
-  - [ ] List custom themes command
+  - [x] Discord command: `!addtheme <name> <hero1> <hero2> ...`
+  - [x] Theme persistence (save to themes.json)
+  - [x] Theme validation (minimum heroes, unique names)
+  - [x] List custom themes command
+  - [ ] Theme modification guide displayed with theme suggestions
 - **Success Criteria**:
   - Users can create themes via Discord
   - Custom themes persist across bot restarts
   - Input validation prevents invalid themes
+  - Users can see how to modify themes when a theme is posted
 
 **Milestone M4.2: Intelligent Recommendations** 🎯
 - **Timeline**: Week 9-10

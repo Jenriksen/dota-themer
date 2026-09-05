@@ -96,6 +96,7 @@
   - [ ] Add update_theme_feedback() function in core.py
   - [ ] Display feedback score in theme suggestion messages
   - [ ] Add description about reactions in theme message
+- [ ] Theme modification guide with suggestions
 - [ ] Help command via `!theme help` for in-context assistance
 
 ---
