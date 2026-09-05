@@ -4,7 +4,7 @@ Provides theme suggestions via Discord commands.
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import discord
 from discord.ext import commands
@@ -68,7 +68,7 @@ async def on_reaction_add(reaction, user):
         return
 
     # Check if 2 hours have passed since message was created
-    time_elapsed = datetime.now(datetime.UTC) - message_info["timestamp"]
+    time_elapsed = datetime.now(timezone.utc) - message_info["timestamp"]
     if time_elapsed >= timedelta(hours=2):
         # Lock the voting
         message_info["locked"] = True
@@ -126,7 +126,7 @@ async def on_reaction_remove(reaction, user):
         return
 
     # Check if 2 hours have passed
-    time_elapsed = datetime.now(datetime.UTC) - message_info["timestamp"]
+    time_elapsed = datetime.now(timezone.utc) - message_info["timestamp"]
     if time_elapsed >= timedelta(hours=2):
         return
 
@@ -186,7 +186,7 @@ async def theme_command(ctx, party_size: int = 2):
     # Store the message_id with metadata for reaction handling
     theme_suggestion_messages[sent_message.id] = {
         "theme_name": suggestion["theme"],
-        "timestamp": datetime.now(datetime.UTC),
+        "timestamp": datetime.now(timezone.utc),
         "locked": False,
     }
 
