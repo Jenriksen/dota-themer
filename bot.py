@@ -28,6 +28,11 @@ async def on_ready():
     print(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
     print("------")
 
+    # Set bot status to show help command
+    await bot.change_presence(
+        activity=discord.Game(name="Type !helptheme to get started")
+    )
+
 
 @bot.command(name="theme", help="Get a theme suggestion for hero selection")
 async def theme_command(ctx, party_size: int = 2):
@@ -90,9 +95,9 @@ async def help_theme_command(ctx):
     `!theme` - Theme for 2 players
     `!theme 3` - Theme for 3 players
     `!tr 5` - Theme for full 5-player party
-    `!addtheme "My Custom Theme" "A test theme" antimage juggernaut
-    `!updatetheme "Red Heroes" add crystal_maiden
-    `!updatetheme "Red Heroes" remove bloodseeker
+    `!addtheme "My Custom Theme" "A test theme" antimage juggernaut` - Create a new theme
+    `!updatetheme "Red Heroes" add crystal_maiden` - Add a hero to an existing theme
+    `!updatetheme "Red Heroes" remove bloodseeker` - Remove a hero from an existing theme
     `!hidetheme "My Custom Theme"` - Hide from suggestions
     `!unhidetheme "My Custom Theme"` - Show in suggestions again
     
