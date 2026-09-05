@@ -42,12 +42,29 @@ def load_heroes():
         raise
 
 
-def load_themes():
-    """Load themes from JSON file."""
+def load_themes(include_hidden=True):
+    """Load themes from JSON file.
+
+    Args:
+        include_hidden: If False, filter out themes with is_hidden=True
+
+    Returns:
+        list: List of theme dicts, optionally filtered
+    """
     logger.debug("Loading themes from themes.json")
     try:
         with open(DATA_DIR / "themes.json", "r") as f:
             themes = json.load(f)
+
+        # Ensure all themes have is_hidden field for backward compatibility
+        for theme in themes:
+            if "is_hidden" not in theme:
+                theme["is_hidden"] = False
+
+        # Filter hidden themes if requested
+        if not include_hidden:
+            themes = [t for t in themes if not t.get("is_hidden", False)]
+
         logger.info(f"Loaded {len(themes)} themes")
         return themes
     except FileNotFoundError as e:
@@ -122,6 +139,7 @@ def filter_themes(
     party_size=None,
     min_heroes=None,
     require_position_coverage=False,
+    include_hidden=True,
 ):
     """
     Filter themes based on criteria.
@@ -132,12 +150,16 @@ def filter_themes(
         party_size: If provided, filter themes with at least this many heroes
         min_heroes: Minimum number of heroes required (overrides party_size)
         require_position_coverage: If True, filter themes with full position coverage
+        include_hidden: If False, filter out themes with is_hidden=True
 
     Returns:
         list: Filtered list of theme dicts
     """
     filtered = []
     for theme in themes:
+        # Skip hidden themes if requested
+        if not include_hidden and theme.get("is_hidden", False):
+            continue
         matching_heroes = get_heroes_by_ids(theme["hero_ids"], all_heroes)
         hero_count = len(matching_heroes)
 
@@ -194,6 +216,7 @@ def select_theme(
         heroes,
         party_size=party_size,
         require_position_coverage=require_position_coverage,
+        include_hidden=False,
     )
 
     if not filtered_themes:
@@ -475,7 +498,7 @@ def get_theme_suggestion(
     )
 
     heroes = load_heroes()
-    themes = load_themes()
+    themes = load_themes(include_hidden=False)
 
     # Select a theme with filtering and weighting options
     theme = select_theme(
@@ -526,9 +549,9 @@ def add_theme(theme_name, description="", hero_ids=None):
 
     theme_name = theme_name.strip()
 
-    # Load existing themes
+    # Load existing themes (include hidden for duplicate checking)
     try:
-        themes = load_themes()
+        themes = load_themes(include_hidden=True)
         heroes = load_heroes()
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
@@ -613,9 +636,9 @@ def update_theme(
 
     theme_name = theme_name.strip()
 
-    # Load existing themes and heroes
+    # Load existing themes and heroes (include hidden)
     try:
-        themes = load_themes()
+        themes = load_themes(include_hidden=True)
         heroes = load_heroes()
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
@@ -681,6 +704,133 @@ def update_theme(
         return False, f"Failed to save theme: {str(e)}"
 
 
+def hide_theme(theme_name):
+    """
+    Hide a theme (mark as hidden so it doesn't appear in suggestions).
+
+    Args:
+        theme_name: Name of the theme to hide
+
+    Returns:
+        tuple: (success: bool, message: str)
+    """
+    logger.info(f"Attempting to hide theme: {theme_name}")
+
+    if not theme_name or not theme_name.strip():
+        logger.warning("Theme name cannot be empty")
+        return False, "Theme name cannot be empty"
+
+    theme_name = theme_name.strip()
+
+    # Load existing themes
+    try:
+        themes = load_themes()
+    except Exception as e:
+        logger.error(f"Failed to load themes: {e}")
+        return False, f"Failed to load themes: {str(e)}"
+
+    # Find the theme to hide
+    theme_index = None
+    for i, theme in enumerate(themes):
+        if theme["name"].lower() == theme_name.lower():
+            theme_index = i
+            break
+
+    if theme_index is None:
+        logger.warning(f"Theme '{theme_name}' not found")
+        return (
+            False,
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        )
+
+    # Hide the theme
+    themes[theme_index]["is_hidden"] = True
+
+    # Sort themes by name
+    themes.sort(key=lambda t: t["name"])
+
+    # Save back to file
+    try:
+        themes_path = DATA_DIR / "themes.json"
+        with open(themes_path, "w") as f:
+            json.dump(themes, f, indent=2)
+
+        logger.info(f"Successfully hid theme: {theme_name}")
+        return (
+            True,
+            f"Theme '{theme_name}' hidden successfully. It will no longer appear in suggestions.",
+        )
+    except Exception as e:
+        logger.error(f"Failed to save themes: {e}")
+        return False, f"Failed to save theme: {str(e)}"
+
+
+def unhide_theme(theme_name):
+    """
+    Unhide a theme (mark as visible so it appears in suggestions).
+
+    Args:
+        theme_name: Name of the theme to unhide
+
+    Returns:
+        tuple: (success: bool, message: str)
+    """
+    logger.info(f"Attempting to unhide theme: {theme_name}")
+
+    if not theme_name or not theme_name.strip():
+        logger.warning("Theme name cannot be empty")
+        return False, "Theme name cannot be empty"
+
+    theme_name = theme_name.strip()
+
+    # Load existing themes (include hidden ones)
+    try:
+        themes = load_themes(include_hidden=True)
+    except Exception as e:
+        logger.error(f"Failed to load themes: {e}")
+        return False, f"Failed to load themes: {str(e)}"
+
+    # Find the theme to unhide
+    theme_index = None
+    for i, theme in enumerate(themes):
+        if theme["name"].lower() == theme_name.lower():
+            theme_index = i
+            break
+
+    if theme_index is None:
+        logger.warning(f"Theme '{theme_name}' not found")
+        return (
+            False,
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        )
+
+    # Check if theme is already visible
+    if not themes[theme_index].get("is_hidden", False):
+        logger.info(f"Theme '{theme_name}' is already visible")
+        return True, f"Theme '{theme_name}' is already visible."
+
+    # Unhide the theme
+    themes[theme_index]["is_hidden"] = False
+
+    # Sort themes by name
+    themes.sort(key=lambda t: t["name"])
+
+    # Save back to file
+    try:
+        themes_path = DATA_DIR / "themes.json"
+        with open(themes_path, "w") as f:
+            json.dump(themes, f, indent=2)
+
+        logger.info(f"Successfully unhid theme: {theme_name}")
+        return (
+            True,
+            f"Theme '{theme_name}' unhidden successfully. It will now appear in suggestions.",
+        )
+    except Exception as e:
+        logger.error(f"Failed to save themes: {e}")
+        return False, f"Failed to save theme: {str(e)}"
+
+
 def remove_theme(theme_name):
     """
     Remove a theme from themes.json.
@@ -699,9 +849,9 @@ def remove_theme(theme_name):
 
     theme_name = theme_name.strip()
 
-    # Load existing themes
+    # Load existing themes (include hidden)
     try:
-        themes = load_themes()
+        themes = load_themes(include_hidden=True)
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
         return False, f"Failed to load themes: {str(e)}"
@@ -739,16 +889,36 @@ def remove_theme(theme_name):
         return False, f"Failed to save themes: {str(e)}"
 
 
-def get_all_theme_names():
+def get_all_theme_names(include_hidden=True):
     """
     Get a list of all theme names.
+
+    Args:
+        include_hidden: If False, exclude hidden themes from the list
 
     Returns:
         list: Sorted list of theme names
     """
     try:
-        themes = load_themes()
+        themes = load_themes(include_hidden=include_hidden)
         return sorted([t["name"] for t in themes])
+    except Exception as e:
+        logger.error(f"Failed to load themes: {e}")
+        return []
+
+
+def get_all_themes_with_status():
+    """
+    Get all themes with their hidden status.
+
+    Returns:
+        list: List of dicts with 'name' and 'is_hidden' for each theme
+    """
+    try:
+        themes = load_themes(include_hidden=True)
+        return [
+            {"name": t["name"], "is_hidden": t.get("is_hidden", False)} for t in themes
+        ]
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
         return []
