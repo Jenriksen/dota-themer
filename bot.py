@@ -113,6 +113,13 @@ async def theme_command(ctx, party_size: int = 2):
     # Store the message_id to theme_name mapping for reaction handling
     theme_suggestion_messages[sent_message.id] = suggestion["theme"]
 
+    # Add bot's own reactions to make it easier for users
+    try:
+        await sent_message.add_reaction("👍")
+        await sent_message.add_reaction("👎")
+    except Exception as e:
+        logger.warning(f"Failed to add reactions to message: {e}")
+
 
 @bot.command(
     name="themeroll",
