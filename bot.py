@@ -41,8 +41,12 @@ async def on_ready():
 
 @bot.event
 async def on_reaction_add(reaction, user):
-    """Handle reactions to theme suggestion messages."""
-    # Don't respond to the bot's own reactions
+    """Handle reactions to theme suggestion messages.
+
+    Note: The bot's own reactions (👍, 👎) on theme messages are explicitly
+    excluded from being counted as votes to prevent inflation of feedback scores.
+    """
+    # Don't count the bot's own reactions as votes
     if user == bot.user:
         return
 
@@ -114,11 +118,14 @@ async def theme_command(ctx, party_size: int = 2):
     theme_suggestion_messages[sent_message.id] = suggestion["theme"]
 
     # Add bot's own reactions to make it easier for users
+    # Note: Bot's own reactions are explicitly excluded in on_reaction_add
     try:
         await sent_message.add_reaction("👍")
         await sent_message.add_reaction("👎")
     except Exception as e:
         logger.warning(f"Failed to add reactions to message: {e}")
+        # Clean up tracking if reactions couldn't be added
+        theme_suggestion_messages.pop(sent_message.id, None)
 
 
 @bot.command(
