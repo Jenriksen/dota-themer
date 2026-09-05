@@ -81,8 +81,9 @@ async def help_theme_command(ctx):
     `!addtheme <name> [description] <hero1> [hero2] ...` - Create a new theme
     `!updatetheme <name> add <hero1> [hero2] ...` - Add heroes to a theme
     `!updatetheme <name> remove <hero1> [hero2] ...` - Remove heroes from a theme
-    `!removetheme <name>` - Remove a theme
-    `!listthemes` - List all available themes
+    `!hidetheme <name>` - Hide a theme from suggestions (can be restored)
+    `!unhidetheme <name>` - Make a hidden theme visible again
+    `!listthemes` - List all available themes (includes hidden themes)
     `!listheroes` - List all available heroes
     
     **Examples:**
@@ -92,6 +93,8 @@ async def help_theme_command(ctx):
     `!addtheme "My Custom Theme" "A test theme" antimage juggernaut
     `!updatetheme "Red Heroes" add crystal_maiden
     `!updatetheme "Red Heroes" remove bloodseeker
+    `!hidetheme "My Custom Theme"` - Hide from suggestions
+    `!unhidetheme "My Custom Theme"` - Show in suggestions again
     
     **Party Sizes:** 1-5 players
     """
@@ -192,26 +195,49 @@ async def add_theme_command(ctx, theme_name: str, *args):
         await ctx.send(f"❌ {message}")
 
 
-@bot.command(name="removetheme", help="Remove a theme")
-async def remove_theme_command(ctx, theme_name: str):
+@bot.command(name="hidetheme", help="Hide a theme from suggestions")
+async def hide_theme_command(ctx, theme_name: str):
     """
-    Remove a theme.
+    Hide a theme (it will no longer appear in suggestions but can be restored).
 
     Usage:
-    !removetheme <name>
+    !hidetheme <name>
 
     Example:
-    !removetheme "My Theme"
+    !hidetheme "My Theme"
     """
-    logger.info(f"Remove theme command from {ctx.author}: {theme_name}")
+    logger.info(f"Hide theme command from {ctx.author}: {theme_name}")
 
-    success, message = core.remove_theme(theme_name)
+    success, message = core.hide_theme(theme_name)
 
     if success:
-        logger.info(f"Theme removed by {ctx.author}: {theme_name}")
+        logger.info(f"Theme hidden by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
     else:
-        logger.warning(f"Failed to remove theme for {ctx.author}: {message}")
+        logger.warning(f"Failed to hide theme for {ctx.author}: {message}")
+        await ctx.send(f"❌ {message}")
+
+
+@bot.command(name="unhidetheme", help="Make a hidden theme visible again")
+async def unhide_theme_command(ctx, theme_name: str):
+    """
+    Unhide a theme (it will appear in suggestions again).
+
+    Usage:
+    !unhidetheme <name>
+
+    Example:
+    !unhidetheme "My Theme"
+    """
+    logger.info(f"Unhide theme command from {ctx.author}: {theme_name}")
+
+    success, message = core.unhide_theme(theme_name)
+
+    if success:
+        logger.info(f"Theme unhidden by {ctx.author}: {theme_name}")
+        await ctx.send(f"✅ {message}")
+    else:
+        logger.warning(f"Failed to unhide theme for {ctx.author}: {message}")
         await ctx.send(f"❌ {message}")
 
 
@@ -284,12 +310,12 @@ async def update_theme_command(ctx, theme_name: str, action: str, *args):
 
 @bot.command(name="listthemes", help="List all available themes")
 async def list_themes_command(ctx):
-    """List all available themes."""
+    """List all available themes with hidden status."""
     logger.info(f"List themes command from {ctx.author}")
 
-    theme_names = core.get_all_theme_names()
+    themes = core.get_all_themes_with_status()
 
-    if not theme_names:
+    if not themes:
         await ctx.send("❌ No themes found.")
         return
 
@@ -297,8 +323,9 @@ async def list_themes_command(ctx):
     chunks = []
     current_chunk = "**Available Themes:**\n"
 
-    for i, name in enumerate(theme_names, 1):
-        line = f"{i}. {name}\n"
+    for i, theme in enumerate(themes, 1):
+        hidden_marker = " (hidden)" if theme["is_hidden"] else ""
+        line = f"{i}. {theme['name']}{hidden_marker}\n"
         if len(current_chunk + line) > 1800:  # Leave room for more
             chunks.append(current_chunk)
             current_chunk = ""
@@ -354,7 +381,8 @@ if __name__ == "__main__":
     if not token:
         logger.error("DISCORD_TOKEN environment variable not set")
         print("Error: DISCORD_TOKEN environment variable not set.")
-        print("Set it with: export DISCORD_TOKEN='your-token-here'")
+        print("Set it with: export DISCORD_TOKEN='your-token-here' (bash)")
+        print("       or: $env:DISCORD_TOKEN='your-token-here' (PowerShell)")
         exit(1)
 
     logger.info("Discord token loaded, starting bot")
