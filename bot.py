@@ -4,6 +4,7 @@ Provides theme suggestions via Discord commands.
 """
 
 import os
+from datetime import datetime, timedelta
 
 import discord
 from discord.ext import commands
@@ -22,7 +23,7 @@ intents.reactions = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Track theme suggestion messages for feedback
-# Maps message_id to theme_name
+# Maps message_id to {"theme_name": str, "timestamp": datetime, "locked": bool}
 theme_suggestion_messages = {}
 
 
@@ -59,7 +60,23 @@ async def on_reaction_add(reaction, user):
     if message_id not in theme_suggestion_messages:
         return
 
-    theme_name = theme_suggestion_messages[message_id]
+    message_info = theme_suggestion_messages[message_id]
+    theme_name = message_info["theme_name"]
+
+    # Check if voting is locked (2 hours have passed)
+    if message_info["locked"]:
+        return
+
+    # Check if 2 hours have passed since message was created
+    time_elapsed = datetime.utcnow() - message_info["timestamp"]
+    if time_elapsed >= timedelta(hours=2):
+        # Lock the voting
+        message_info["locked"] = True
+        try:
+            await reaction.message.add_reaction("🔒")
+        except Exception:
+            pass  # Lock emoji might already be added
+        return
 
     # Handle thumbs up (👍) and thumbs down (👎) reactions
     if str(reaction.emoji) == "👍":
@@ -79,8 +96,60 @@ async def on_reaction_add(reaction, user):
 
     if success:
         logger.info(f"Feedback updated: {message}")
-        # Clean up the message tracking
-        del theme_suggestion_messages[message_id]
+    else:
+        logger.warning(f"Failed to update feedback: {message}")
+
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    """Handle removal of reactions from theme suggestion messages.
+
+    When a user removes their 👍 or 👎 reaction, decrement the feedback score.
+    """
+    # Don't process the bot's own reactions
+    if user == bot.user:
+        return
+
+    # Only handle reactions on our own messages
+    if reaction.message.author != bot.user:
+        return
+
+    # Check if this is a theme suggestion message
+    message_id = reaction.message.id
+    if message_id not in theme_suggestion_messages:
+        return
+
+    message_info = theme_suggestion_messages[message_id]
+
+    # Check if voting is locked
+    if message_info["locked"]:
+        return
+
+    # Check if 2 hours have passed
+    time_elapsed = datetime.utcnow() - message_info["timestamp"]
+    if time_elapsed >= timedelta(hours=2):
+        return
+
+    theme_name = message_info["theme_name"]
+
+    # Handle removal of thumbs up (👍) and thumbs down (👎) reactions
+    if str(reaction.emoji) == "👍":
+        delta = -1  # Removing upvote = -1
+    elif str(reaction.emoji) == "👎":
+        delta = 1  # Removing downvote = +1
+    else:
+        # Ignore other reactions
+        return
+
+    logger.info(
+        f"Feedback reaction removed by {user}: {reaction.emoji} on theme '{theme_name}'"
+    )
+
+    # Update the feedback score
+    success, message = core.update_theme_feedback(theme_name, delta)
+
+    if success:
+        logger.info(f"Feedback updated: {message}")
     else:
         logger.warning(f"Failed to update feedback: {message}")
 
@@ -110,12 +179,16 @@ async def theme_command(ctx, party_size: int = 2):
     response += f"\n**Heroes:** {suggestion['heroes']}"
     response += f"\n**Feedback:** {suggestion['feedback_score']} 👍👎"
     response += f"\n*({suggestion['hero_count']} heroes match this theme)*"
-    response += f"\n\nReact with 👍 to upvote this theme, or 👎 to downvote it!"
+    response += f"\n\nReact with 👍 to upvote this theme, or 👎 to downvote it! (Voting locks after 2 hours)"
 
     sent_message = await ctx.send(response)
 
-    # Store the message_id to theme_name mapping for reaction handling
-    theme_suggestion_messages[sent_message.id] = suggestion["theme"]
+    # Store the message_id with metadata for reaction handling
+    theme_suggestion_messages[sent_message.id] = {
+        "theme_name": suggestion["theme"],
+        "timestamp": datetime.utcnow(),
+        "locked": False,
+    }
 
     # Add bot's own reactions to make it easier for users
     # Note: Bot's own reactions are explicitly excluded in on_reaction_add
