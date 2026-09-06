@@ -46,14 +46,25 @@ async def cleanup_task():
         if time_elapsed >= timedelta(minutes=10):
             inactive_threads.append(thread_id)
 
-    # Remove inactive threads from tracking
+    # Remove inactive threads from tracking and archive Discord threads
     for thread_id in inactive_threads:
         thread_info = active_modification_threads[thread_id]
         message_id = thread_info.get("message_id")
         if message_id in messages_with_active_threads:
             messages_with_active_threads.remove(message_id)
+
+        # Archive the Discord thread
+        try:
+            thread_channel = bot.get_channel(thread_id)
+            if thread_channel and hasattr(thread_channel, "archive"):
+                await thread_channel.archive()
+                logger.info(f"Archived inactive modification thread: {thread_id}")
+            else:
+                logger.warning(f"Could not find thread channel {thread_id} to archive")
+        except Exception as e:
+            logger.warning(f"Failed to archive thread {thread_id}: {e}")
+
         del active_modification_threads[thread_id]
-        logger.info(f"Cleaned up inactive modification thread: {thread_id}")
 
 
 @bot.event
@@ -311,6 +322,14 @@ async def on_message(message):
     if content.lower() in ["done", "cancel", "exit", "quit"]:
         try:
             await message.channel.send("✅ Theme modification session ended.")
+
+            # Archive the Discord thread
+            try:
+                await message.channel.archive()
+                logger.info(f"Archived modification thread: {thread_id}")
+            except Exception as e:
+                logger.warning(f"Failed to archive thread {thread_id}: {e}")
+
             # Remove thread from tracking
             thread_info = active_modification_threads.get(thread_id, {})
             message_id_to_clean = thread_info.get("message_id")
