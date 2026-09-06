@@ -26,7 +26,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "alchemist",
@@ -56,7 +57,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "ancient_apparition",
@@ -86,7 +88,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "antimage",
@@ -116,7 +119,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "arc_warden",
@@ -147,7 +151,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "axe",
@@ -178,7 +183,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "bane",
@@ -209,7 +215,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "beastmaster",
@@ -241,7 +248,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "bloodseeker",
@@ -272,7 +280,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "bounty_hunter",
@@ -304,7 +313,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "brewmaster",
@@ -335,7 +345,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "bristleback",
@@ -366,7 +377,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "broodmother",
@@ -398,7 +410,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "centaur",
@@ -429,7 +442,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "chaos_knight",
@@ -460,7 +474,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "chen",
@@ -491,7 +506,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "clinkz",
@@ -523,7 +539,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "rattletrap",
@@ -554,7 +571,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "crystal_maiden",
@@ -585,7 +603,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "dark_seer",
@@ -616,7 +635,8 @@
       "has_mask": true,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "dark_willow",
@@ -647,7 +667,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "dawnbreaker",
@@ -678,7 +699,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "dazzle",
@@ -709,7 +731,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "death_prophet",
@@ -740,7 +763,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "disruptor",
@@ -771,7 +795,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "doombringer",
@@ -803,7 +828,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "dragon_knight",
@@ -837,7 +863,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "drow_ranger",
@@ -869,7 +896,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "earth_spirit",
@@ -900,7 +928,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "earthshaker",
@@ -931,7 +960,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "elder_titan",
@@ -962,7 +992,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "ember_spirit",
@@ -994,7 +1025,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "enchantress",
@@ -1025,7 +1057,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "furion",
@@ -1057,7 +1090,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "grimstroke",
@@ -1088,7 +1122,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "gyrocopter",
@@ -1120,7 +1155,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "hoodwink",
@@ -1151,7 +1187,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "huskar",
@@ -1183,7 +1220,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "invoker",
@@ -1216,7 +1254,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "wisp",
@@ -1248,7 +1287,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "jakiro",
@@ -1280,7 +1320,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "juggernaut",
@@ -1311,7 +1352,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "keeper_of_the_light",
@@ -1343,7 +1385,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "kunkka",
@@ -1375,7 +1418,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "legion_commander",
@@ -1407,7 +1451,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "leshrac",
@@ -1439,7 +1484,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "lichen",
@@ -1470,7 +1516,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "life_stealer",
@@ -1501,7 +1548,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "lina",
@@ -1533,7 +1581,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "lion",
@@ -1564,7 +1613,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "lone_druid",
@@ -1597,7 +1647,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "luna",
@@ -1629,7 +1680,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "lycan",
@@ -1661,7 +1713,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "magnataur",
@@ -1692,7 +1745,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "mars",
@@ -1723,7 +1777,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "medusa",
@@ -1753,7 +1808,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "meepo",
@@ -1785,7 +1841,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "mirana",
@@ -1817,7 +1874,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "monkey_king",
@@ -1849,7 +1907,8 @@
       "has_mask": true,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "morphling",
@@ -1880,7 +1939,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "muerta",
@@ -1911,7 +1971,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "naga_siren",
@@ -1943,7 +2004,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "necrolyte",
@@ -1974,7 +2036,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "night_stalker",
@@ -2006,7 +2069,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "nyx_assassin",
@@ -2037,7 +2101,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "ogre_magi",
@@ -2068,7 +2133,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "omniknight",
@@ -2099,7 +2165,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "oracle",
@@ -2130,7 +2197,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "outworld_devourer",
@@ -2162,7 +2230,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "pangolier",
@@ -2193,7 +2262,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "phantom_assassin",
@@ -2224,7 +2294,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "phantom_lancer",
@@ -2255,7 +2326,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "phoenix",
@@ -2287,7 +2359,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "puck",
@@ -2319,7 +2392,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "pudge",
@@ -2350,7 +2424,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "pugna",
@@ -2382,7 +2457,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "pugo",
@@ -2412,7 +2488,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "queenofpain",
@@ -2444,7 +2521,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "razor",
@@ -2476,7 +2554,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "stealth_assassin",
@@ -2507,7 +2586,8 @@
       "has_mask": true,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "ringmaster",
@@ -2539,7 +2619,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "rubick",
@@ -2570,7 +2651,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "sand_king",
@@ -2601,7 +2683,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "shadow_demon",
@@ -2632,7 +2715,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "nevermore",
@@ -2664,7 +2748,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "shadow_shaman",
@@ -2695,7 +2780,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "silencer",
@@ -2727,7 +2813,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "skywrath_mage",
@@ -2759,7 +2846,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "slardar",
@@ -2790,7 +2878,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "slark",
@@ -2822,7 +2911,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "snapfire",
@@ -2854,7 +2944,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "sniper",
@@ -2885,7 +2976,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "spectre",
@@ -2916,7 +3008,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "spirit_breaker",
@@ -2947,7 +3040,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "storm_spirit",
@@ -2979,7 +3073,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "sven",
@@ -3011,7 +3106,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "techies",
@@ -3042,7 +3138,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "templar_assassin",
@@ -3074,7 +3171,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "terrorblade",
@@ -3106,7 +3204,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "tidehunter",
@@ -3137,7 +3236,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "timbersaw",
@@ -3168,7 +3268,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "tinker",
@@ -3199,7 +3300,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "tiny",
@@ -3231,7 +3333,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "treant",
@@ -3263,7 +3366,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "troll_warlord",
@@ -3294,7 +3398,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "tusk",
@@ -3325,7 +3430,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "underlord",
@@ -3356,7 +3462,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "undying",
@@ -3388,7 +3495,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "ursa",
@@ -3420,7 +3528,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "vengefulspirit",
@@ -3451,7 +3560,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "venomancer",
@@ -3483,7 +3593,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "viper",
@@ -3515,7 +3626,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "visage",
@@ -3546,7 +3658,8 @@
       "has_mask": true,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "void_spirit",
@@ -3577,7 +3690,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "warlock",
@@ -3608,7 +3722,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "weaver",
@@ -3640,7 +3755,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "windrunner",
@@ -3673,7 +3789,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "winter_wyvern",
@@ -3705,7 +3822,8 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "witch_doctor",
@@ -3736,7 +3854,8 @@
       "has_mask": true,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   },
   {
     "id": "wraith_king",
@@ -3766,7 +3885,8 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": true
-    }
+    },
+    "aliases": []
   },
   {
     "id": "zuus",
@@ -3799,6 +3919,7 @@
       "has_mask": false,
       "has_staff": true,
       "has_sword": false
-    }
+    },
+    "aliases": []
   }
 ]
