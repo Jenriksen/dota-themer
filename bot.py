@@ -258,9 +258,10 @@ async def theme_error_handler(ctx, error):
     )
 
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(
-            "Usage: `!theme [party_size]` - Party size is optional (default: 2)"
-        )
+        await ctx.send("""
+            Usage: `!theme [party_size]` - Party size is optional (default: 2)
+            For additional help, use `!helptheme` to see all commands and usage.
+            """)
     elif isinstance(error, commands.BadArgument):
         await ctx.send("Party size must be a number between 1 and 5.")
     else:
