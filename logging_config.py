@@ -10,7 +10,7 @@ import logging
 import logging.config
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 
@@ -47,7 +47,9 @@ class StructuredFormatter(logging.Formatter):
 
         # Add standard fields
         if self.include_timestamp:
-            log_entry["timestamp"] = datetime.utcnow().isoformat() + "Z"
+            log_entry["timestamp"] = (
+                datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            )
 
         if self.include_level:
             log_entry["level"] = record.levelname

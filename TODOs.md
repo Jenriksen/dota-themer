@@ -97,6 +97,7 @@
   - [ ] Display feedback score in theme suggestion messages
   - [ ] Add description about reactions in theme message
 - [ ] Theme modification guide with suggestions
+  - [ ] Research and add common Dota2 hero abbreviations to aliases field in heroes.json
 - [ ] Help command via `!theme help` for in-context assistance
 
 ---
