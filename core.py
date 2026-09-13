@@ -6,7 +6,6 @@ Suggests a theme and lists matching heroes with their positions.
 import json
 import random
 import sys
-from itertools import combinations
 from pathlib import Path
 
 import logging_config
@@ -829,64 +828,6 @@ def unhide_theme(theme_name):
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
         return False, f"Failed to save theme: {str(e)}"
-
-
-def remove_theme(theme_name):
-    """
-    Remove a theme from themes.json.
-
-    Args:
-        theme_name: Name of the theme to remove
-
-    Returns:
-        tuple: (success: bool, message: str)
-    """
-    logger.info(f"Attempting to remove theme: {theme_name}")
-
-    if not theme_name or not theme_name.strip():
-        logger.warning("Theme name cannot be empty")
-        return False, "Theme name cannot be empty"
-
-    theme_name = theme_name.strip()
-
-    # Load existing themes (include hidden)
-    try:
-        themes = load_themes(include_hidden=True)
-    except Exception as e:
-        logger.error(f"Failed to load themes: {e}")
-        return False, f"Failed to load themes: {str(e)}"
-
-    # Find and remove the theme
-    theme_index = None
-    for i, theme in enumerate(themes):
-        if theme["name"].lower() == theme_name.lower():
-            theme_index = i
-            break
-
-    if theme_index is None:
-        logger.warning(f"Theme '{theme_name}' not found")
-        return (
-            False,
-            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
-        )
-
-    # Remove the theme
-    removed_theme = themes.pop(theme_index)
-
-    # Sort themes by name
-    themes.sort(key=lambda t: t["name"])
-
-    # Save back to file
-    try:
-        themes_path = DATA_DIR / "themes.json"
-        with open(themes_path, "w") as f:
-            json.dump(themes, f, indent=2)
-
-        logger.info(f"Successfully removed theme: {theme_name}")
-        return True, f"Theme '{theme_name}' removed successfully"
-    except Exception as e:
-        logger.error(f"Failed to save themes: {e}")
-        return False, f"Failed to save themes: {str(e)}"
 
 
 def get_all_theme_names(include_hidden=True):

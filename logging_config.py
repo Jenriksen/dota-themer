@@ -139,7 +139,6 @@ class PlainTextFormatter(logging.Formatter):
 # Logger names for different components
 LOGGER_CORE = "dota_themer.core"
 LOGGER_BOT = "dota_themer.bot"
-LOGGER_MAIN = "dota_themer.main"
 
 
 def get_logger(name: str, level: Optional[int] = None) -> logging.Logger:
@@ -219,7 +218,6 @@ def setup_logging(
     # Set levels for specific loggers
     logging.getLogger(LOGGER_CORE).setLevel(level)
     logging.getLogger(LOGGER_BOT).setLevel(level)
-    logging.getLogger(LOGGER_MAIN).setLevel(level)
 
     # Log startup message
     logger = logging.getLogger(__name__)
@@ -299,8 +297,3 @@ def setup_logging_from_env() -> None:
     )
 
 
-# Pre-configured loggers for easy import
-# These will use the root logger's configuration
-CoreLogger = logging.getLogger(LOGGER_CORE)
-BotLogger = logging.getLogger(LOGGER_BOT)
-MainLogger = logging.getLogger(LOGGER_MAIN)

@@ -127,21 +127,21 @@ def demo_update_theme():
     print_result(success, message)
 
 
-def demo_remove_theme():
-    """Demonstrate removing a theme."""
-    print_section("Demo: Removing a Theme")
+def demo_hide_theme():
+    """Demonstrate hiding a theme."""
+    print_section("Demo: Hiding a Theme")
 
-    # First add a theme to remove
-    core.add_theme("Remove Demo", "Theme for removal demo", ["antimage"])
+    # First add a theme to hide
+    core.add_theme("Hide Demo", "Theme for hide demo", ["antimage"])
 
-    # Test 1: Remove existing theme
-    print("Test 1: Removing existing theme")
-    success, message = core.remove_theme("Remove Demo")
+    # Test 1: Hide existing theme
+    print("Test 1: Hiding existing theme")
+    success, message = core.hide_theme("Hide Demo")
     print_result(success, message)
 
-    # Test 2: Remove non-existent theme
-    print("\nTest 2: Removing non-existent theme")
-    success, message = core.remove_theme("Non Existent Theme")
+    # Test 2: Hide non-existent theme
+    print("\nTest 2: Hiding non-existent theme")
+    success, message = core.hide_theme("Non Existent Theme")
     print_result(success, message)
 
 
@@ -167,14 +167,14 @@ def demo_list_functions():
 
 
 def cleanup_demo_themes():
-    """Remove themes created during demo."""
-    print_section("Cleanup: Removing Demo Themes")
+    """Hide themes created during demo."""
+    print_section("Cleanup: Hiding Demo Themes")
 
-    themes_to_remove = ["Demo Theme", "Update Demo", "Remove Demo"]
+    themes_to_remove = ["Demo Theme", "Update Demo", "Hide Demo"]
     for theme_name in themes_to_remove:
         try:
-            core.remove_theme(theme_name)
-            print(f"✅ Removed: {theme_name}")
+            core.hide_theme(theme_name)
+            print(f"✅ Hid: {theme_name}")
         except Exception:
             pass  # Theme might not exist
 
@@ -192,7 +192,7 @@ def main():
     # Run demos
     demo_add_theme()
     demo_update_theme()
-    demo_remove_theme()
+    demo_hide_theme()
     demo_list_functions()
 
     # Cleanup
@@ -205,7 +205,7 @@ def main():
     print("\nTo use in Discord:")
     print("  !addtheme <name> [description] <hero1> [hero2] ...")
     print("  !updatetheme <name> add|remove <hero1> [hero2] ...")
-    print("  !removetheme <name>")
+    print("  !hidetheme <name>")
     print("  !listthemes")
     print("  !listheroes")
     print("  !helptheme")
