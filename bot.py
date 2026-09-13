@@ -304,6 +304,10 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
+    # Skip command messages - let discord.py handle commands normally
+    if message.content.startswith(bot.command_prefix):
+        return
+
     # Check if this message is in an active modification thread
     if message.channel.type != discord.ChannelType.public_thread:
         return
@@ -331,7 +335,6 @@ async def on_message(message):
                 logger.warning(f"Failed to archive thread {thread_id}: {e}")
 
             # Remove thread from tracking
-            thread_info = active_modification_threads.get(thread_id, {})
             message_id_to_clean = thread_info.get("message_id")
             if message_id_to_clean in messages_with_active_threads:
                 messages_with_active_threads.remove(message_id_to_clean)
