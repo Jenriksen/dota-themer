@@ -304,18 +304,25 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Skip command messages - let discord.py handle commands normally
-    if message.content.startswith(bot.command_prefix):
-        return
+    # Check if this message is a command (starts with prefix)
+    is_command = message.content.startswith(bot.command_prefix)
 
     # Check if this message is in an active modification thread
-    if message.channel.type != discord.ChannelType.public_thread:
+    is_thread_message = message.channel.type == discord.ChannelType.public_thread
+    in_active_thread = (
+        is_thread_message and message.channel.id in active_modification_threads
+    )
+
+    # If it's a command in a thread, still process the command normally
+    # If it's a command NOT in a thread, process normally
+    # If it's NOT a command but IS in an active modification thread, handle it here
+    if is_command or not in_active_thread:
+        # Let discord.py handle commands and non-thread messages
+        await bot.process_commands(message)
         return
 
+    # From here on, we're handling non-command messages in active modification threads
     thread_id = message.channel.id
-    if thread_id not in active_modification_threads:
-        return
-
     thread_info = active_modification_threads[thread_id]
     theme_name = thread_info["theme_name"]
 
