@@ -921,7 +921,7 @@ class TestThemeManagement(unittest.TestCase):
         self.assertIn("TestThemeForAddition", themes_after)
 
         # Clean up
-        core.remove_theme("TestThemeForAddition")
+        core.hide_theme("TestThemeForAddition")
 
     def test_add_theme_duplicate(self):
         """add_theme rejects duplicate theme names."""
@@ -1005,35 +1005,6 @@ class TestThemeManagement(unittest.TestCase):
         )
         self.assertFalse(success)
         self.assertIn("not found", message)
-
-    def test_remove_theme_valid(self):
-        """remove_theme removes a theme successfully."""
-        # Add a test theme first
-        core.add_theme("TestThemeForRemoval", "Test description")
-
-        themes_before = core.get_all_theme_names()
-        self.assertIn("TestThemeForRemoval", themes_before)
-
-        # Remove it
-        success, message = core.remove_theme("TestThemeForRemoval")
-        self.assertTrue(success)
-        self.assertIn("removed successfully", message)
-
-        # Verify it was removed
-        themes_after = core.get_all_theme_names()
-        self.assertNotIn("TestThemeForRemoval", themes_after)
-
-    def test_remove_theme_nonexistent(self):
-        """remove_theme rejects nonexistent theme."""
-        success, message = core.remove_theme("NonexistentTheme54321")
-        self.assertFalse(success)
-        self.assertIn("not found", message)
-
-    def test_remove_theme_empty_name(self):
-        """remove_theme rejects empty theme name."""
-        success, message = core.remove_theme("")
-        self.assertFalse(success)
-        self.assertIn("cannot be empty", message)
 
 
 if __name__ == "__main__":

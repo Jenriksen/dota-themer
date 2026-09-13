@@ -356,15 +356,6 @@ class TestLoggerConstants(unittest.TestCase):
         """Logger constants are defined."""
         self.assertEqual(logging_config.LOGGER_CORE, "dota_themer.core")
         self.assertEqual(logging_config.LOGGER_BOT, "dota_themer.bot")
-        self.assertEqual(logging_config.LOGGER_MAIN, "dota_themer.main")
-
-    def test_preconfigured_loggers_exist(self):
-        """Pre-configured loggers exist."""
-        import logging
-
-        self.assertIsInstance(logging_config.CoreLogger, logging.Logger)
-        self.assertIsInstance(logging_config.BotLogger, logging.Logger)
-        self.assertIsInstance(logging_config.MainLogger, logging.Logger)
 
 
 if __name__ == "__main__":

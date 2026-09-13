@@ -6,7 +6,6 @@ Suggests a theme and lists matching heroes with their positions.
 import json
 import random
 import sys
-from itertools import combinations
 from pathlib import Path
 
 import logging_config
