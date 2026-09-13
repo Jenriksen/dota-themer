@@ -295,5 +295,3 @@ def setup_logging_from_env() -> None:
         log_file=log_file,
         console_output=True,
     )
-
-
