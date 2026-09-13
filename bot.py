@@ -34,6 +34,16 @@ async def on_ready():
     )
 
 
+@bot.event
+async def on_message(message):
+    """Forward messages to command processing.
+
+    Defined explicitly so command dispatch is deterministic regardless of
+    how commands.Bot's default on_message is resolved in the runtime.
+    """
+    await bot.process_commands(message)
+
+
 @bot.command(name="theme", help="Get a theme suggestion for hero selection")
 async def theme_command(ctx, party_size: int = 2):
     """

@@ -90,6 +90,12 @@ class TestBotCommands(unittest.TestCase):
         bot_content = read_bot_file()
         self.assertIn("helptheme", bot_content)
 
+    def test_processes_commands_on_message(self):
+        """Bot defines on_message and forwards to process_commands."""
+        bot_content = read_bot_file()
+        self.assertIn("async def on_message(message):", bot_content)
+        self.assertIn("await bot.process_commands(message)", bot_content)
+
     def test_formats_response_correctly(self):
         """Bot formats response with theme, description, heroes."""
         bot_content = read_bot_file()
