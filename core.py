@@ -55,10 +55,12 @@ def load_themes(include_hidden=True):
         with open(DATA_DIR / "themes.json", "r") as f:
             themes = json.load(f)
 
-        # Ensure all themes have is_hidden field for backward compatibility
+        # Ensure all themes have is_hidden and feedback_score fields for backward compatibility
         for theme in themes:
             if "is_hidden" not in theme:
                 theme["is_hidden"] = False
+            if "feedback_score" not in theme:
+                theme["feedback_score"] = 0
 
         # Filter hidden themes if requested
         if not include_hidden:
@@ -525,6 +527,7 @@ def get_theme_suggestion(
         "description": theme.get("description", ""),
         "heroes": format_hero_list(matching_heroes),
         "hero_count": len(matching_heroes),
+        "feedback_score": theme.get("feedback_score", 0),
     }
 
 
@@ -828,6 +831,128 @@ def unhide_theme(theme_name):
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
         return False, f"Failed to save theme: {str(e)}"
+
+
+def update_theme_feedback(theme_name, delta):
+    """
+    Update the feedback score for a theme.
+
+    Args:
+        theme_name: Name of the theme to update
+        delta: Amount to change the feedback score by (+1 for thumbsup, -1 for thumbsdown)
+
+    Returns:
+        tuple: (success: bool, message: str)
+    """
+    logger.info(f"Attempting to update feedback for theme: {theme_name} by {delta}")
+
+    if not theme_name or not theme_name.strip():
+        logger.warning("Theme name cannot be empty")
+        return False, "Theme name cannot be empty"
+
+    theme_name = theme_name.strip()
+
+    # Load existing themes
+    try:
+        themes = load_themes(include_hidden=True)
+    except Exception as e:
+        logger.error(f"Failed to load themes: {e}")
+        return False, f"Failed to load themes: {str(e)}"
+
+    # Find the theme to update
+    theme_index = None
+    for i, theme in enumerate(themes):
+        if theme["name"].lower() == theme_name.lower():
+            theme_index = i
+            break
+
+    if theme_index is None:
+        logger.warning(f"Theme '{theme_name}' not found")
+        return (
+            False,
+            f"Theme '{theme_name}' not found.",
+        )
+
+    # Update feedback score
+    themes[theme_index]["feedback_score"] = (
+        themes[theme_index].get("feedback_score", 0) + delta
+    )
+
+    # Sort themes by name
+    themes.sort(key=lambda t: t["name"])
+
+    # Save back to file
+    try:
+        themes_path = DATA_DIR / "themes.json"
+        with open(themes_path, "w") as f:
+            json.dump(themes, f, indent=2)
+
+        logger.info(f"Successfully updated feedback for theme: {theme_name}")
+        return (
+            True,
+            f"Theme '{theme_name}' feedback updated to {themes[theme_index]['feedback_score']}",
+        )
+    except Exception as e:
+        logger.error(f"Failed to save themes: {e}")
+        return False, f"Failed to save feedback: {str(e)}"
+
+
+def remove_theme(theme_name):
+    """
+    Remove a theme from themes.json.
+
+    Args:
+        theme_name: Name of the theme to remove
+
+    Returns:
+        tuple: (success: bool, message: str)
+    """
+    logger.info(f"Attempting to remove theme: {theme_name}")
+
+    if not theme_name or not theme_name.strip():
+        logger.warning("Theme name cannot be empty")
+        return False, "Theme name cannot be empty"
+
+    theme_name = theme_name.strip()
+
+    # Load existing themes (include hidden)
+    try:
+        themes = load_themes(include_hidden=True)
+    except Exception as e:
+        logger.error(f"Failed to load themes: {e}")
+        return False, f"Failed to load themes: {str(e)}"
+
+    # Find and remove the theme
+    theme_index = None
+    for i, theme in enumerate(themes):
+        if theme["name"].lower() == theme_name.lower():
+            theme_index = i
+            break
+
+    if theme_index is None:
+        logger.warning(f"Theme '{theme_name}' not found")
+        return (
+            False,
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        )
+
+    # Remove the theme
+    removed_theme = themes.pop(theme_index)
+
+    # Sort themes by name
+    themes.sort(key=lambda t: t["name"])
+
+    # Save back to file
+    try:
+        themes_path = DATA_DIR / "themes.json"
+        with open(themes_path, "w") as f:
+            json.dump(themes, f, indent=2)
+
+        logger.info(f"Successfully removed theme: {theme_name}")
+        return True, f"Theme '{theme_name}' removed successfully"
+    except Exception as e:
+        logger.error(f"Failed to save themes: {e}")
+        return False, f"Failed to save themes: {str(e)}"
 
 
 def get_all_theme_names(include_hidden=True):
