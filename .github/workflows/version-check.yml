@@ -1,0 +1,27 @@
+name: Version Check
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '__version__.py'
+
+jobs:
+  version-check:
+    name: Verify Version Increment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run version check
+        run: |
+          echo "Checking that version in __version__.py is incremented compared to main branch..."
+          python3 scripts/check_version.py
