@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 import discord
 from discord.ext import commands, tasks
 
+import __version__
 import core
 import logging_config
 
@@ -70,8 +71,10 @@ async def cleanup_task():
 @bot.event
 async def on_ready():
     """Called when the bot connects to Discord."""
+    logger.info(f"Dota Themer v{__version__.__version__} started")
     logger.info(f"Discord bot logged in as {bot.user.name} (ID: {bot.user.id})")
     print(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
+    print(f"Dota Themer v{__version__.__version__}")
     print("------")
 
     # Set bot status to show help command
@@ -988,7 +991,7 @@ if __name__ == "__main__":
     # Setup logging from environment
     logging_config.setup_logging_from_env()
 
-    logger.info("Starting Dota Themer Discord bot")
+    logger.info(f"Starting Dota Themer v{__version__.__version__} Discord bot")
 
     # Load token from environment variable
     token = os.getenv("DISCORD_TOKEN")
