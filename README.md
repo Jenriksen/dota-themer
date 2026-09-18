@@ -225,7 +225,10 @@ python core.py 3
 
 ### Pre-commit Hook
 
-A pre-commit hook is available to ensure all Python code complies with the Black formatter before allowing commits.
+A pre-commit hook is available to ensure code quality before allowing commits. It performs the following checks:
+
+1. **Code Formatting**: Verifies all staged Python files comply with Black and isort formatting
+2. **Version Check**: Ensures `__version__.py` has been incremented compared to the main branch
 
 **Installation:**
 
@@ -244,11 +247,33 @@ Or on Windows (Command Prompt):
 mklink .git\hooks\pre-commit scripts\pre-commit-hook.sh
 ```
 
-The hook will automatically check all staged Python files with Black and block the commit if any files need reformatting, with clear instructions on how to fix them.
+Or on Windows (PowerShell):
+```powershell
+# Create the hooks directory if it doesn't exist
+if (-not (Test-Path .git\hooks)) { New-Item -ItemType Directory -Path .git\hooks | Out-Null }
+# Copy the pre-commit hook
+Copy-Item scripts\pre-commit-hook.sh .git\hooks\pre-commit
+```
+
+The hook will automatically check all staged Python files with Black and isort, and verify version increment, blocking the commit if any checks fail with clear instructions on how to fix them.
 
 **Requirements:**
 - Black must be installed (`pip install black`)
+- isort must be installed (`pip install isort`)
+- Python must be installed and available in PATH
 - The hook requires Black 23.0.0+
+
+**Checks Performed:**
+
+**1. Formatting Check (Black & isort):**
+- Verifies all staged `.py` files comply with Black code formatting
+- Verifies all imports are correctly sorted with isort
+
+**2. Version Check:**
+- Compares the version in `__version__.py` against the main branch
+- Blocks commit if the version is lower than the main branch version
+- Allows any version if main doesn't have `__version__.py` (first version)
+- Uses semantic versioning comparison (MAJOR.MINOR.PATCH)
 
 **To fix formatting issues:**
 ```bash
@@ -262,6 +287,24 @@ black .
 git add .
 git commit -m "Your message"
 ```
+
+**To fix version issues:**
+```bash
+# Update the version in __version__.py to be higher than main branch
+# For example, if main is 1.0.0, change to 1.0.1 or 1.1.0 or 2.0.0
+# Then stage and commit again
+git add __version__.py
+git commit -m "Bump version to X.Y.Z"
+```
+
+**Bypassing the Hook:**
+
+In rare cases, you can bypass the pre-commit hook with:
+```bash
+git commit --no-verify -m "Your message"
+```
+
+However, this is not recommended as it may introduce formatting issues or version regressions.
 
 ## Testing
 
