@@ -221,9 +221,10 @@ def select_theme(
     )
 
     if not filtered_themes:
+        # Fall back to all themes if filtering removed everything, but
+        # keep respecting the hidden filter (issue #6)
         logger.warning("No themes matched filter criteria, falling back to all themes")
-        # Fall back to all themes if filtering removed everything
-        filtered_themes = themes
+        filtered_themes = [t for t in themes if not t.get("is_hidden", False)]
 
     logger.debug(f"Selecting from {len(filtered_themes)} filtered themes")
 

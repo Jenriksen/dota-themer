@@ -158,7 +158,7 @@ dota-themer/
 ├── core.py                 # Core logic
 ├── bot.py                  # Discord bot
 ├── logging_config.py       # Structured logging configuration
-├── test_core.py            # Core unit tests (94 tests)
+├── test_core.py            # Core unit tests (96 tests)
 ├── test_bot.py             # Bot unit tests (15 tests)
 ├── test_logging.py          # Logging unit tests (21 tests)
 ├── .gitignore              # Git ignore rules
@@ -311,7 +311,7 @@ However, this is not recommended as it may introduce formatting issues or versio
 ### Running Tests
 
 ```bash
-# Run all tests (130 tests)
+# Run all tests (132 tests)
 python -m unittest discover
 
 # Run specific test files
@@ -333,7 +333,7 @@ python core.py 5
 Each run outputs a random theme with matching heroes and their positions.
 
 ### Test Coverage
-- **130 total tests** covering:
+- **132 total tests** covering:
   - Core functionality (data loading, theme selection, hero filtering)
   - Enhanced theme selection (filtering, weighting, position coverage)
   - Position-based features (lane grouping, balanced team suggestions)
@@ -546,8 +546,8 @@ MIT License
 
 ---
 
-**Current Version:** 1.0.1  
+**Current Version:** 1.0.2  
 **Heroes:** 121 (complete Dota 2 roster)  
 **Themes:** 52  
-**Tests:** 130  
+**Tests:** 132  
 **Last Updated:** August 2026
