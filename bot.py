@@ -5,6 +5,7 @@ Provides theme suggestions via Discord commands.
 
 import os
 from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Optional, Set
 
 import discord
 from discord.ext import commands, tasks
@@ -24,14 +25,14 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Track theme suggestion messages for feedback
 # Maps message_id to {"theme_name": str, "timestamp": datetime, "locked": bool}
-theme_suggestion_messages = {}
+theme_suggestion_messages: Dict[int, Dict[str, Any]] = {}
 
 # Track active modification threads
 # Maps thread_id to {"theme_name": str, "user_id": int, "created_at": datetime, "message_id": int}
-active_modification_threads = {}
+active_modification_threads: Dict[int, Dict[str, Any]] = {}
 
 # Track which message_ids have active modification threads
-messages_with_active_threads = set()
+messages_with_active_threads: Set[int] = set()
 
 
 @tasks.loop(seconds=60)  # Check every minute
@@ -778,7 +779,9 @@ async def unhide_theme_command(ctx, theme_name: str):
     name="updatetheme",
     help="Update a theme (add/remove heroes) or open interactive modification",
 )
-async def update_theme_command(ctx, theme_name: str, action: str = None, *args):
+async def update_theme_command(
+    ctx, theme_name: str, action: Optional[str] = None, *args
+):
     """
     Update an existing theme or open interactive modification.
 
