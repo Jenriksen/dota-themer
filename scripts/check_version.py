@@ -14,9 +14,32 @@ Returns:
     1 - Version check failed (new version < main branch version)
 """
 
+import ast
 import subprocess
 import sys
 from pathlib import Path
+
+
+def extract_version(content):
+    """Safely extract __version__ from Python source without executing it.
+
+    Uses ast parsing instead of exec() so the version file is never
+    executed as code (avoids bandit B102 and is safer in general).
+    """
+    try:
+        tree = ast.parse(content)
+    except SyntaxError:
+        return None
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == "__version__":
+                    try:
+                        return ast.literal_eval(node.value)
+                    except (ValueError, SyntaxError):
+                        return None
+    return None
 
 
 def get_current_version():
@@ -30,10 +53,8 @@ def get_current_version():
     with open(version_file, "r") as f:
         content = f.read()
 
-    # Extract version using exec (safe since it's our own file)
-    namespace = {}
-    exec(content, namespace)
-    return namespace.get("__version__")
+    # Extract version by parsing the AST (no code execution)
+    return extract_version(content)
 
 
 def get_main_version():
@@ -48,10 +69,8 @@ def get_main_version():
         )
         content = result.stdout
 
-        # Extract version using exec
-        namespace = {}
-        exec(content, namespace)
-        return namespace.get("__version__")
+        # Extract version by parsing the AST (no code execution)
+        return extract_version(content)
     except subprocess.CalledProcessError:
         # main branch doesn't have __version__.py, this is the first version
         return None
