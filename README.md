@@ -10,7 +10,7 @@ See [TODOs.md](TODOs.md) for detailed task tracking.
 
 ## Features
 
-- **Theme Suggestions**: Randomly selects a theme from a curated list of 71 themes
+- **Theme Suggestions**: Randomly selects a theme from a curated list of 52 themes
 - **Hero Filtering**: Lists all heroes that match the selected theme
 - **Position Information**: Shows each hero's viable positions in parentheses
 - **Party Size Support**: Accepts party size input (1-5 players) for lane-based features
@@ -35,7 +35,7 @@ Each hero has:
 
 ### Themes (`data/themes.json`)
 Each theme has:
-- `name`: Theme name (e.g., "Red Heroes", "Wings", "Bald and Beautiful")
+- `name`: Theme name (e.g., "Red Heroes", "Wings", "Bald Heroes")
 - `description`: Optional description
 - `hero_ids`: Array of hero IDs that match this theme
 
@@ -144,7 +144,7 @@ Party configurations prefer pairs:
 - [x] Position-based hero suggestions for balanced teams
 - [x] Hero data with visual attributes for all 121 heroes
 - [x] Structured logging (JSON and text formats)
-- [x] Enhanced theme library (71 themes)
+- [x] Enhanced theme library (52 themes)
 - [ ] Hero data curation from Liquipedia (automation pending)
 
 ## Project Structure
@@ -158,7 +158,7 @@ dota-themer/
 ├── core.py                 # Core logic
 ├── bot.py                  # Discord bot
 ├── logging_config.py       # Structured logging configuration
-├── test_core.py            # Core unit tests (92 tests)
+├── test_core.py            # Core unit tests (94 tests)
 ├── test_bot.py             # Bot unit tests (15 tests)
 ├── test_logging.py          # Logging unit tests (21 tests)
 ├── .gitignore              # Git ignore rules
@@ -166,7 +166,7 @@ dota-themer/
 ├── .env.example            # Example environment variables
 └── data/
     ├── heroes.json          # Hero definitions (121 heroes)
-    └── themes.json          # Theme definitions (71 themes)
+    └── themes.json          # Theme definitions (52 themes)
 └── scripts/
     ├── add_themes.py        # Add new themes to themes.json
     ├── add_visual_attributes.py  # Add visual attributes to heroes
@@ -311,7 +311,7 @@ However, this is not recommended as it may introduce formatting issues or versio
 ### Running Tests
 
 ```bash
-# Run all tests (128 tests)
+# Run all tests (130 tests)
 python -m unittest discover
 
 # Run specific test files
@@ -333,7 +333,7 @@ python core.py 5
 Each run outputs a random theme with matching heroes and their positions.
 
 ### Test Coverage
-- **128 total tests** covering:
+- **130 total tests** covering:
   - Core functionality (data loading, theme selection, hero filtering)
   - Enhanced theme selection (filtering, weighting, position coverage)
   - Position-based features (lane grouping, balanced team suggestions)
@@ -546,8 +546,8 @@ MIT License
 
 ---
 
-**Current Version:** 1.0.0  
+**Current Version:** 1.0.1  
 **Heroes:** 121 (complete Dota 2 roster)  
-**Themes:** 71  
-**Tests:** 128  
+**Themes:** 52  
+**Tests:** 130  
 **Last Updated:** August 2026
