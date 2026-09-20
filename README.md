@@ -225,7 +225,10 @@ python core.py 3
 
 ### Pre-commit Hook
 
-A pre-commit hook is available to ensure all Python code complies with the Black formatter before allowing commits.
+A pre-commit hook is available to ensure code quality before allowing commits. It performs the following checks:
+
+1. **Code Formatting**: Verifies all staged Python files comply with Black and isort formatting
+2. **Version Check**: Ensures `__version__.py` has been incremented compared to the main branch
 
 **Installation:**
 
@@ -244,11 +247,33 @@ Or on Windows (Command Prompt):
 mklink .git\hooks\pre-commit scripts\pre-commit-hook.sh
 ```
 
-The hook will automatically check all staged Python files with Black and block the commit if any files need reformatting, with clear instructions on how to fix them.
+Or on Windows (PowerShell):
+```powershell
+# Create the hooks directory if it doesn't exist
+if (-not (Test-Path .git\hooks)) { New-Item -ItemType Directory -Path .git\hooks | Out-Null }
+# Copy the pre-commit hook
+Copy-Item scripts\pre-commit-hook.sh .git\hooks\pre-commit
+```
+
+The hook will automatically check all staged Python files with Black and isort, and verify version increment, blocking the commit if any checks fail with clear instructions on how to fix them.
 
 **Requirements:**
 - Black must be installed (`pip install black`)
+- isort must be installed (`pip install isort`)
+- Python must be installed and available in PATH
 - The hook requires Black 23.0.0+
+
+**Checks Performed:**
+
+**1. Formatting Check (Black & isort):**
+- Verifies all staged `.py` files comply with Black code formatting
+- Verifies all imports are correctly sorted with isort
+
+**2. Version Check:**
+- Compares the version in `__version__.py` against the main branch
+- Blocks commit if the version is lower than the main branch version
+- Allows any version if main doesn't have `__version__.py` (first version)
+- Uses semantic versioning comparison (MAJOR.MINOR.PATCH)
 
 **To fix formatting issues:**
 ```bash
@@ -262,6 +287,24 @@ black .
 git add .
 git commit -m "Your message"
 ```
+
+**To fix version issues:**
+```bash
+# Update the version in __version__.py to be higher than main branch
+# For example, if main is 1.0.0, change to 1.0.1 or 1.1.0 or 2.0.0
+# Then stage and commit again
+git add __version__.py
+git commit -m "Bump version to X.Y.Z"
+```
+
+**Bypassing the Hook:**
+
+In rare cases, you can bypass the pre-commit hook with:
+```bash
+git commit --no-verify -m "Your message"
+```
+
+However, this is not recommended as it may introduce formatting issues or version regressions.
 
 ## Testing
 
@@ -340,32 +383,70 @@ python scripts/add_visual_attributes.py
 
 ### Docker Deployment (Optional)
 
-For containerized deployment and testing:
+The repository includes a production-ready **multi-stage Dockerfile** and **docker-compose.yml** for containerized deployment.
 
-1. **Create a `Dockerfile`:**
-   ```dockerfile
-   FROM python:3.11-slim
-   WORKDIR /app
-   COPY requirements.txt .
-   RUN pip install -r requirements.txt
-   COPY . .
-   CMD ["python", "bot.py"]
-   ```
+**Using docker-compose (recommended for local development):**
 
-2. **Build and run:**
+1. Create a `.env` file with your Discord token:
    ```bash
-   docker build -t dota-themer .
-   docker run -e DISCORD_TOKEN=your_token dota-themer
+   echo DISCORD_TOKEN=your_bot_token_here > .env
    ```
 
-3. **For local testing with a test token:**
+2. Build and start the containers:
    ```bash
-   # Create a test.env file with your test token
-   echo DISCORD_TOKEN=your_test_token > test.env
-   
-   # Run with the test environment
-   docker run --env-file test.env dota-themer
+   docker-compose up -d
    ```
+
+3. View logs:
+   ```bash
+   docker-compose logs -f dota-themer
+   ```
+
+**Manual Docker build:**
+```bash
+docker build -t dota-themer .
+docker run -e DISCORD_TOKEN=your_token -e LOG_LEVEL=INFO dota-themer
+```
+
+### Railway Deployment (Recommended for 24/7 Hosting)
+
+[Railway](https://railway.app/) provides free hosting perfect for Discord bots:
+
+**Prerequisites:**
+- Railway account
+- GitHub account connected to Railway
+- Discord bot token
+- Bot added to your server
+
+**Steps:**
+
+1. **Create new project:**
+   - Go to [Railway.app](https://railway.app/)
+   - Click **"New Project"** → **"Deploy from GitHub repo"**
+   - Select `Jenriksen/dota-themer` repository
+   - Select `main` branch
+
+2. **Configure environment variables:**
+   - Go to **Variables** tab
+   - Add `DISCORD_TOKEN=your_bot_token_here`
+   - Optionally add `LOG_LEVEL=INFO`, `LOG_FORMAT=json`
+
+3. **Enable auto-deploy:**
+   - Railway will automatically redeploy on every push to main
+   - ✅ Enable auto-deploy for seamless updates
+
+4. **Deploy:**
+   - Click **"Deploy"**
+   - Wait ~2-5 minutes for build to complete
+
+5. **Verify:**
+   - Check **Logs** tab for startup messages
+   - In Discord, verify bot shows as "Online"
+   - Test with `!theme` command
+
+**Free Tier:** ✅ Yes - Railway's free tier is sufficient for a single Discord bot
+
+**Note:** Since Railway auto-deploys from main, always use feature branches and merge via PRs.
 
 ## Environment Variables
 
@@ -376,6 +457,30 @@ For containerized deployment and testing:
 | `LOG_FORMAT` | Log format (`json` or `text`) | `text` | No |
 | `LOG_FILE` | Log file path | None | No |
 | `ENV` | Environment name | `development` | No |
+
+### Discord Bot Permissions
+
+Your bot requires these **permissions** in the Discord Developer Portal:
+
+**Text Permissions:**
+- ✅ **Send Messages** - Post theme suggestions
+- ✅ **Embed Links** - Format messages with rich content
+- ✅ **Add Reactions** - Add/remove 👍, 👎, ❓, ✅, 🔒 reactions
+- ✅ **Read Message History** - Read thread messages
+- ✅ **Create Public Threads** - Create modification threads
+- ✅ **Send Messages in Threads** - Reply in threads
+- ✅ **Manage Threads** - Archive inactive threads
+
+**OAuth2 Scopes:**
+- ✅ **bot** - Required for all bots
+
+**Permission Bitmask:** `274877955104` (includes all above)
+
+**How to set up:**
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Select your application → **Bot** → **Permissions**
+3. Enable all permissions listed above
+4. Generate invite URL and add bot to your server
 
 ## Configuration File
 
