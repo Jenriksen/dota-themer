@@ -7,4 +7,4 @@ Semantic versioning: MAJOR.MINOR.PATCH
 - PATCH: Backwards-compatible bug fixes
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"

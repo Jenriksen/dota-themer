@@ -314,6 +314,20 @@ class TestDataIntegrity(unittest.TestCase):
                     f"Hero '{hero['name']}' has invalid position: {pos}",
                 )
 
+    def test_no_duplicate_theme_hero_sets(self):
+        """No two themes share the same hero set (issue #5)."""
+        themes = core.load_themes(include_hidden=True)
+        seen_sets = {}
+
+        for theme in themes:
+            hero_set = frozenset(theme["hero_ids"])
+            if hero_set and hero_set in seen_sets:
+                self.fail(
+                    f"Themes '{seen_sets[hero_set]}' and '{theme['name']}' "
+                    "have identical hero sets"
+                )
+            seen_sets[hero_set] = theme["name"]
+
 
 class TestEdgeCases(unittest.TestCase):
     """Tests for edge cases and things that shouldn't work."""
@@ -945,6 +959,20 @@ class TestThemeManagement(unittest.TestCase):
         )
         self.assertFalse(success)
         self.assertIn("Invalid hero IDs", message)
+
+    def test_add_theme_duplicate_hero_set(self):
+        """add_theme rejects a theme whose hero set matches an existing theme."""
+        themes = core.load_themes(include_hidden=True)
+        existing = next((t for t in themes if t["hero_ids"]), None)
+        self.assertIsNotNone(existing, "themes.json must have at least one theme")
+
+        success, message = core.add_theme(
+            "TestThemeDuplicateHeroSet", "Duplicate hero set", existing["hero_ids"]
+        )
+
+        self.assertFalse(success)
+        self.assertIn("Hero set already used", message)
+        self.assertIn(existing["name"], message)
 
     def test_update_theme_add_heroes(self):
         """update_theme adds heroes to existing theme."""

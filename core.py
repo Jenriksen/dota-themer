@@ -584,6 +584,20 @@ def add_theme(theme_name, description="", hero_ids=None):
     else:
         validated_hero_ids = []
 
+    # Check for duplicate hero-set (identical sets would skew weighted
+    # selection probabilities, see issue #5)
+    if validated_hero_ids:
+        new_hero_set = frozenset(validated_hero_ids)
+        for theme in themes:
+            if frozenset(theme["hero_ids"]) == new_hero_set:
+                logger.warning(
+                    f"Theme '{theme_name}' has same hero set as '{theme['name']}'"
+                )
+                return (
+                    False,
+                    f"Hero set already used by theme '{theme['name']}'",
+                )
+
     # Create new theme
     new_theme = {
         "name": theme_name,
