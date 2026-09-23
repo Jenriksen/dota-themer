@@ -285,7 +285,7 @@ dota-themer/
 ├── test_logging.py      # Tests for logging_config.py
 └── scripts/
     ├── pre-commit-hook.sh  # Git pre-commit hook
-    └── add_*.py          # Data management scripts
+    └── check_version.py   # Version consistency check
 ```
 
 **Seams for testing:**
