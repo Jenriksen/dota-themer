@@ -147,6 +147,27 @@ class TestSelectTheme(unittest.TestCase):
             core.select_theme(themes, heroes)
             mock_choice.assert_called_once()
 
+    def test_fallback_excludes_hidden_themes(self):
+        """Fallback path never returns hidden themes."""
+        themes = [
+            {"name": "Visible", "hero_ids": []},
+            {"name": "Hidden", "hero_ids": [], "is_hidden": True},
+        ]
+        heroes = []
+        # Impossible filter forces the fallback path
+        result = core.select_theme(themes, heroes, party_size=100)
+        self.assertEqual(result["name"], "Visible")
+
+    def test_fallback_all_hidden_raises(self):
+        """Fallback with only hidden themes raises instead of leaking one."""
+        themes = [
+            {"name": "Hidden", "hero_ids": [], "is_hidden": True},
+            {"name": "Also Hidden", "hero_ids": [], "is_hidden": True},
+        ]
+        heroes = []
+        with self.assertRaises(IndexError):
+            core.select_theme(themes, heroes, party_size=100)
+
 
 class TestGetThemeSuggestion(unittest.TestCase):
     """Tests for get_theme_suggestion function."""
