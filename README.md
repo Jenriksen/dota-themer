@@ -73,8 +73,13 @@ Heroes: Chaos Knight (1,3), Dragon Knight (1,3), Keeper of the Light (4,5), Snap
 git clone https://github.com/jenriksen/dota-themer.git
 cd dota-themer
 
-# Install dependencies (requirements.txt is the canonical dependency list)
-pip install -r requirements.txt
+# Install uv (https://docs.astral.sh/uv/)
+pip install uv
+
+# Create a virtual environment and install dependencies
+# (requirements.txt is the canonical dependency list)
+uv venv
+uv pip install -r requirements.txt
 ```
 
 ### Configuration
@@ -191,12 +196,12 @@ dota-themer/
 git clone https://github.com/jenriksen/dota-themer.git
 cd dota-themer
 
-:: Create virtual environment
-python -m venv venv
-call venv\Scripts\activate
+:: Install uv (skip if already installed)
+pip install uv
 
-:: Install dependencies
-pip install -r requirements.txt
+:: Create virtual environment and install dependencies
+uv venv
+uv pip install -r requirements.txt
 
 :: Run tests
 python -m unittest discover
@@ -212,12 +217,12 @@ python core.py 3
 git clone https://github.com/jenriksen/dota-themer.git
 cd dota-themer
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate
+# Install uv (skip if already installed)
+pip install uv
 
-# Install dependencies
-pip install -r requirements.txt
+# Create virtual environment and install dependencies
+uv venv
+uv pip install -r requirements.txt
 
 # Run tests
 python -m unittest discover
@@ -356,7 +361,8 @@ The easiest way to test the application locally:
 
 1. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
+   uv venv
+   uv pip install -r requirements.txt
    ```
 
 2. **Run the core application:**

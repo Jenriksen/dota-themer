@@ -108,7 +108,8 @@ To run the bot locally:
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 
 # Set your Discord token
 export DISCORD_TOKEN='your-bot-token-here'
