@@ -1058,6 +1058,23 @@ class TestThemeManagement(unittest.TestCase):
         self.assertFalse(success)
         self.assertIn("Invalid hero IDs", message)
 
+    def test_add_theme_hero_ids_sorted_deduplicated(self):
+        """add_theme stores hero_ids sorted with duplicates removed."""
+        success, message = core.add_theme(
+            "TestThemeSortedHeroIds",
+            "Sorting test",
+            ["zuus", "antimage", "pudge", "antimage", "zuus"],
+        )
+        self.assertTrue(success)
+
+        themes = core.load_themes(include_hidden=True)
+        theme = next((t for t in themes if t["name"] == "TestThemeSortedHeroIds"), None)
+        self.assertIsNotNone(theme, "added theme not found")
+        self.assertEqual(theme["hero_ids"], ["antimage", "pudge", "zuus"])
+
+        # Clean up
+        core.remove_theme("TestThemeSortedHeroIds")
+
     def test_add_theme_duplicate_hero_set(self):
         """add_theme rejects a theme whose hero set matches an existing theme."""
         themes = core.load_themes(include_hidden=True)

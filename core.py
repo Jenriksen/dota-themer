@@ -613,7 +613,7 @@ def add_theme(theme_name, description="", hero_ids=None):
             )
 
         # Remove duplicates
-        validated_hero_ids = list(set(validated_hero_ids))
+        validated_hero_ids = sorted(set(validated_hero_ids))
     else:
         validated_hero_ids = []
 
