@@ -922,8 +922,8 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_save_themes_is_atomic_write(self):
         """save_themes writes via temp file and os.replace, not in-place truncation."""
-        import tempfile
         import os
+        import tempfile
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             core.DATA_DIR = Path(tmp_dir)
