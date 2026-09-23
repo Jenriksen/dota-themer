@@ -498,6 +498,24 @@ class TestDataFileErrors(unittest.TestCase):
             with self.assertRaises(json.JSONDecodeError):
                 core.load_themes()
 
+    def test_get_all_theme_names_propagates_load_failure(self):
+        """get_all_theme_names raises on load failure, not silent empty list."""
+        core.DATA_DIR = Path("/nonexistent/path")
+        with self.assertRaises(FileNotFoundError):
+            core.get_all_theme_names()
+
+    def test_get_all_hero_names_propagates_load_failure(self):
+        """get_all_hero_names raises on load failure, not silent empty dict."""
+        core.DATA_DIR = Path("/nonexistent/path")
+        with self.assertRaises(FileNotFoundError):
+            core.get_all_hero_names()
+
+    def test_get_all_themes_with_status_propagates_load_failure(self):
+        """get_all_themes_with_status raises on load failure, not empty list."""
+        core.DATA_DIR = Path("/nonexistent/path")
+        with self.assertRaises(FileNotFoundError):
+            core.get_all_themes_with_status()
+
 
 class TestEmptyAndNullData(unittest.TestCase):
     """Tests for empty data structures and null values."""

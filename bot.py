@@ -676,6 +676,14 @@ async def add_theme_command(ctx, theme_name: str, *args):
     """
     logger.info(f"Add theme command from {ctx.author}: {theme_name}")
 
+    # Load hero names once; a load failure must not silently reclassify args
+    try:
+        hero_name_to_id = core.get_all_hero_names()
+    except Exception as e:
+        logger.error(f"Failed to load heroes for addtheme: {e}")
+        await ctx.send("❌ Failed to load hero data. Please try again later.")
+        return
+
     # Parse arguments
     description = ""
     hero_names = []
@@ -683,8 +691,6 @@ async def add_theme_command(ctx, theme_name: str, *args):
     if len(args) >= 1:
         # Check if the first arg looks like a description (has spaces or is quoted)
         # For simplicity, we'll treat the first arg as description if it doesn't match a hero
-        hero_name_to_id = core.get_all_hero_names()
-
         # If first arg is not a hero, it's the description
         if args[0].lower() not in hero_name_to_id:
             description = args[0]
@@ -693,7 +699,6 @@ async def add_theme_command(ctx, theme_name: str, *args):
             hero_names = list(args)
 
     # Convert hero names to IDs
-    hero_name_to_id = core.get_all_hero_names()
     hero_ids = []
     invalid_heroes = []
 
@@ -889,7 +894,12 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
         return
 
     # Convert hero names to IDs
-    hero_name_to_id = core.get_all_hero_names()
+    try:
+        hero_name_to_id = core.get_all_hero_names()
+    except Exception as e:
+        logger.error(f"Failed to load heroes for updatetheme: {e}")
+        await ctx.send("❌ Failed to load hero data. Please try again later.")
+        return
     hero_ids = []
     invalid_heroes = []
 
@@ -934,7 +944,12 @@ async def list_themes_command(ctx):
     """List all available themes with hidden status."""
     logger.info(f"List themes command from {ctx.author}")
 
-    themes = core.get_all_themes_with_status()
+    try:
+        themes = core.get_all_themes_with_status()
+    except Exception as e:
+        logger.error(f"Failed to load themes for listthemes: {e}")
+        await ctx.send("❌ Failed to load theme data. Please try again later.")
+        return
 
     if not themes:
         await ctx.send("❌ No themes found.")

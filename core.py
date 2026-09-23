@@ -1000,12 +1000,8 @@ def get_all_theme_names(include_hidden=True):
     Returns:
         list: Sorted list of theme names
     """
-    try:
-        themes = load_themes(include_hidden=include_hidden)
-        return sorted([t["name"] for t in themes])
-    except Exception as e:
-        logger.error(f"Failed to load themes: {e}")
-        return []
+    themes = load_themes(include_hidden=include_hidden)
+    return sorted([t["name"] for t in themes])
 
 
 def get_all_themes_with_status():
@@ -1015,14 +1011,8 @@ def get_all_themes_with_status():
     Returns:
         list: List of dicts with 'name' and 'is_hidden' for each theme
     """
-    try:
-        themes = load_themes(include_hidden=True)
-        return [
-            {"name": t["name"], "is_hidden": t.get("is_hidden", False)} for t in themes
-        ]
-    except Exception as e:
-        logger.error(f"Failed to load themes: {e}")
-        return []
+    themes = load_themes(include_hidden=True)
+    return [{"name": t["name"], "is_hidden": t.get("is_hidden", False)} for t in themes]
 
 
 def get_all_hero_names():
@@ -1032,12 +1022,8 @@ def get_all_hero_names():
     Returns:
         dict: Mapping of hero name (lowercase) to hero ID
     """
-    try:
-        heroes = load_heroes()
-        return {h["name"].lower(): h["id"] for h in heroes}
-    except Exception as e:
-        logger.error(f"Failed to load heroes: {e}")
-        return {}
+    heroes = load_heroes()
+    return {h["name"].lower(): h["id"] for h in heroes}
 
 
 def main():
