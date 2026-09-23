@@ -73,8 +73,8 @@ Heroes: Chaos Knight (1,3), Dragon Knight (1,3), Keeper of the Light (4,5), Snap
 git clone https://github.com/jenriksen/dota-themer.git
 cd dota-themer
 
-# Install dependencies
-pip install discord.py
+# Install dependencies (requirements.txt is the canonical dependency list)
+pip install -r requirements.txt
 ```
 
 ### Configuration
@@ -105,9 +105,16 @@ python bot.py
 ```
 
 **Discord Commands:**
-- `!theme` or `!theme 3` - Get a theme suggestion (party size optional, default: 2)
-- `!tr 3` - Short alias for `!theme 3`
+- `!theme [party_size]` - Get a theme suggestion (party size 1-5, default: 2)
+- `!tr [party_size]` - Short alias for `!theme` (also defaults to party size 2)
 - `!helptheme` - Show help information
+- `!addtheme <name> [description] <hero1> [hero2] ...` - Create a new theme
+- `!updatetheme <name> add|remove <hero1> [hero2] ...` - Add or remove heroes from a theme
+- `!hidetheme <name>` - Hide a theme from suggestions
+- `!unhidetheme <name>` - Make a hidden theme visible again
+- `!listthemes` - List all themes including hidden status
+- `!listheroes` - List all available heroes
+- React with 👍/👎 on a theme suggestion to vote; react with ❓ to open an interactive modification thread
 
 ### Optional Logging Configuration
 
@@ -142,7 +149,7 @@ Party configurations prefer pairs:
 - [x] Weighted random theme selection
 - [x] Discord bot integration
 - [x] Position-based hero suggestions for balanced teams
-- [x] Hero data with visual attributes for all 121 heroes
+- [x] Hero data with visual attributes for all 120 heroes
 - [x] Structured logging (JSON and text formats)
 - [x] Enhanced theme library (52 themes)
 - [ ] Hero data curation from Liquipedia (automation pending)
@@ -158,14 +165,14 @@ dota-themer/
 ├── core.py                 # Core logic
 ├── bot.py                  # Discord bot
 ├── logging_config.py       # Structured logging configuration
-├── test_core.py            # Core unit tests (94 tests)
+├── test_core.py            # Core unit tests (104 tests)
 ├── test_bot.py             # Bot unit tests (15 tests)
 ├── test_logging.py          # Logging unit tests (21 tests)
 ├── .gitignore              # Git ignore rules
 ├── requirements.txt        # Python dependencies
 ├── .env.example            # Example environment variables
 └── data/
-    ├── heroes.json          # Hero definitions (121 heroes)
+    ├── heroes.json          # Hero definitions (120 heroes)
     └── themes.json          # Theme definitions (52 themes)
 └── scripts/
     └── pre-commit-hook.sh   # Git pre-commit hook for Black formatting
@@ -309,7 +316,7 @@ However, this is not recommended as it may introduce formatting issues or versio
 ### Running Tests
 
 ```bash
-# Run all tests (130 tests)
+# Run all tests (140 tests)
 python -m unittest discover
 
 # Run specific test files
@@ -331,7 +338,7 @@ python core.py 5
 Each run outputs a random theme with matching heroes and their positions.
 
 ### Test Coverage
-- **130 total tests** covering:
+- **140 total tests** covering:
   - Core functionality (data loading, theme selection, hero filtering)
   - Enhanced theme selection (filtering, weighting, position coverage)
   - Position-based features (lane grouping, balanced team suggestions)
@@ -533,7 +540,6 @@ MIT License
 ---
 
 **Current Version:** 1.0.1  
-**Heroes:** 121 (complete Dota 2 roster)  
+**Heroes:** 120 (complete Dota 2 roster)  
 **Themes:** 52  
-**Tests:** 130  
-**Last Updated:** August 2026
+**Tests:** 140

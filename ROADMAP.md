@@ -14,10 +14,10 @@
 - Support both casual play and organized party queues
 
 ### Success Metrics
-- [ ] 8+ themes available (Current: 8 ✅)
-- [ ] 100+ heroes with accurate position data (Current: 108 ✅)
+- [x] 8+ themes available (Current: 52 ✅)
+- [x] 100+ heroes with accurate position data (Current: 120 ✅)
 - [ ] Discord bot deployed and active in at least one server
-- [ ] 72+ unit tests passing (Current: 86+ ✅)
+- [x] 72+ unit tests passing (Current: 140 ✅)
 - [ ] Regular usage by 50+ unique users/month (Future target)
 
 ---
@@ -25,10 +25,11 @@
 ## Current Status (as of Latest Commit)
 
 ### ✅ Completed
+- Custom theme creation via Discord commands (`!addtheme`, `!updatetheme`, `!hidetheme`, `!unhidetheme`)
 - Domain modeling complete (CONTEXT.md)
 - Core logic implemented (core.py)
-- Data infrastructure: 108 heroes, 8 themes
-- Comprehensive test suite: 86+ unit tests
+- Data infrastructure: 120 heroes, 52 themes
+- Comprehensive test suite: 140 unit tests
 - Discord bot integration (bot.py)
 - Position-based features: lane grouping, balanced suggestions
 - Enhanced theme selection: filtering, weighting, validation
@@ -37,7 +38,6 @@
 - Discord bot deployment (requires token configuration)
 
 ### 📋 Backlog
-- Custom theme creation
 - Additional themes (visual, lore, mechanical)
 - Hero data curation from Liquipedia
 - Advanced features (winrate recommendations, team validation)
@@ -118,12 +118,12 @@
 - **Timeline**: Week 5-6
 - **Goals**: Complete and verify all hero data
 - **Deliverables**:
-  - [x] Expand hero database to 108 heroes
+  - [x] Expand hero database to 120 heroes
   - [ ] Manually curate positions from Liquipedia
-  - [ ] Verify all hero IDs match Dota 2 API
-  - [ ] Add visual attributes to heroes
+  - [x] Verify all hero IDs match Dota 2 API
+  - [x] Add visual attributes to heroes
 - **Success Criteria**:
-  - All 108+ Dota 2 heroes represented
+  - All 120 Dota 2 heroes represented
   - Position data accuracy >95%
   - Visual attributes for theme matching
 
@@ -131,11 +131,11 @@
 - **Timeline**: Week 6-7
 - **Goals**: Grow theme library to 20+
 - **Deliverables**:
-  - [ ] Add 12+ new themes
+  - [x] Add 12+ new themes (52 themes available)
   - [ ] Theme categories (visual, lore, mechanical)
-  - [ ] Theme validation scripts
+  - [x] Theme validation scripts (test suite enforces theme/hero integrity)
 - **Success Criteria**:
-  - 20+ themes available
+  - ✅ 20+ themes available (52 themes)
   - Each theme has 5+ matching heroes
   - Themes cover diverse categories
 
@@ -290,18 +290,18 @@
 ## Success Metrics Dashboard
 
 ### Phase 2 Goals (Current)
-- [x] Core logic tests passing (86+ tests)
+- [x] Core logic tests passing (104+ tests)
 - [x] Bot logic tests passing (15 tests)
 - [ ] Discord bot deployed and responding
 - [ ] 10+ users testing the bot
 
 ### Phase 3 Goals
-- [ ] 20+ themes available
-- [ ] 108+ heroes with verified positions
+- [x] 20+ themes available (52 themes)
+- [x] 108+ heroes with verified positions (now 120 heroes)
 - [ ] Data accuracy >95%
 
 ### Phase 4 Goals
-- [ ] Custom theme creation working
+- [x] Custom theme creation working (`!addtheme`, `!updatetheme`)
 - [ ] 50+ unique users/month
 - [ ] User satisfaction >4/5 stars
 
@@ -335,8 +335,8 @@
 - [README.md](README.md) - Usage and project structure
 - [CONTEXT.md](CONTEXT.md) - Domain model and design decisions
 - [TODOs.md](TODOs.md) - Detailed task tracking
-- [data/heroes.json](data/heroes.json) - Hero data (108 heroes)
-- [data/themes.json](data/themes.json) - Theme data (8 themes)
+- [data/heroes.json](data/heroes.json) - Hero data (120 heroes)
+- [data/themes.json](data/themes.json) - Theme data (52 themes)
 
 ---
 
