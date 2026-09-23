@@ -322,6 +322,36 @@ class TestDataIntegrity(unittest.TestCase):
                     f"Theme '{theme['name']}' references non-existent hero: {hero_id}",
                 )
 
+    def test_no_legacy_alias_hero_ids(self):
+        """No legacy/alias hero IDs remain; official Dota 2 API IDs are used."""
+        legacy_to_official = {
+            "stealth_assassin": "riki",
+            "nevermore": "shadow_fiend",
+            "windrunner": "windranger",
+            "furion": "natures_prophet",
+        }
+        heroes = core.load_heroes()
+        hero_ids = {h["id"] for h in heroes}
+        themes = core.load_themes(include_hidden=True)
+
+        for legacy_id, official_id in legacy_to_official.items():
+            self.assertNotIn(
+                legacy_id,
+                hero_ids,
+                f"Legacy hero ID '{legacy_id}' still present in heroes.json",
+            )
+            self.assertIn(
+                official_id,
+                hero_ids,
+                f"Official hero ID '{official_id}' missing from heroes.json",
+            )
+            for theme in themes:
+                self.assertNotIn(
+                    legacy_id,
+                    theme["hero_ids"],
+                    f"Theme '{theme['name']}' still references legacy ID '{legacy_id}'",
+                )
+
     def test_all_heroes_have_valid_positions(self):
         """All heroes have valid position numbers (1-5)."""
         heroes = core.load_heroes()

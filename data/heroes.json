@@ -1061,8 +1061,8 @@
     "aliases": []
   },
   {
-    "id": "furion",
-    "name": "Furion",
+    "id": "natures_prophet",
+    "name": "Nature's Prophet",
     "primary_role": "Carry",
     "positions": [
       1,
@@ -2527,7 +2527,7 @@
     "aliases": []
   },
   {
-    "id": "stealth_assassin",
+    "id": "riki",
     "name": "Riki",
     "primary_role": "Carry",
     "positions": [
@@ -2688,7 +2688,7 @@
     "aliases": []
   },
   {
-    "id": "nevermore",
+    "id": "shadow_fiend",
     "name": "Shadow Fiend",
     "primary_role": "Carry",
     "positions": [
@@ -3728,7 +3728,7 @@
     "aliases": []
   },
   {
-    "id": "windrunner",
+    "id": "windranger",
     "name": "Windranger",
     "primary_role": "Support",
     "positions": [

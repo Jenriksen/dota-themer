@@ -25,8 +25,8 @@
       "phantom_assassin",
       "phantom_lancer",
       "razor",
-      "stealth_assassin",
-      "nevermore",
+      "riki",
+      "shadow_fiend",
       "slark",
       "sniper",
       "spectre",
@@ -37,7 +37,7 @@
       "venomancer",
       "viper",
       "weaver",
-      "windrunner"
+      "windranger"
     ]
   },
   {
@@ -47,7 +47,7 @@
       "beastmaster",
       "chen",
       "enchantress",
-      "furion",
+      "natures_prophet",
       "lone_druid",
       "lycan",
       "meepo"
@@ -74,7 +74,7 @@
       "abaddon",
       "antimage",
       "doombringer",
-      "nevermore",
+      "shadow_fiend",
       "night_stalker",
       "spectre",
       "terrorblade"
@@ -99,7 +99,7 @@
       "doombringer",
       "leshrac",
       "life_stealer",
-      "nevermore",
+      "shadow_fiend",
       "pugna",
       "queenofpain",
       "shadow_demon",
@@ -127,7 +127,7 @@
       "luna",
       "mirana",
       "templar_assassin",
-      "windrunner"
+      "windranger"
     ]
   },
   {
@@ -164,7 +164,7 @@
     "description": "Heroes with predominantly green color schemes",
     "hero_ids": [
       "clinkz",
-      "furion",
+      "natures_prophet",
       "invoker",
       "leshrac",
       "lycan",
@@ -187,7 +187,7 @@
       "phantom_assassin",
       "puck",
       "rubick",
-      "nevermore",
+      "shadow_fiend",
       "silencer"
     ]
   },
@@ -379,7 +379,7 @@
       "razor",
       "sniper",
       "viper",
-      "windrunner"
+      "windranger"
     ]
   },
   {
@@ -410,7 +410,7 @@
       "pugna",
       "queenofpain",
       "razor",
-      "nevermore",
+      "shadow_fiend",
       "silencer",
       "skywrath_mage",
       "sniper",
@@ -423,7 +423,7 @@
       "viper",
       "warlock",
       "weaver",
-      "windrunner",
+      "windranger",
       "witch_doctor",
       "zuus"
     ]
@@ -437,7 +437,7 @@
       "life_stealer",
       "phoenix",
       "queenofpain",
-      "nevermore",
+      "shadow_fiend",
       "vengefulspirit"
     ]
   },
@@ -510,7 +510,7 @@
       "shadow_shaman",
       "vengefulspirit",
       "warlock",
-      "windrunner",
+      "windranger",
       "zuus"
     ]
   },
@@ -529,7 +529,7 @@
       "lycan",
       "naga_siren",
       "queenofpain",
-      "stealth_assassin",
+      "riki",
       "shadow_demon",
       "slark",
       "tidehunter"
@@ -589,7 +589,7 @@
       "queenofpain",
       "skywrath_mage",
       "vengefulspirit",
-      "windrunner"
+      "windranger"
     ]
   },
   {
@@ -661,7 +661,7 @@
     "description": "Heroes with terrifying visages",
     "hero_ids": [
       "doombringer",
-      "nevermore",
+      "shadow_fiend",
       "terrorblade",
       "abaddon",
       "life_stealer",
@@ -710,7 +710,7 @@
     "name": "Nature Themed",
     "description": "Heroes connected to nature and plants",
     "hero_ids": [
-      "furion",
+      "natures_prophet",
       "treant",
       "enchantress",
       "lone_druid",
@@ -755,7 +755,7 @@
     "hero_ids": [
       "gyrocopter",
       "phoenix",
-      "windrunner",
+      "windranger",
       "drow_ranger",
       "medusa",
       "morphling",
@@ -781,7 +781,7 @@
       "beastmaster",
       "enchantress",
       "chen",
-      "furion",
+      "natures_prophet",
       "lone_druid",
       "lycan",
       "meepo",
@@ -837,7 +837,7 @@
     "hero_ids": [
       "ember_spirit",
       "storm_spirit",
-      "windrunner",
+      "windranger",
       "phantom_lancer",
       "clinkz",
       "bounty_hunter",

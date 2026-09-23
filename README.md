@@ -168,8 +168,6 @@ dota-themer/
     ├── heroes.json          # Hero definitions (121 heroes)
     └── themes.json          # Theme definitions (52 themes)
 └── scripts/
-    ├── add_themes.py        # Add new themes to themes.json
-    ├── add_visual_attributes.py  # Add visual attributes to heroes
     └── pre-commit-hook.sh   # Git pre-commit hook for Black formatting
 ```
 
@@ -368,18 +366,6 @@ The easiest way to test the application locally:
    # Run the bot
    python bot.py
    ```
-
-### Using the Provided Scripts
-
-**Add new themes:**
-```bash
-python scripts/add_themes.py
-```
-
-**Add/Update visual attributes for heroes:**
-```bash
-python scripts/add_visual_attributes.py
-```
 
 ### Docker Deployment (Optional)
 
