@@ -5,11 +5,15 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
 
 jobs:
   lint:
-    name: Lint Code
+    name: Code Linting
     runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,27 +23,31 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
+      - name: Install linting tools
         run: |
           python -m pip install --upgrade pip
           pip install flake8 black isort mypy
 
       - name: Run Flake8 (PEP8 compliance)
-        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Check all files
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Run Black (code formatting)
+      - name: Run Black (code formatting check)
         run: black --check . --verbose
 
-      - name: Run isort (import sorting)
-        run: isort --check . --verbose
+      - name: Run isort (import sorting check)
+        run: isort --check . --verbose --diff
 
       - name: Run mypy (type checking)
         run: mypy . --ignore-missing-imports --verbose
 
   test:
-    name: Run Tests
+    name: Unit Tests
     runs-on: ubuntu-latest
     needs: lint
+    if: github.event_name != 'schedule'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -56,8 +64,16 @@ jobs:
         run: |
           pip install coverage
           coverage run -m unittest discover
-          coverage report --show-missing
+          coverage report --show-missing --fail-under=80
           coverage xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            .coverage
+            coverage.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -67,10 +83,11 @@ jobs:
           flags: unittests
           name: codecov-umbrella
 
-  security-scan:
-    name: Security Scan
+  code-quality:
+    name: Code Quality Checks
     runs-on: ubuntu-latest
-    needs: lint
+    needs: test
+    if: github.event_name != 'schedule'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -80,32 +97,22 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install security tools
+      - name: Install code quality tools
+        run: pip install radon pydocstyle
+
+      - name: Run Radon (code complexity)
         run: |
-          pip install bandit safety pip-audit
+          radon cc . -j --min C --max F
+          radon mi . -j --min A --max D
 
-      - name: Run Bandit (security linter)
-        run: bandit -r . -f json -o bandit-results.json || true
+      - name: Run pydocstyle (docstring style)
+        run: pydocstyle . || true
 
-      - name: Run Safety (dependency vulnerabilities)
-        run: safety check --json --output json || true
-
-      - name: Run pip-audit (package vulnerabilities)
-        run: pip-audit --format json --output pip-audit-results.json || true
-
-      - name: Upload security scan results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: security-scan-results
-          path: |
-            bandit-results.json
-            pip-audit-results.json
-
-  build:
-    name: Build and Verify
+  verify:
+    name: Functionality Verification
     runs-on: ubuntu-latest
-    needs: [lint, test, security-scan]
+    needs: test
+    if: github.event_name != 'schedule'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -118,7 +125,7 @@ jobs:
       - name: Install bot dependencies
         run: pip install discord.py
 
-      - name: Verify core functionality
+      - name: Test core functionality with all party sizes
         run: |
           python core.py 1
           python core.py 2
@@ -126,14 +133,94 @@ jobs:
           python core.py 4
           python core.py 5
 
-      - name: Verify bot can be imported
-        run: python -c "import bot; print('Bot module imports successfully')"
+      - name: Test bot module imports
+        run: python -c "import bot; print('Bot module OK')"
 
-  # Optional: Docker build (if Dockerfile exists)
+      - name: Test core module imports
+        run: python -c "import core; print('Core module OK')"
+
+      - name: Test logging module imports
+        run: python -c "import logging_config; print('Logging module OK')"
+
+  bandit:
+    name: Bandit Security Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit
+        run: bandit -r . -f json -o bandit-results.json -ll
+
+      - name: Upload Bandit results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-results
+          path: bandit-results.json
+
+  pip-audit:
+    name: pip-audit (Dependency Vulnerabilities)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run pip-audit
+        run: pip-audit --format json --output pip-audit-results.json
+
+      - name: Upload pip-audit results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pip-audit-results
+          path: pip-audit-results.json
+
+  safety:
+    name: Safety (Dependency Checking)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Safety
+        run: pip install safety
+
+      - name: Run Safety
+        run: safety check --json --output safety-results.json || true
+
+      - name: Upload Safety results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: safety-results
+          path: safety-results.json
+
   docker-build:
     name: Docker Build
     runs-on: ubuntu-latest
-    needs: build
+    needs: verify
     if: false  # Disabled until Dockerfile is added
     steps:
       - name: Checkout repository
@@ -144,3 +231,29 @@ jobs:
 
       - name: Run container tests
         run: docker run dota-themer python -m unittest discover
+
+  trivy:
+    name: Trivy (Container Scanning)
+    runs-on: ubuntu-latest
+    if: false  # Disabled until Dockerfile is added
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t dota-themer .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'dota-themer'
+          format: 'json'
+          output: 'trivy-results.json'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-results
+          path: trivy-results.json
