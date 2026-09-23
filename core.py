@@ -4,8 +4,10 @@ Suggests a theme and lists matching heroes with their positions.
 """
 
 import json
+import os
 import random
 import sys
+import tempfile
 from pathlib import Path
 
 import logging_config
@@ -73,6 +75,36 @@ def load_themes(include_hidden=True):
         raise
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in themes file: {e}")
+        raise
+
+
+def save_themes(themes):
+    """
+    Save themes to JSON file atomically.
+
+    Writes to a temporary file in the data directory, then atomically
+    replaces themes.json via os.replace, so a crash mid-write can never
+    leave a truncated or partial themes.json behind.
+
+    Args:
+        themes: List of theme dicts to persist
+
+    Raises:
+        OSError: If the temporary file cannot be created or replaced
+        Any exception raised by json.dump (e.g. TypeError)
+    """
+    themes_path = DATA_DIR / "themes.json"
+    fd, tmp_path = tempfile.mkstemp(dir=DATA_DIR, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(themes, f, indent=2)
+        os.replace(tmp_path, themes_path)
+        logger.debug(f"Atomically saved {len(themes)} themes to {themes_path}")
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
         raise
 
 
@@ -614,9 +646,7 @@ def add_theme(theme_name, description="", hero_ids=None):
 
     # Save back to file
     try:
-        themes_path = DATA_DIR / "themes.json"
-        with open(themes_path, "w") as f:
-            json.dump(themes, f, indent=2)
+        save_themes(themes)
 
         logger.info(
             f"Successfully added theme: {theme_name} with {len(validated_hero_ids)} heroes"
@@ -707,9 +737,7 @@ def update_theme(
 
     # Save back to file
     try:
-        themes_path = DATA_DIR / "themes.json"
-        with open(themes_path, "w") as f:
-            json.dump(themes, f, indent=2)
+        save_themes(themes)
 
         logger.info(f"Successfully updated theme: {theme_name}")
         return (
@@ -768,9 +796,7 @@ def hide_theme(theme_name):
 
     # Save back to file
     try:
-        themes_path = DATA_DIR / "themes.json"
-        with open(themes_path, "w") as f:
-            json.dump(themes, f, indent=2)
+        save_themes(themes)
 
         logger.info(f"Successfully hid theme: {theme_name}")
         return (
@@ -834,9 +860,7 @@ def unhide_theme(theme_name):
 
     # Save back to file
     try:
-        themes_path = DATA_DIR / "themes.json"
-        with open(themes_path, "w") as f:
-            json.dump(themes, f, indent=2)
+        save_themes(themes)
 
         logger.info(f"Successfully unhid theme: {theme_name}")
         return (
@@ -898,9 +922,7 @@ def update_theme_feedback(theme_name, delta):
 
     # Save back to file
     try:
-        themes_path = DATA_DIR / "themes.json"
-        with open(themes_path, "w") as f:
-            json.dump(themes, f, indent=2)
+        save_themes(themes)
 
         logger.info(f"Successfully updated feedback for theme: {theme_name}")
         return (
@@ -959,9 +981,7 @@ def remove_theme(theme_name):
 
     # Save back to file
     try:
-        themes_path = DATA_DIR / "themes.json"
-        with open(themes_path, "w") as f:
-            json.dump(themes, f, indent=2)
+        save_themes(themes)
 
         logger.info(f"Successfully removed theme: {theme_name}")
         return True, f"Theme '{theme_name}' removed successfully"

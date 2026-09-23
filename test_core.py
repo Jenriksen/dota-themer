@@ -920,6 +920,53 @@ class TestThemeManagement(unittest.TestCase):
             shutil.copy2(self.heroes_backup, heroes_path)
             self.heroes_backup.unlink()
 
+    def test_save_themes_is_atomic_write(self):
+        """save_themes writes via temp file and os.replace, not in-place truncation."""
+        import os
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            core.DATA_DIR = Path(tmp_dir)
+            themes = [{"name": "T1", "hero_ids": ["h1"]}]
+            core.save_themes(themes)
+
+            with open(Path(tmp_dir) / "themes.json") as f:
+                self.assertEqual(json.load(f), themes)
+            # No leftover temp files
+            leftovers = [p for p in os.listdir(tmp_dir) if p != "themes.json"]
+            self.assertEqual(leftovers, [])
+
+    def test_save_themes_cleans_up_on_serialization_failure(self):
+        """save_themes removes the temp file and re-raises on failure."""
+        import os
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            core.DATA_DIR = Path(tmp_dir)
+            with patch("json.dump", side_effect=TypeError("boom")):
+                with self.assertRaises(TypeError):
+                    core.save_themes([{"name": "T", "hero_ids": []}])
+            # Temp file must not remain in the data directory
+            leftovers = [p for p in os.listdir(tmp_dir) if p != "themes.json"]
+            self.assertEqual(leftovers, [])
+
+    def test_save_themes_no_truncation_of_existing_file_on_failure(self):
+        """A failed save leaves the previous themes.json intact."""
+        import os
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            core.DATA_DIR = Path(tmp_dir)
+            original = [{"name": "Original", "hero_ids": ["h1"]}]
+            core.save_themes(original)
+
+            with patch("json.dump", side_effect=TypeError("boom")):
+                with self.assertRaises(TypeError):
+                    core.save_themes([{"bad": object()}])
+
+            with open(Path(tmp_dir) / "themes.json") as f:
+                self.assertEqual(json.load(f), original)
+
     def test_get_all_theme_names(self):
         """get_all_theme_names returns sorted list of theme names."""
         names = core.get_all_theme_names()
