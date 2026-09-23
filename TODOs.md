@@ -14,16 +14,16 @@
   - Output format: Theme + heroes with positions in parentheses
 
 ### Core Functionality
-- [x] Created `data/heroes.json` with 46 heroes
-- [x] Created `data/themes.json` with 8 themes
+- [x] Created `data/heroes.json` with 46 heroes (later expanded to 120)
+- [x] Created `data/themes.json` with 8 themes (later expanded to 52)
 - [x] Implemented `core.py` with theme selection and hero filtering
 - [x] Tested with all party sizes (1-5)
 - [x] Output matches required format: `HeroName (pos1,pos2)`
 
 ### Testing
-- [x] Created `test_core.py` with 57 unit tests
+- [x] Created `test_core.py` with 57 unit tests (now 104)
 - [x] Created `test_bot.py` with 15 unit tests
-- [x] Added 14 more tests for enhanced theme selection (86 total)
+- [x] Added 14 more tests for enhanced theme selection (later grown to 140 total across the suite)
 - [x] Fixed data inconsistency (clockwerk -> rattletrap)
 - [x] Added .gitignore for Python artifacts
 
@@ -38,7 +38,7 @@
 - [x] Implemented party composition validation
 
 ### Data Improvements
-- [x] Expanded hero database to 121 heroes (complete Dota 2 roster)
+- [x] Expanded hero database to 120 heroes (complete Dota 2 roster)
 
 ### Discord Bot Integration
 - [x] Created `bot.py` using discord.py
@@ -70,17 +70,17 @@
 - [x] Add position validation for party configurations
 
 ### 3. Data Improvements (Medium Priority)
-- [x] Expand hero database to 121 heroes (complete Dota 2 roster)
+- [x] Expand hero database to 120 heroes (complete Dota 2 roster)
 - [x] Manually curated hero positions for all heroes
-- [ ] Add more themes (current: 8)
+- [ ] Add more themes (current: 52)
 - [ ] Add visual attributes to heroes for better theme matching
 
 ### 4. Advanced Features (Backlog)
-- [ ] Custom theme creation via Discord commands
+- [x] Custom theme creation via Discord commands (`!addtheme`, `!updatetheme`)
   - [ ] Bot Command Tests: No tests for the bot commands themselves (only core functions are tested)
   - [ ] Input Validation: Could improve hero name matching (fuzzy matching?)
   - [ ] Error Messages: Could be more user-friendly
-  - [ ] Hide/UnHide Themes: Replace remove with hide functionality (users cannot delete, only hide from suggestions)
+  - [x] Hide/UnHide Themes: Implemented via `!hidetheme`/`!unhidetheme` (users cannot delete, only hide from suggestions)
   - [ ] Categories: Theme categories not yet implemented (mentioned in ROADMAP)
   - [ ] Permissions: No permission system (any user can modify themes)
   - [ ] Audit Log: No logging of who created/modified themes
@@ -90,12 +90,12 @@
 - [ ] Multiple theme suggestions per request
 - [ ] Theme rotation / daily themes
 - [ ] Hero name hyperlinks in output (underline name, link to dota2.com/hero/{id})
-- [ ] Theme feedback via reactions (:thumbsup: +1, :thumbsdown: -1, persisted in themes.json)
-  - [ ] Add feedback_score field to themes.json
-  - [ ] Implement on_reaction_add event handler in bot.py
-  - [ ] Add update_theme_feedback() function in core.py
-  - [ ] Display feedback score in theme suggestion messages
-  - [ ] Add description about reactions in theme message
+- [x] Theme feedback via reactions (:thumbsup: +1, :thumbsdown: -1, persisted in themes.json)
+  - [x] Add feedback_score field to themes.json
+  - [x] Implement on_reaction_add event handler in bot.py
+  - [x] Add update_theme_feedback() function in core.py
+  - [x] Display feedback score in theme suggestion messages
+  - [x] Add description about reactions in theme message
 - [ ] Theme modification guide with suggestions
   - [ ] Research and add common Dota2 hero abbreviations to aliases field in heroes.json
 - [ ] Help command via `!theme help` for in-context assistance
@@ -108,7 +108,8 @@ To run the bot locally:
 
 ```bash
 # Install dependencies
-uv pip install discord.py
+uv venv
+uv pip install -r requirements.txt
 
 # Set your Discord token
 export DISCORD_TOKEN='your-bot-token-here'
@@ -126,7 +127,7 @@ python core.py 3
 - `CONTEXT.md` - Domain model (complete)
 - `core.py` - Core logic (complete, tested)
 - `bot.py` - Discord bot (complete, needs token)
-- `test_core.py` - Core unit tests (57 tests)
+- `test_core.py` - Core unit tests (104 tests)
 - `test_bot.py` - Bot unit tests (15 tests)
-- `data/heroes.json` - Hero data (MVP complete, 46 heroes)
-- `data/themes.json` - Theme data (MVP complete, 8 themes)
+- `data/heroes.json` - Hero data (MVP complete, 120 heroes)
+- `data/themes.json` - Theme data (MVP complete, 52 themes)

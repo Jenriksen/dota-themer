@@ -65,9 +65,10 @@ Each hero's positions reflect their viable roles, with primary position first.
 - Position subset: Prefer pairs of 2, use mid for odd numbers (Q12)
 - Output format: Theme + heroes with positions in parentheses (Q13)
 - Hero identifier: Internal name/ID for stability (Q15 implied)
+- Theme selection: Weighted random, favoring themes with more heroes (`select_theme()` in core.py)
+- Party size validation: Themes are filtered to those with enough heroes for the party size (`filter_themes()` in core.py)
+- Position coverage: Themes can be filtered to require full position coverage (`has_position_coverage()` in core.py)
 
 ## Open Questions
 
-- [ ] How are themes selected (random? weighted?)?
-- [ ] Should we validate themes have enough heroes for party size?
-- [ ] Should we filter themes by position coverage?
+- None currently open — see Resolved Decisions above

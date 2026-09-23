@@ -30,7 +30,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: dota-themer-cli
-    command: ["python", "core.py", "2"]
+    command: ["/app/.venv/bin/python", "core.py", "2"]
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-DEBUG}
       - LOG_FORMAT=${LOG_FORMAT:-text}
