@@ -12,6 +12,11 @@ services:
     restart: unless-stopped
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
+      # Storage backend: json (default) or sqlite (#34)
+      - DOTA_THEMER_BACKEND=${DOTA_THEMER_BACKEND:-json}
+      # S3 snapshots (optional): pull at startup, push after every save
+      - DOTA_THEMER_S3_BUCKET=${DOTA_THEMER_S3_BUCKET:-}
+      - DOTA_THEMER_S3_PREFIX=${DOTA_THEMER_S3_PREFIX:-}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - LOG_FORMAT=${LOG_FORMAT:-json}
       - LOG_FILE=/app/logs/dota-themer.log
@@ -19,8 +24,9 @@ services:
     volumes:
       # Persist logs
       - ./logs:/app/logs
-      # Mount data directory for easy updates
-      - ./data:/app/data:ro
+      # Persist data (writable: SQLite database lives here when
+      # DOTA_THEMER_BACKEND=sqlite, #34)
+      - dota_data:/app/data
     networks:
       - dota-network
 
@@ -43,3 +49,6 @@ services:
 networks:
   dota-network:
     driver: bridge
+
+volumes:
+  dota_data:
