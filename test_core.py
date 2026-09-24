@@ -1441,3 +1441,57 @@ class TestCachedRepositories(unittest.TestCase):
         self.assertEqual(suggestion["theme"], "Axes Only")
         self.assertEqual(hero_repo.load_calls, 1)
         self.assertEqual(theme_repo.load_calls, 1)
+
+
+class TestHeroResolver(unittest.TestCase):
+    """Table-driven tests for the R2a HeroResolver service."""
+
+    def setUp(self):
+        self.heroes = [
+            {
+                "id": "ancient_apparition",
+                "name": "Ancient Apparition",
+                "aliases": ["aa"],
+            },
+            {"id": "axe", "name": "Axe", "aliases": []},
+            {"id": "zuus", "name": "Zeus", "aliases": ["thundergod"]},
+        ]
+        self.resolver = core.HeroResolver(InMemoryHeroRepository(self.heroes))
+
+    def test_resolution_table(self):
+        """One contract: exact ID, exact name, alias, and fuzzy all resolve."""
+        cases = [
+            ("axe", "axe"),  # exact ID
+            ("Axe", "axe"),  # exact name, different case
+            ("axe ", "axe"),  # surrounding whitespace
+            ("ancient apparition", "ancient_apparition"),  # name lowercased
+            ("AA", "ancient_apparition"),  # alias, different case
+            ("thundergod", "zuus"),  # alias
+            ("Zeu", "zuus"),  # fuzzy: prefix scores 2*3=6 >= 3
+            ("Zeuss", "zuus"),  # fuzzy: substring hit scores 12 >= 5
+        ]
+        for name, expected_id in cases:
+            with self.subTest(name=name):
+                self.assertEqual(self.resolver.resolve(name), expected_id)
+
+    def test_unresolvable_names_return_none(self):
+        """Names with no exact/alias/fuzzy match resolve to None."""
+        for name in ("", "unknown hero", "zzzzzzzz"):
+            with self.subTest(name=name):
+                self.assertIsNone(self.resolver.resolve(name))
+
+    def test_resolve_all_partitions_names(self):
+        """resolve_all returns resolved IDs and the invalid originals in order."""
+        hero_ids, invalid = self.resolver.resolve_all(
+            ["Axe", "bogus", "AA", "zzzzzzzz"]
+        )
+        self.assertEqual(hero_ids, ["axe", "ancient_apparition"])
+        self.assertEqual(invalid, ["bogus", "zzzzzzzz"])
+
+    def test_resolver_uses_injected_repository(self):
+        """HeroResolver reads heroes from the injected repository."""
+        repo = LoadCountingHeroRepository(self.heroes)
+        resolver = core.HeroResolver(repo)
+        resolver.resolve("Axe")
+        resolver.resolve("zuus")
+        self.assertEqual(repo.load_calls, 1)

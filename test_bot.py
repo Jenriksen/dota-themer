@@ -161,3 +161,18 @@ class TestRepositoryWiring(unittest.TestCase):
                 )
                 segment = content[m.start() : call_end]
                 self.assertIn("theme_repo=", segment, f"{segment} must pass theme_repo")
+
+
+class TestHeroResolverWiring(unittest.TestCase):
+    """Tests for R2a/R2b: bot uses the single HeroResolver service."""
+
+    def test_constructs_hero_resolver(self):
+        """bot.py creates a HeroResolver singleton."""
+        content = read_bot_file()
+        self.assertIn("core.HeroResolver(", content)
+
+    def test_no_inline_resolution_loops(self):
+        """The three divergent resolution loops are gone from bot.py."""
+        content = read_bot_file()
+        self.assertNotIn("best_score", content)
+        self.assertNotIn("hero_name_to_id", content)
