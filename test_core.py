@@ -931,42 +931,184 @@ class TestPositionBasedFeatures(unittest.TestCase):
 
 
 class TestThemeManagement(unittest.TestCase):
-    """Tests for theme management functions."""
+    """Tests for theme management functions.
+
+    Hermetic (R1c): CRUD behavior is tested against in-memory repository
+    fakes with fixed fixtures; nothing here reads or writes the live
+    data/*.json files. File-path persistence is covered separately by
+    TestRepositories (tmp directories) and TestDataIntegrity (read-only).
+    """
 
     def setUp(self):
         self.original_data_dir = core.DATA_DIR
-        # Use the actual data directory
-        core.DATA_DIR = Path(__file__).parent / "data"
+        self.addCleanup(setattr, core, "DATA_DIR", self.original_data_dir)
+        self.hero_repo = InMemoryHeroRepository(
+            [
+                {"id": "antimage", "name": "Anti-Mage", "positions": [1]},
+                {"id": "juggernaut", "name": "Juggernaut", "positions": [1]},
+                {"id": "zuus", "name": "Zeus", "positions": [2]},
+                {"id": "pudge", "name": "Pudge", "positions": [3]},
+            ]
+        )
+        self.theme_repo = InMemoryThemeRepository(
+            [
+                {
+                    "name": "Carry Duo",
+                    "description": "Two carries",
+                    "hero_ids": ["antimage", "juggernaut"],
+                },
+                {"name": "Solo Mid", "description": "", "hero_ids": ["zuus"]},
+            ]
+        )
 
-        # Create backup copies of the data files
-        self.themes_backup = Path(__file__).parent / "data" / "themes_backup.json"
-        self.heroes_backup = Path(__file__).parent / "data" / "heroes_backup.json"
+    def test_get_all_theme_names(self):
+        """get_all_theme_names returns sorted list of theme names."""
+        names = core.get_all_theme_names(theme_repo=self.theme_repo)
+        self.assertEqual(names, ["Carry Duo", "Solo Mid"])
 
-        import shutil
+    def test_get_all_theme_names_excludes_hidden(self):
+        """get_all_theme_names filters hidden themes when asked."""
+        core.hide_theme("Solo Mid", theme_repo=self.theme_repo)
+        names = core.get_all_theme_names(theme_repo=self.theme_repo)
+        self.assertEqual(names, ["Carry Duo", "Solo Mid"])
+        names = core.get_all_theme_names(
+            include_hidden=False, theme_repo=self.theme_repo
+        )
+        self.assertEqual(names, ["Carry Duo"])
 
-        themes_path = core.DATA_DIR / "themes.json"
-        heroes_path = core.DATA_DIR / "heroes.json"
+    def test_get_all_hero_names(self):
+        """get_all_hero_names returns dict mapping hero names to IDs."""
+        hero_map = core.get_all_hero_names(hero_repo=self.hero_repo)
+        self.assertEqual(
+            hero_map,
+            {
+                "anti-mage": "antimage",
+                "juggernaut": "juggernaut",
+                "zeus": "zuus",
+                "pudge": "pudge",
+            },
+        )
 
-        if themes_path.exists():
-            shutil.copy2(themes_path, self.themes_backup)
-        if heroes_path.exists():
-            shutil.copy2(heroes_path, self.heroes_backup)
+    def test_add_theme_valid(self):
+        """add_theme adds a new theme successfully."""
+        success, message = core.add_theme(
+            "New Theme",
+            "A test theme",
+            ["antimage", "zuus"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
 
-    def tearDown(self):
-        core.DATA_DIR = self.original_data_dir
+        self.assertTrue(success)
+        self.assertIn("added successfully", message)
+        self.assertEqual(
+            [t["name"] for t in self.theme_repo.themes],
+            ["Carry Duo", "New Theme", "Solo Mid"],
+        )
 
-        # Restore backup copies
-        import shutil
+    def test_add_theme_duplicate(self):
+        """add_theme rejects duplicate theme names."""
+        success, message = core.add_theme(
+            "carry duo",
+            "Description",
+            ["pudge"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertFalse(success)
+        self.assertIn("already exists", message)
 
-        themes_path = Path(__file__).parent / "data" / "themes.json"
-        heroes_path = Path(__file__).parent / "data" / "heroes.json"
+    def test_add_theme_empty_name(self):
+        """add_theme rejects empty theme name."""
+        success, message = core.add_theme(
+            "", "Description", hero_repo=self.hero_repo, theme_repo=self.theme_repo
+        )
+        self.assertFalse(success)
+        self.assertIn("cannot be empty", message)
 
-        if self.themes_backup.exists():
-            shutil.copy2(self.themes_backup, themes_path)
-            self.themes_backup.unlink()
-        if self.heroes_backup.exists():
-            shutil.copy2(self.heroes_backup, heroes_path)
-            self.heroes_backup.unlink()
+    def test_add_theme_invalid_hero(self):
+        """add_theme rejects invalid hero IDs."""
+        success, message = core.add_theme(
+            "Invalid Hero Theme",
+            "Description",
+            ["antimage", "nonexistent_hero"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertFalse(success)
+        self.assertIn("Invalid hero IDs", message)
+
+    def test_add_theme_hero_ids_sorted_deduplicated(self):
+        """add_theme stores hero_ids sorted with duplicates removed."""
+        success, message = core.add_theme(
+            "Sorted Theme",
+            "Sorting test",
+            ["zuus", "antimage", "pudge", "antimage", "zuus"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertTrue(success)
+
+        theme = next(
+            (t for t in self.theme_repo.themes if t["name"] == "Sorted Theme"), None
+        )
+        self.assertIsNotNone(theme, "added theme not found")
+        self.assertEqual(theme["hero_ids"], ["antimage", "pudge", "zuus"])
+
+    def test_add_theme_duplicate_hero_set(self):
+        """add_theme rejects a theme whose hero set matches an existing theme."""
+        success, message = core.add_theme(
+            "Duplicate Hero Set",
+            "Duplicate hero set",
+            ["juggernaut", "antimage"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+
+        self.assertFalse(success)
+        self.assertIn("Hero set already used", message)
+        self.assertIn("Carry Duo", message)
+
+    def test_update_theme_add_heroes(self):
+        """update_theme adds heroes to existing theme."""
+        success, message = core.update_theme(
+            "Carry Duo",
+            add_hero_ids=["zuus"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertTrue(success)
+
+        theme = next(
+            (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
+        )
+        self.assertEqual(theme["hero_ids"], ["antimage", "juggernaut", "zuus"])
+
+    def test_update_theme_remove_heroes(self):
+        """update_theme removes heroes from existing theme."""
+        success, message = core.update_theme(
+            "Carry Duo",
+            remove_hero_ids=["antimage"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertTrue(success)
+
+        theme = next(
+            (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
+        )
+        self.assertEqual(theme["hero_ids"], ["juggernaut"])
+
+    def test_update_theme_nonexistent(self):
+        """update_theme rejects nonexistent theme."""
+        success, message = core.update_theme(
+            "NonexistentTheme12345",
+            add_hero_ids=["antimage"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertFalse(success)
+        self.assertIn("not found", message)
 
     def test_save_themes_is_atomic_write(self):
         """save_themes writes via temp file and os.replace, not in-place truncation."""
@@ -999,14 +1141,14 @@ class TestThemeManagement(unittest.TestCase):
             self.assertEqual(leftovers, [])
 
     def test_save_themes_no_truncation_of_existing_file_on_failure(self):
-        """A failed save leaves the previous themes.json intact."""
-        import os
+        """save_themes leaves the existing themes.json intact on serialization failure."""
         import tempfile
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             core.DATA_DIR = Path(tmp_dir)
             original = [{"name": "Original", "hero_ids": ["h1"]}]
-            core.save_themes(original)
+            with open(Path(tmp_dir) / "themes.json", "w") as f:
+                json.dump(original, f)
 
             with patch("json.dump", side_effect=TypeError("boom")):
                 with self.assertRaises(TypeError):
@@ -1014,158 +1156,6 @@ class TestThemeManagement(unittest.TestCase):
 
             with open(Path(tmp_dir) / "themes.json") as f:
                 self.assertEqual(json.load(f), original)
-
-    def test_get_all_theme_names(self):
-        """get_all_theme_names returns sorted list of theme names."""
-        names = core.get_all_theme_names()
-        self.assertIsInstance(names, list)
-        self.assertGreater(len(names), 0)
-        # Should be sorted
-        self.assertEqual(names, sorted(names))
-
-    def test_get_all_hero_names(self):
-        """get_all_hero_names returns dict mapping hero names to IDs."""
-        hero_map = core.get_all_hero_names()
-        self.assertIsInstance(hero_map, dict)
-        self.assertGreater(len(hero_map), 0)
-        # All values should be strings (hero IDs)
-        for name, hero_id in hero_map.items():
-            self.assertIsInstance(name, str)
-            self.assertIsInstance(hero_id, str)
-
-    def test_add_theme_valid(self):
-        """add_theme adds a new theme successfully."""
-        themes_before = core.get_all_theme_names()
-
-        # Add a test theme
-        success, message = core.add_theme(
-            "TestThemeForAddition", "A test theme", ["antimage", "juggernaut"]
-        )
-
-        self.assertTrue(success)
-        self.assertIn("added successfully", message)
-
-        # Verify it was added
-        themes_after = core.get_all_theme_names()
-        self.assertEqual(len(themes_after), len(themes_before) + 1)
-        self.assertIn("TestThemeForAddition", themes_after)
-
-        # Clean up
-        core.hide_theme("TestThemeForAddition")
-
-    def test_add_theme_duplicate(self):
-        """add_theme rejects duplicate theme names."""
-        themes = core.get_all_theme_names()
-        if themes:
-            existing_theme = themes[0]
-            success, message = core.add_theme(existing_theme, "Description")
-            self.assertFalse(success)
-            self.assertIn("already exists", message)
-
-    def test_add_theme_empty_name(self):
-        """add_theme rejects empty theme name."""
-        success, message = core.add_theme("", "Description")
-        self.assertFalse(success)
-        self.assertIn("cannot be empty", message)
-
-    def test_add_theme_invalid_hero(self):
-        """add_theme rejects invalid hero IDs."""
-        success, message = core.add_theme(
-            "TestThemeInvalidHero", "Description", ["antimage", "nonexistent_hero"]
-        )
-        self.assertFalse(success)
-        self.assertIn("Invalid hero IDs", message)
-
-    def test_add_theme_hero_ids_sorted_deduplicated(self):
-        """add_theme stores hero_ids sorted with duplicates removed."""
-        success, message = core.add_theme(
-            "TestThemeSortedHeroIds",
-            "Sorting test",
-            ["zuus", "antimage", "pudge", "antimage", "zuus"],
-        )
-        self.assertTrue(success)
-
-        themes = core.load_themes(include_hidden=True)
-        theme = next((t for t in themes if t["name"] == "TestThemeSortedHeroIds"), None)
-        self.assertIsNotNone(theme, "added theme not found")
-        self.assertEqual(theme["hero_ids"], ["antimage", "pudge", "zuus"])
-
-        # Clean up
-        core.remove_theme("TestThemeSortedHeroIds")
-
-    def test_add_theme_duplicate_hero_set(self):
-        """add_theme rejects a theme whose hero set matches an existing theme."""
-        themes = core.load_themes(include_hidden=True)
-        existing = next((t for t in themes if t["hero_ids"]), None)
-        self.assertIsNotNone(existing, "themes.json must have at least one theme")
-
-        success, message = core.add_theme(
-            "TestThemeDuplicateHeroSet", "Duplicate hero set", existing["hero_ids"]
-        )
-
-        self.assertFalse(success)
-        self.assertIn("Hero set already used", message)
-        self.assertIn(existing["name"], message)
-
-    def test_update_theme_add_heroes(self):
-        """update_theme adds heroes to existing theme."""
-        themes = core.load_themes()
-        if themes:
-            theme_name = themes[0]["name"]
-            original_count = len(themes[0]["hero_ids"])
-
-            # Add a hero
-            success, message = core.update_theme(theme_name, add_hero_ids=["antimage"])
-
-            self.assertTrue(success)
-
-            # Verify the hero was added
-            themes_after = core.load_themes()
-            for theme in themes_after:
-                if theme["name"] == theme_name:
-                    self.assertGreaterEqual(len(theme["hero_ids"]), original_count)
-                    break
-
-            # Clean up: remove the hero we added
-            core.update_theme(theme_name, remove_hero_ids=["antimage"])
-
-    def test_update_theme_remove_heroes(self):
-        """update_theme removes heroes from existing theme."""
-        themes = core.load_themes()
-        if themes:
-            # Find a theme with at least 2 heroes
-            for theme in themes:
-                if len(theme["hero_ids"]) >= 2:
-                    theme_name = theme["name"]
-                    hero_to_remove = theme["hero_ids"][0]
-                    original_count = len(theme["hero_ids"])
-
-                    # Remove a hero
-                    success, message = core.update_theme(
-                        theme_name, remove_hero_ids=[hero_to_remove]
-                    )
-
-                    self.assertTrue(success)
-
-                    # Verify the hero was removed
-                    themes_after = core.load_themes()
-                    for t in themes_after:
-                        if t["name"] == theme_name:
-                            self.assertEqual(len(t["hero_ids"]), original_count - 1)
-                            self.assertNotIn(hero_to_remove, t["hero_ids"])
-                            break
-
-                    # Restore the hero
-                    core.update_theme(theme_name, add_hero_ids=[hero_to_remove])
-                    break
-
-    def test_update_theme_nonexistent(self):
-        """update_theme rejects nonexistent theme."""
-        success, message = core.update_theme(
-            "NonexistentTheme12345", add_hero_ids=["antimage"]
-        )
-        self.assertFalse(success)
-        self.assertIn("not found", message)
 
 
 if __name__ == "__main__":
