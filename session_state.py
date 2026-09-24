@@ -4,6 +4,7 @@ Tracks theme suggestion messages and active modification threads in one
 object so bot.py no longer owns raw module-level dicts (R5a).
 """
 
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Set
 
@@ -72,3 +73,32 @@ class SessionState:
             for thread_id, info in self._threads.items()
             if now - info["created_at"] >= cutoff
         ]
+
+
+@dataclass
+class VoteDecision:
+    """Outcome of a vote-lock policy evaluation."""
+
+    allowed: bool
+    should_lock: bool
+
+
+class VoteLockPolicy:
+    """The 2-hour voting rule as a testable policy (R5b).
+
+    Durability across restarts stays a #34 follow-up.
+    """
+
+    def __init__(self, lock_after: timedelta = timedelta(hours=2)) -> None:
+        self._lock_after = lock_after
+
+    def evaluate(self, state: "SessionState", message_id: int) -> VoteDecision:
+        info = state._suggestions.get(message_id)
+        if info is None:
+            return VoteDecision(allowed=False, should_lock=False)
+        if info["locked"]:
+            return VoteDecision(allowed=False, should_lock=False)
+        elapsed = datetime.now(timezone.utc) - info["timestamp"]
+        if elapsed >= self._lock_after:
+            return VoteDecision(allowed=False, should_lock=True)
+        return VoteDecision(allowed=True, should_lock=False)
