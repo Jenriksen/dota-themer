@@ -15,15 +15,38 @@ import core
 import logging_config
 import presentation
 import session_state
+import snapshot
+import storage
 import thread_commands
 
 # Get logger for this module
 logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 
 # Repository singletons: load data once per process, cache reads,
-# invalidate the theme cache on save (R1d)
-HERO_REPO = core.CachedHeroRepository(core.FileHeroRepository(core.DATA_DIR))
-THEME_REPO = core.CachedThemeRepository(core.FileThemeRepository(core.DATA_DIR))
+# invalidate the theme cache on save (R1d). Backend is selected via
+# DOTA_THEMER_BACKEND=json|sqlite (#34); S3 snapshot push/pull is
+# enabled by DOTA_THEMER_S3_BUCKET.
+_snapshot_config = None
+if os.environ.get("DOTA_THEMER_S3_BUCKET"):
+    _snapshot_config = snapshot.SnapshotConfig.from_env(core.DATA_DIR / "dota.db")
+    snapshot.pull_snapshot(_snapshot_config.db_path, _snapshot_config)
+_hero_repo, _theme_repo = storage.create_repositories(core.DATA_DIR)
+
+
+def _maybe_wrap_snapshots(repo):
+    """Push an S3 snapshot after every theme save when S3 is configured."""
+    if _snapshot_config is None:
+        return repo
+    return storage.SnapshottingThemeRepository(
+        repo,
+        on_save=lambda themes: snapshot.push_snapshot(
+            _snapshot_config.db_path, _snapshot_config
+        ),
+    )
+
+
+HERO_REPO = core.CachedHeroRepository(_hero_repo)
+THEME_REPO = core.CachedThemeRepository(_maybe_wrap_snapshots(_theme_repo))
 HERO_RESOLVER = core.HeroResolver(HERO_REPO)
 
 # Session state: theme suggestions and active modification threads (R5a)

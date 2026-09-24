@@ -252,3 +252,24 @@ class TestHandlerSplit(unittest.TestCase):
             'else:\n        await message.channel.send(f"\u274c {message_text}")',
             content,
         )
+
+
+class TestStorageWiring(unittest.TestCase):
+    """Tests for #34: backend selection and S3 snapshot wiring in bot.py."""
+
+    def test_uses_create_repositories(self):
+        """bot.py builds its repositories through storage.create_repositories."""
+        content = read_bot_file()
+        self.assertIn("storage.create_repositories(", content)
+
+    def test_no_hardcoded_json_repos(self):
+        """The FileHeroRepository/FileThemeRepository singletons are gone."""
+        content = read_bot_file()
+        self.assertNotIn("core.FileHeroRepository(core.DATA_DIR)", content)
+        self.assertNotIn("core.FileThemeRepository(core.DATA_DIR)", content)
+
+    def test_snapshot_pull_and_wrap(self):
+        """S3 snapshot pull and the snapshotting wrapper are wired when configured."""
+        content = read_bot_file()
+        self.assertIn("snapshot.pull_snapshot(", content)
+        self.assertIn("SnapshottingThemeRepository(", content)
