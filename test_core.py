@@ -1170,3 +1170,75 @@ class TestThemeManagement(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRepositories(unittest.TestCase):
+    """Tests for the repository seam (R1a: pure extraction)."""
+
+    def test_file_hero_repository_loads_heroes_from_data_dir(self):
+        """FileHeroRepository returns the hero list parsed from heroes.json."""
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            data_dir = Path(tmp_dir)
+            heroes = [{"id": "axe", "name": "Axe", "positions": [3]}]
+            with open(data_dir / "heroes.json", "w") as f:
+                json.dump(heroes, f)
+
+            repo = core.FileHeroRepository(data_dir)
+            self.assertEqual(repo.load_heroes(), heroes)
+
+    def test_file_theme_repository_load_defaults_and_filters_hidden(self):
+        """FileThemeRepository defaults is_hidden/feedback_score and filters."""
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            data_dir = Path(tmp_dir)
+            themes = [
+                {"name": "T1"},
+                {"name": "T2", "is_hidden": True},
+                {"name": "T3", "feedback_score": 5},
+            ]
+            with open(data_dir / "themes.json", "w") as f:
+                json.dump(themes, f)
+
+            repo = core.FileThemeRepository(data_dir)
+            loaded = repo.load_themes()
+            self.assertEqual(
+                loaded,
+                [
+                    {"name": "T1", "is_hidden": False, "feedback_score": 0},
+                    {"name": "T2", "is_hidden": True, "feedback_score": 0},
+                    {"name": "T3", "is_hidden": False, "feedback_score": 5},
+                ],
+            )
+            self.assertEqual(
+                repo.load_themes(include_hidden=False),
+                [
+                    {"name": "T1", "is_hidden": False, "feedback_score": 0},
+                    {"name": "T3", "is_hidden": False, "feedback_score": 5},
+                ],
+            )
+
+    def test_file_theme_repository_save_themes_is_atomic(self):
+        """FileThemeRepository.save_themes atomically writes themes.json."""
+        import os
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            data_dir = Path(tmp_dir)
+            repo = core.FileThemeRepository(data_dir)
+            themes = [{"name": "T1", "hero_ids": ["h1"]}]
+            repo.save_themes(themes)
+
+            with open(data_dir / "themes.json") as f:
+                self.assertEqual(json.load(f), themes)
+            leftovers = [p for p in os.listdir(tmp_dir) if p != "themes.json"]
+            self.assertEqual(leftovers, [])
+
+    def test_file_repositories_satisfy_repository_protocols(self):
+        """File repositories implement the HeroRepository/ThemeRepository protocols."""
+        repo = core.FileHeroRepository(Path("."))
+        theme_repo = core.FileThemeRepository(Path("."))
+        self.assertIsInstance(repo, core.HeroRepository)
+        self.assertIsInstance(theme_repo, core.ThemeRepository)

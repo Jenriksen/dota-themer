@@ -9,6 +9,7 @@ import random
 import sys
 import tempfile
 from pathlib import Path
+from typing import Protocol, runtime_checkable
 
 import logging_config
 
@@ -27,85 +28,130 @@ OFFLANE_POSITIONS = {3, 4}  # Offlaner + Soft Support
 LANE_NAMES = {1: "Safelane", 2: "Mid", 3: "Offlane", 4: "Offlane", 5: "Safelane"}
 
 
+@runtime_checkable
+class HeroRepository(Protocol):
+    """Interface for hero persistence."""
+
+    def load_heroes(self):
+        """Return the list of hero dicts."""
+
+
+@runtime_checkable
+class ThemeRepository(Protocol):
+    """Interface for theme persistence."""
+
+    def load_themes(self, include_hidden=True):
+        """Return the list of theme dicts, optionally filtering hidden."""
+
+    def save_themes(self, themes):
+        """Persist the list of theme dicts."""
+
+
+class FileHeroRepository:
+    """Hero persistence backed by heroes.json in a data directory."""
+
+    def __init__(self, data_dir):
+        self.data_dir = Path(data_dir)
+
+    def load_heroes(self):
+        """Load heroes from JSON file."""
+        logger.debug("Loading heroes from heroes.json")
+        try:
+            with open(self.data_dir / "heroes.json", "r") as f:
+                heroes = json.load(f)
+            logger.info(f"Loaded {len(heroes)} heroes")
+            return heroes
+        except FileNotFoundError as e:
+            logger.error(f"Heroes file not found: {e}")
+            raise
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in heroes file: {e}")
+            raise
+
+
 def load_heroes():
-    """Load heroes from JSON file."""
-    logger.debug("Loading heroes from heroes.json")
-    try:
-        with open(DATA_DIR / "heroes.json", "r") as f:
-            heroes = json.load(f)
-        logger.info(f"Loaded {len(heroes)} heroes")
-        return heroes
-    except FileNotFoundError as e:
-        logger.error(f"Heroes file not found: {e}")
-        raise
-    except json.JSONDecodeError as e:
-        logger.error(f"Invalid JSON in heroes file: {e}")
-        raise
+    """Load heroes via the default hero repository."""
+    return FileHeroRepository(DATA_DIR).load_heroes()
+
+
+class FileThemeRepository:
+    """Theme persistence backed by themes.json in a data directory."""
+
+    def __init__(self, data_dir):
+        self.data_dir = Path(data_dir)
+
+    def load_themes(self, include_hidden=True):
+        """Load themes from JSON file.
+
+        Args:
+            include_hidden: If False, filter out themes with is_hidden=True
+
+        Returns:
+            list: List of theme dicts, optionally filtered
+        """
+        logger.debug("Loading themes from themes.json")
+        try:
+            with open(self.data_dir / "themes.json", "r") as f:
+                themes = json.load(f)
+
+            # Ensure all themes have is_hidden and feedback_score fields for backward compatibility
+            for theme in themes:
+                if "is_hidden" not in theme:
+                    theme["is_hidden"] = False
+                if "feedback_score" not in theme:
+                    theme["feedback_score"] = 0
+
+            # Filter hidden themes if requested
+            if not include_hidden:
+                themes = [t for t in themes if not t.get("is_hidden", False)]
+
+            logger.info(f"Loaded {len(themes)} themes")
+            return themes
+        except FileNotFoundError as e:
+            logger.error(f"Themes file not found: {e}")
+            raise
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in themes file: {e}")
+            raise
+
+    def save_themes(self, themes):
+        """
+        Save themes to JSON file atomically.
+
+        Writes to a temporary file in the data directory, then atomically
+        replaces themes.json via os.replace, so a crash mid-write can never
+        leave a truncated or partial themes.json behind.
+
+        Args:
+            themes: List of theme dicts to persist
+
+        Raises:
+            OSError: If the temporary file cannot be created or replaced
+            Any exception raised by json.dump (e.g. TypeError)
+        """
+        themes_path = self.data_dir / "themes.json"
+        fd, tmp_path = tempfile.mkstemp(dir=self.data_dir, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w") as f:
+                json.dump(themes, f, indent=2)
+            os.replace(tmp_path, themes_path)
+            logger.debug(f"Atomically saved {len(themes)} themes to {themes_path}")
+        except Exception:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
 
 
 def load_themes(include_hidden=True):
-    """Load themes from JSON file.
-
-    Args:
-        include_hidden: If False, filter out themes with is_hidden=True
-
-    Returns:
-        list: List of theme dicts, optionally filtered
-    """
-    logger.debug("Loading themes from themes.json")
-    try:
-        with open(DATA_DIR / "themes.json", "r") as f:
-            themes = json.load(f)
-
-        # Ensure all themes have is_hidden and feedback_score fields for backward compatibility
-        for theme in themes:
-            if "is_hidden" not in theme:
-                theme["is_hidden"] = False
-            if "feedback_score" not in theme:
-                theme["feedback_score"] = 0
-
-        # Filter hidden themes if requested
-        if not include_hidden:
-            themes = [t for t in themes if not t.get("is_hidden", False)]
-
-        logger.info(f"Loaded {len(themes)} themes")
-        return themes
-    except FileNotFoundError as e:
-        logger.error(f"Themes file not found: {e}")
-        raise
-    except json.JSONDecodeError as e:
-        logger.error(f"Invalid JSON in themes file: {e}")
-        raise
+    """Load themes via the default theme repository."""
+    return FileThemeRepository(DATA_DIR).load_themes(include_hidden=include_hidden)
 
 
 def save_themes(themes):
-    """
-    Save themes to JSON file atomically.
-
-    Writes to a temporary file in the data directory, then atomically
-    replaces themes.json via os.replace, so a crash mid-write can never
-    leave a truncated or partial themes.json behind.
-
-    Args:
-        themes: List of theme dicts to persist
-
-    Raises:
-        OSError: If the temporary file cannot be created or replaced
-        Any exception raised by json.dump (e.g. TypeError)
-    """
-    themes_path = DATA_DIR / "themes.json"
-    fd, tmp_path = tempfile.mkstemp(dir=DATA_DIR, suffix=".tmp")
-    try:
-        with os.fdopen(fd, "w") as f:
-            json.dump(themes, f, indent=2)
-        os.replace(tmp_path, themes_path)
-        logger.debug(f"Atomically saved {len(themes)} themes to {themes_path}")
-    except Exception:
-        try:
-            os.unlink(tmp_path)
-        except OSError:
-            pass
-        raise
+    """Save themes via the default theme repository."""
+    FileThemeRepository(DATA_DIR).save_themes(themes)
 
 
 def get_heroes_by_ids(hero_ids, all_heroes):
