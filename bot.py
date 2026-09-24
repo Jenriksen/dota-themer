@@ -4,7 +4,7 @@ Provides theme suggestions via Discord commands.
 """
 
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Optional
 
 import discord
@@ -15,6 +15,7 @@ import core
 import logging_config
 import presentation
 import session_state
+import thread_commands
 
 # Get logger for this module
 logger = logging_config.get_logger(logging_config.LOGGER_BOT)
@@ -27,6 +28,7 @@ HERO_RESOLVER = core.HeroResolver(HERO_REPO)
 
 # Session state: theme suggestions and active modification threads (R5a)
 SESSION_STATE = session_state.SessionState()
+VOTE_LOCK_POLICY = session_state.VoteLockPolicy()
 
 # Configure bot
 intents = discord.Intents.default()
@@ -80,143 +82,136 @@ async def on_ready():
 async def on_reaction_add(reaction, user):
     """Handle reactions to theme suggestion messages.
 
-    Note: The bot's own reactions (👍, 👎) on theme messages are explicitly
-    excluded from being counted as votes to prevent inflation of feedback scores.
+    The bot's own reactions on theme messages are explicitly excluded from
+    being counted as votes to prevent inflation of feedback scores.
     """
-    # Don't count the bot's own reactions as votes
     if user == bot.user:
         return
-
-    # Only handle reactions on our own messages
     if reaction.message.author != bot.user:
         return
 
-    # Check if this is a theme suggestion message
-    message_id = reaction.message.id
-    message_info = SESSION_STATE.get_suggestion(message_id=message_id)
+    message_info = SESSION_STATE.get_suggestion(message_id=reaction.message.id)
     if message_info is None:
         return
 
-    theme_name = message_info["theme_name"]
+    emoji = str(reaction.emoji)
+    if emoji == "\U00002753":
+        await handle_question_mark_reaction(reaction, user, message_info)
+        return
+    if emoji in (presentation.UP_VOTE, presentation.DOWN_VOTE):
+        await handle_vote_reaction(reaction, user, message_info, emoji)
 
-    # Handle question mark reaction - start modification thread
-    if str(reaction.emoji) == "❓":
-        # Check if theme message is locked (2+ hours old)
-        if SESSION_STATE.is_locked(message_id):
-            return
 
-        time_elapsed = datetime.now(timezone.utc) - message_info["timestamp"]
-        if time_elapsed >= timedelta(hours=2):
-            # Lock the voting and modification
+async def handle_question_mark_reaction(reaction, user, message_info):
+    """Start a modification thread when a user reacts with a question mark."""
+    message_id = reaction.message.id
+    decision = VOTE_LOCK_POLICY.evaluate(SESSION_STATE, message_id=message_id)
+    if not decision.allowed:
+        if decision.should_lock:
             SESSION_STATE.lock_suggestion(message_id)
-            try:
-                await reaction.message.add_reaction("🔒")
-            except Exception:
-                pass
-            return
-
-        # Check if there's already an active modification thread for this message
-        message_has_active_thread = SESSION_STATE.message_has_active_thread(message_id)
-
-        if message_has_active_thread:
-            # Just remove the ❓ reaction - clicking again will restart
-            try:
-                await reaction.message.clear_reaction("❓")
-            except Exception as e:
-                logger.warning(f"Failed to clear ❓ reaction: {e}")
-            return
-
-        # Remove ❓ and add ✅
-        try:
-            await reaction.message.clear_reaction("❓")
-            await reaction.message.add_reaction("✅")
-        except Exception as e:
-            logger.warning(f"Failed to update reactions: {e}")
-            return
-
-        # Create thread and post instructions
-        try:
-            thread = await reaction.message.create_thread(name=f"Modify: {theme_name}")
-
-            # Get theme details for instructions
-            try:
-                themes = THEME_REPO.load_themes(include_hidden=True)
-                theme = next(t for t in themes if t["name"] == theme_name)
-                heroes_list = ", ".join(
-                    sorted(
-                        [
-                            h["name"]
-                            for h in core.get_heroes_by_ids(
-                                theme["hero_ids"], HERO_REPO.load_heroes()
-                            )
-                        ]
-                    )
-                )
-            except Exception:
-                heroes_list = "Unknown"
-
-            # Post instructions in thread
-            instructions = presentation.render_modification_instructions(
-                theme_name=theme_name, heroes_list=heroes_list
-            )
-            await thread.send(instructions)
-
-            # Track the active modification thread
-            SESSION_STATE.register_thread(
-                thread_id=thread.id,
-                theme_name=theme_name,
-                user_id=user.id,
-                message_id=message_id,
-            )
-
-            logger.info(
-                f"Started modification thread for theme '{theme_name}' by {user}"
-            )
-
-        except Exception as e:
-            logger.warning(f"Failed to create modification thread: {e}")
-            # Try to add ✅ back if thread creation failed
-            try:
-                await reaction.message.add_reaction("❓")
-            except Exception:
-                pass
-
+            await add_lock_reaction(reaction)
         return
 
-    # Check if voting is locked (2 hours have passed)
-    if SESSION_STATE.is_locked(message_id):
+    if SESSION_STATE.message_has_active_thread(message_id):
+        await clear_reaction_ignoring_errors(reaction, "\U00002753")
         return
 
-    # Check if 2 hours have passed since message was created
-    time_elapsed = datetime.now(timezone.utc) - message_info["timestamp"]
-    if time_elapsed >= timedelta(hours=2):
-        # Lock the voting
-        SESSION_STATE.lock_suggestion(message_id)
-        try:
-            await reaction.message.add_reaction("🔒")
-        except Exception:
-            pass  # Lock emoji might already be added
+    try:
+        await reaction.message.clear_reaction("\U00002753")
+        await reaction.message.add_reaction("\U00002705")
+    except Exception as e:
+        logger.warning(f"Failed to update reactions: {e}")
         return
 
-    # Handle thumbs up (👍) and thumbs down (👎) reactions
-    if str(reaction.emoji) == "👍":
-        delta = 1
-    elif str(reaction.emoji) == "👎":
-        delta = -1
-    else:
-        # Ignore other reactions
+    await start_modification_thread(reaction, user, message_info)
+
+
+async def start_modification_thread(reaction, user, message_info):
+    """Create the modification thread, post instructions, and track it."""
+    theme_name = message_info["theme_name"]
+    message_id = reaction.message.id
+    try:
+        thread = await reaction.message.create_thread(name=f"Modify: {theme_name}")
+        heroes_list = build_heroes_list_text(theme_name)
+        instructions = presentation.render_modification_instructions(
+            theme_name=theme_name, heroes_list=heroes_list
+        )
+        await thread.send(instructions)
+        SESSION_STATE.register_thread(
+            thread_id=thread.id,
+            theme_name=theme_name,
+            user_id=user.id,
+            message_id=message_id,
+        )
+        logger.info(f"Started modification thread for theme '{theme_name}' by {user}")
+    except Exception as e:
+        logger.warning(f"Failed to create modification thread: {e}")
+        await add_reaction_ignoring_errors(reaction, "\U00002753")
+
+
+async def clear_reaction_ignoring_errors(reaction, emoji):
+    """Clear a reaction, logging failures without raising."""
+    try:
+        await reaction.message.clear_reaction(emoji)
+    except Exception as e:
+        logger.warning(f"Failed to clear {emoji} reaction: {e}")
+
+
+async def add_reaction_ignoring_errors(reaction, emoji):
+    """Add a reaction, ignoring failures."""
+    try:
+        await reaction.message.add_reaction(emoji)
+    except Exception:
+        pass
+
+
+async def handle_vote_reaction(reaction, user, message_info, emoji):
+    """Apply a thumbs-up/down vote to the theme's feedback score."""
+    message_id = reaction.message.id
+    decision = VOTE_LOCK_POLICY.evaluate(SESSION_STATE, message_id=message_id)
+    if not decision.allowed:
+        if decision.should_lock:
+            SESSION_STATE.lock_suggestion(message_id)
+            await add_lock_reaction(reaction)
         return
 
+    theme_name = message_info["theme_name"]
+    delta = 1 if emoji == presentation.UP_VOTE else -1
     logger.info(
         f"Feedback reaction from {user}: {reaction.emoji} on theme '{theme_name}'"
     )
-
-    # Update the feedback score
     try:
         message = core.update_theme_feedback(theme_name, delta, theme_repo=THEME_REPO)
         logger.info(f"Feedback updated: {message}")
     except core.ThemeError as e:
         logger.warning(f"Failed to update feedback: {e}")
+
+
+async def add_lock_reaction(reaction):
+    """Add the lock emoji, ignoring an already-added reaction."""
+    try:
+        await reaction.message.add_reaction("\U0001f512")
+    except Exception:
+        pass
+
+
+def build_heroes_list_text(theme_name):
+    """Comma-join the current hero names of a theme, or 'Unknown' on failure."""
+    try:
+        themes = THEME_REPO.load_themes(include_hidden=True)
+        theme = next(t for t in themes if t["name"] == theme_name)
+        return ", ".join(
+            sorted(
+                [
+                    h["name"]
+                    for h in core.get_heroes_by_ids(
+                        theme["hero_ids"], HERO_REPO.load_heroes()
+                    )
+                ]
+            )
+        )
+    except Exception:
+        return "Unknown"
 
 
 @bot.event
@@ -239,13 +234,8 @@ async def on_reaction_remove(reaction, user):
     if message_info is None:
         return
 
-    # Check if voting is locked
-    if SESSION_STATE.is_locked(message_id):
-        return
-
-    # Check if 2 hours have passed
-    time_elapsed = datetime.now(timezone.utc) - message_info["timestamp"]
-    if time_elapsed >= timedelta(hours=2):
+    decision = VOTE_LOCK_POLICY.evaluate(SESSION_STATE, message_id=message_id)
+    if not decision.allowed:
         return
 
     theme_name = message_info["theme_name"]
@@ -274,170 +264,115 @@ async def on_reaction_remove(reaction, user):
 @bot.event
 async def on_message(message):
     """Handle messages in active modification threads for natural language theme modification."""
-    # Ignore the bot's own messages
     if message.author == bot.user:
         return
 
-    # Check if this message is a command (starts with prefix)
     is_command = message.content.startswith(bot.command_prefix)
-
-    # Check if this message is in an active modification thread
     is_thread_message = message.channel.type == discord.ChannelType.public_thread
     in_active_thread = is_thread_message and SESSION_STATE.has_thread(
         message.channel.id
     )
 
-    # If it's a command in a thread, still process the command normally
-    # If it's a command NOT in a thread, process normally
-    # If it's NOT a command but IS in an active modification thread, handle it here
     if is_command or not in_active_thread:
-        # Let discord.py handle commands and non-thread messages
         await bot.process_commands(message)
         return
 
-    # From here on, we're handling non-command messages in active modification threads
     thread_id = message.channel.id
     thread_info = SESSION_STATE.get_thread(thread_id=thread_id)
     theme_name = thread_info["theme_name"]
-
-    # Get the message content
     content = message.content.strip()
 
-    # Check for exit commands
-    if content.lower() in ["done", "cancel", "exit", "quit"]:
-        try:
-            await message.channel.send("✅ Theme modification session ended.")
-
-            # Archive the Discord thread
-            try:
-                await message.channel.archive()
-                logger.info(f"Archived modification thread: {thread_id}")
-            except Exception as e:
-                logger.warning(f"Failed to archive thread {thread_id}: {e}")
-
-            # Remove thread from tracking
-            SESSION_STATE.remove_thread(thread_id)
-
-            # Re-add ❓ reaction to the original message if it exists
-            try:
-                original_message = await message.channel.fetch_message(
-                    message.channel.parent_id
-                )
-                if SESSION_STATE.has_suggestion(original_message.id):
-                    # Remove ✅ and re-add ❓
-                    try:
-                        await original_message.clear_reaction("✅")
-                        await original_message.add_reaction("❓")
-                    except Exception as e:
-                        logger.warning(f"Failed to restore ❓ reaction: {e}")
-            except Exception:
-                pass
-
-        except Exception as e:
-            logger.warning(f"Failed to end modification session: {e}")
+    if thread_commands.is_exit_command(content):
+        await end_modification_session(message, thread_id)
         return
 
-    # Parse the command
-    action = None
-    hero_names = []
-
-    # Check for +/prefixes without space
-    if content.startswith("+"):
-        action = "add"
-        hero_part = content[1:].strip()
-    elif content.startswith("-"):
-        action = "remove"
-        hero_part = content[1:].strip()
-    elif content.lower().startswith("add"):
-        action = "add"
-        hero_part = content[3:].strip()
-    elif content.lower().startswith("remove"):
-        action = "remove"
-        hero_part = content[6:].strip()
-
-    if action is None:
+    parsed = thread_commands.parse_modification(content)
+    if parsed is None:
         await message.channel.send(
-            "❌ Invalid command. Use 'Add', 'Remove', '+', or '-' followed by hero names."
+            "\u274c Invalid command. Use 'Add', 'Remove', '+', or '-' followed by hero names."
         )
         return
 
-    # Parse hero names from the remaining part
-    # Simple quoted string handling
-    hero_names = []
-    current = ""
-    in_quotes = False
-    for char in hero_part:
-        if char == '"':
-            in_quotes = not in_quotes
-        elif char == " " and not in_quotes:
-            if current:
-                hero_names.append(current)
-                current = ""
-        else:
-            current += char
-    if current:
-        hero_names.append(current)
-
-    # If no quotes were used, fall back to simple split
-    if not any('"' in s for s in hero_names) and '"' not in hero_part:
-        hero_names = hero_part.split()
-
-    hero_ids, invalid_heroes = HERO_RESOLVER.resolve_all(hero_names)
-
+    hero_ids, invalid_heroes = HERO_RESOLVER.resolve_all(parsed.hero_names)
     if invalid_heroes:
         await message.channel.send(
-            f"⚠️ Invalid hero names: {', '.join(invalid_heroes)}. "
+            f"\u26a0\ufe0f Invalid hero names: {', '.join(invalid_heroes)}. "
             f"Type a valid hero name or alias."
         )
         return
 
-    # Apply the modification
     try:
-        if action == "add":
+        if parsed.action == "add":
             message_text = core.update_theme(
                 theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
             )
-        else:  # remove
+        else:
             message_text = core.update_theme(
                 theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
             )
     except core.ThemeError as e:
-        await message.channel.send(f"❌ {e}")
+        await message.channel.send(f"\u274c {e}")
         return
 
-        # Update the original theme message
+    await refresh_original_suggestion(message, theme_name)
+    await message.channel.send(f"\u2705 {message_text}")
+    logger.info(
+        f"Theme '{theme_name}' modified by {message.author}: "
+        f"{parsed.action} {parsed.hero_names}"
+    )
+
+
+async def end_modification_session(message, thread_id):
+    """End a modification session: confirm, archive, restore reactions."""
+    try:
+        await message.channel.send("\u2705 Theme modification session ended.")
+        try:
+            await message.channel.archive()
+            logger.info(f"Archived modification thread: {thread_id}")
+        except Exception as e:
+            logger.warning(f"Failed to archive thread {thread_id}: {e}")
+
+        SESSION_STATE.remove_thread(thread_id)
+
         try:
             original_message = await message.channel.fetch_message(
                 message.channel.parent_id
             )
             if SESSION_STATE.has_suggestion(original_message.id):
-                # Re-fetch theme and rebuild the message
-                themes = THEME_REPO.load_themes(include_hidden=True)
-                theme = next(t for t in themes if t["name"] == theme_name)
-                matching_heroes = core.get_heroes_by_ids(
-                    theme["hero_ids"], HERO_REPO.load_heroes()
-                )
-                matching_heroes.sort(key=lambda h: h["name"])
-                new_response = presentation.render_theme_suggestion(
-                    theme_name=theme["name"],
-                    description=theme.get("description", ""),
-                    heroes_display=core.format_hero_list(matching_heroes),
-                    hero_count=len(matching_heroes),
-                    feedback_score=theme.get("feedback_score", 0),
-                )
-                await original_message.edit(content=new_response)
-        except Exception as e:
-            logger.warning(f"Failed to update original message: {e}")
+                try:
+                    await original_message.clear_reaction("\u2705")
+                    await original_message.add_reaction("\u2753")
+                except Exception as e:
+                    logger.warning(f"Failed to restore \u2753 reaction: {e}")
+        except Exception:
+            pass
+    except Exception as e:
+        logger.warning(f"Failed to end modification session: {e}")
 
-        await message.channel.send(f"✅ {message_text}")
-        logger.info(
-            f"Theme '{theme_name}' modified by {message.author}: {action} {hero_names}"
+
+async def refresh_original_suggestion(message, theme_name):
+    """Re-render the original theme suggestion after a modification."""
+    try:
+        original_message = await message.channel.fetch_message(
+            message.channel.parent_id
         )
-    else:
-        await message.channel.send(f"❌ {message_text}")
-        logger.warning(
-            f"Failed to modify theme '{theme_name}' for {message.author}: {message_text}"
-        )
+        if SESSION_STATE.has_suggestion(original_message.id):
+            themes = THEME_REPO.load_themes(include_hidden=True)
+            theme = next(t for t in themes if t["name"] == theme_name)
+            matching_heroes = core.get_heroes_by_ids(
+                theme["hero_ids"], HERO_REPO.load_heroes()
+            )
+            matching_heroes.sort(key=lambda h: h["name"])
+            new_response = presentation.render_theme_suggestion(
+                theme_name=theme["name"],
+                description=theme.get("description", ""),
+                heroes_display=core.format_hero_list(matching_heroes),
+                hero_count=len(matching_heroes),
+                feedback_score=theme.get("feedback_score", 0),
+            )
+            await original_message.edit(content=new_response)
+    except Exception as e:
+        logger.warning(f"Failed to update original message: {e}")
 
 
 @bot.command(name="theme", help="Get a theme suggestion for hero selection")
@@ -662,7 +597,7 @@ async def unhide_theme_command(ctx, theme_name: str):
 
 @bot.command(
     name="updatetheme",
-    help="Update a theme (add/remove heroes) or open interactive modification",
+    help="Update an existing theme or open interactive modification",
 )
 async def update_theme_command(
     ctx, theme_name: str, action: Optional[str] = None, *args
@@ -682,111 +617,98 @@ async def update_theme_command(
     """
     logger.info(f"Update theme command from {ctx.author}: {theme_name} {action} {args}")
 
-    # If no action provided, open interactive modification thread
     if action is None:
-        # Check if this is a reply to a theme suggestion message
-        replied_message = ctx.message.reference
-        if replied_message and SESSION_STATE.has_suggestion(replied_message.message_id):
-            message_info = SESSION_STATE.get_suggestion(
-                message_id=replied_message.message_id
-            )
-            if message_info is not None:
-                theme_name = message_info["theme_name"]
+        await open_interactive_modification(ctx, theme_name)
+        return
 
-        # Get theme details for instructions
-        try:
-            themes = THEME_REPO.load_themes(include_hidden=True)
-            theme = next(t for t in themes if t["name"] == theme_name)
-            heroes_list = ", ".join(
-                sorted(
-                    [
-                        h["name"]
-                        for h in core.get_heroes_by_ids(
-                            theme["hero_ids"], HERO_REPO.load_heroes()
-                        )
-                    ]
-                )
-            )
-        except Exception:
-            heroes_list = "Unknown"
+    await apply_direct_theme_update(ctx, theme_name, action.lower(), list(args))
 
-        # Create thread and post instructions
-        try:
-            thread = await ctx.message.create_thread(name=f"Modify: {theme_name}")
 
-            instructions = presentation.render_modification_instructions(
-                theme_name=theme_name, heroes_list=heroes_list
-            )
-            await thread.send(instructions)
+async def open_interactive_modification(ctx, theme_name):
+    """Open an interactive modification thread for the theme."""
+    replied_message = ctx.message.reference
+    if replied_message and SESSION_STATE.has_suggestion(replied_message.message_id):
+        message_info = SESSION_STATE.get_suggestion(
+            message_id=replied_message.message_id
+        )
+        if message_info is not None:
+            theme_name = message_info["theme_name"]
 
-            # Track the active modification thread
-            SESSION_STATE.register_thread(
-                thread_id=thread.id,
-                theme_name=theme_name,
-                user_id=ctx.author.id,
-                message_id=ctx.message.id,
-            )
+    heroes_list = build_heroes_list_text(theme_name)
 
-            # Add ✅ reaction to original message if it's from the bot
-            if ctx.message.reference and SESSION_STATE.has_suggestion(
-                ctx.message.reference.message_id
-            ):
-                try:
-                    message = await ctx.fetch_message(ctx.message.reference.message_id)
-                    await message.clear_reaction("❓")
-                    await message.add_reaction("✅")
-                except Exception as e:
-                    logger.warning(f"Failed to update reactions: {e}")
+    try:
+        thread = await ctx.message.create_thread(name=f"Modify: {theme_name}")
+        instructions = presentation.render_modification_instructions(
+            theme_name=theme_name, heroes_list=heroes_list
+        )
+        await thread.send(instructions)
+        SESSION_STATE.register_thread(
+            thread_id=thread.id,
+            theme_name=theme_name,
+            user_id=ctx.author.id,
+            message_id=ctx.message.id,
+        )
+        await mark_thread_started_on_original(ctx)
+        logger.info(
+            f"Started modification thread for theme '{theme_name}' by {ctx.author}"
+        )
+    except Exception as e:
+        logger.warning(f"Failed to create modification thread: {e}")
+        await ctx.send(f"\u274c Failed to create modification thread: {str(e)}")
 
-            logger.info(
-                f"Started modification thread for theme '{theme_name}' by {ctx.author}"
-            )
-            return
-        except Exception as e:
-            logger.warning(f"Failed to create modification thread: {e}")
-            await ctx.send(f"❌ Failed to create modification thread: {str(e)}")
-            return
 
-    action = action.lower()
+async def mark_thread_started_on_original(ctx):
+    """Swap the question-mark reaction for a check mark on the original message."""
+    if not (
+        ctx.message.reference
+        and SESSION_STATE.has_suggestion(ctx.message.reference.message_id)
+    ):
+        return
+    try:
+        message = await ctx.fetch_message(ctx.message.reference.message_id)
+        await message.clear_reaction("\u2753")
+        await message.add_reaction("\u2705")
+    except Exception as e:
+        logger.warning(f"Failed to update reactions: {e}")
 
-    if action not in ["add", "remove"]:
+
+async def apply_direct_theme_update(ctx, theme_name, action, hero_name_args):
+    """Apply a direct !updatetheme <name> add/remove <heroes> update."""
+    if action not in ("add", "remove"):
         await ctx.send(
-            f"❌ Invalid action: '{action}'. Use 'add' or 'remove'."
+            f"\u274c Invalid action: '{action}'. Use 'add' or 'remove'."
             f"\nExample: `!updatetheme ThemeName add hero1 hero2`"
         )
         return
 
-    # Convert hero names to IDs
     try:
         HERO_RESOLVER.resolve("")
     except Exception as e:
         logger.error(f"Failed to load heroes for updatetheme: {e}")
-        await ctx.send("❌ Failed to load hero data. Please try again later.")
+        await ctx.send("\u274c Failed to load hero data. Please try again later.")
         return
-    hero_ids, invalid_heroes = HERO_RESOLVER.resolve_all(list(args))
-
+    hero_ids, invalid_heroes = HERO_RESOLVER.resolve_all(hero_name_args)
     if invalid_heroes:
         await ctx.send(
-            f"⚠️ Invalid hero names/IDs: {', '.join(invalid_heroes)}. "
+            f"\u26a0\ufe0f Invalid hero names/IDs: {', '.join(invalid_heroes)}. "
             f"Valid heroes: {', '.join(sorted(h['name'].lower() for h in HERO_RESOLVER._load_heroes())[:10])}..."
         )
         return
 
-    # Update the theme
     try:
         if action == "add":
             message = core.update_theme(
                 theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
             )
-        else:  # remove
+        else:
             message = core.update_theme(
                 theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
             )
         logger.info(f"Theme updated by {ctx.author}: {theme_name}")
-        await ctx.send(f"✅ {message}")
+        await ctx.send(f"\u2705 {message}")
     except core.ThemeError as e:
         logger.warning(f"Failed to update theme for {ctx.author}: {e}")
-        await ctx.send(f"❌ {e}")
+        await ctx.send(f"\u274c {e}")
 
 
 @bot.command(name="listthemes", help="List all available themes")

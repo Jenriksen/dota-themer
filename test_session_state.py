@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from session_state import SessionState
+from session_state import SessionState, VoteDecision, VoteLockPolicy
 
 
 class TestThemeSuggestionTracking(unittest.TestCase):
@@ -159,3 +159,55 @@ class TestInactiveThreadSweep(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestVoteLockPolicy(unittest.TestCase):
+    """VoteLockPolicy makes the 2-hour voting rule a testable policy (R5b)."""
+
+    def setUp(self):
+        self.state = SessionState()
+        self.policy = VoteLockPolicy()
+        self.state.register_suggestion(message_id=1, theme_name="T")
+
+    def test_fresh_message_is_unlocked(self):
+        """A just-registered suggestion accepts votes."""
+        decision = self.policy.evaluate(self.state, message_id=1)
+        self.assertTrue(decision.allowed)
+        self.assertFalse(decision.should_lock)
+
+    def test_expired_message_must_lock(self):
+        """An expired message is rejected and the lock is set."""
+        self.state._suggestions[1]["timestamp"] = datetime.now(
+            timezone.utc
+        ) - timedelta(hours=3)
+        decision = self.policy.evaluate(self.state, message_id=1)
+        self.assertFalse(decision.allowed)
+        self.assertTrue(decision.should_lock)
+
+    def test_locked_message_is_rejected_without_relocking(self):
+        """An already-locked message is rejected but does not need relocking."""
+        self.state.lock_suggestion(1)
+        decision = self.policy.evaluate(self.state, message_id=1)
+        self.assertFalse(decision.allowed)
+        self.assertFalse(decision.should_lock)
+
+    def test_unknown_message_is_rejected(self):
+        """Unknown messages are never votable and never need a lock emoji."""
+        decision = self.policy.evaluate(self.state, message_id=999)
+        self.assertFalse(decision.allowed)
+        self.assertFalse(decision.should_lock)
+
+    def test_expiration_duration_is_configurable(self):
+        """A custom cutoff is honored."""
+        policy = VoteLockPolicy(lock_after=timedelta(minutes=30))
+        self.state._suggestions[1]["timestamp"] = datetime.now(
+            timezone.utc
+        ) - timedelta(minutes=31)
+        decision = policy.evaluate(self.state, message_id=1)
+        self.assertFalse(decision.allowed)
+        self.assertTrue(decision.should_lock)
+
+    def test_decision_is_dataclass(self):
+        """evaluate returns a VoteDecision with allowed/should_lock fields."""
+        decision = self.policy.evaluate(self.state, message_id=1)
+        self.assertIsInstance(decision, VoteDecision)

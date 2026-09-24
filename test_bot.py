@@ -202,4 +202,53 @@ class TestSessionStateWiring(unittest.TestCase):
         self.assertIn("SESSION_STATE.register_suggestion(", content)
         self.assertIn("SESSION_STATE.register_thread(", content)
         self.assertIn("SESSION_STATE.remove_thread(", content)
-        self.assertIn("SESSION_STATE.is_locked(", content)
+
+
+class TestVoteLockPolicyWiring(unittest.TestCase):
+    """Tests for R5b: bot uses the VoteLockPolicy for the 2-hour rule."""
+
+    def test_constructs_vote_lock_policy(self):
+        """bot.py creates a VoteLockPolicy singleton."""
+        content = read_bot_file()
+        self.assertIn("session_state.VoteLockPolicy()", content)
+
+    def test_no_inline_two_hour_checks(self):
+        """The inlined 2-hour elapsed checks are gone from bot.py."""
+        content = read_bot_file()
+        self.assertNotIn("timedelta(hours=2)", content)
+
+    def test_reaction_handlers_use_policy(self):
+        """All lock decisions go through VOTE_LOCK_POLICY.evaluate."""
+        content = read_bot_file()
+        self.assertGreaterEqual(content.count("VOTE_LOCK_POLICY.evaluate("), 3)
+
+
+class TestHandlerSplit(unittest.TestCase):
+    """Tests for R5c/R5d: the giant handlers are split into units."""
+
+    def test_on_message_is_slim(self):
+        """on_message delegates parsing to thread_commands and actions to helpers."""
+        content = read_bot_file()
+        self.assertIn("thread_commands.is_exit_command(", content)
+        self.assertIn("thread_commands.parse_modification(", content)
+        self.assertIn("end_modification_session(", content)
+        self.assertIn("refresh_original_suggestion(", content)
+
+    def test_on_reaction_add_is_slim(self):
+        """on_reaction_add dispatches to per-emoji handlers."""
+        content = read_bot_file()
+        self.assertIn("handle_question_mark_reaction(", content)
+        self.assertIn("handle_vote_reaction(", content)
+        self.assertIn("build_heroes_list_text(", content)
+
+    def test_modification_success_path_replies_success(self):
+        """A successful thread modification replies with the success message.
+
+        Regression guard for the R3 migration bug where the success block
+        sat dead inside the except arm.
+        """
+        content = read_bot_file()
+        self.assertNotIn(
+            'else:\n        await message.channel.send(f"\u274c {message_text}")',
+            content,
+        )
