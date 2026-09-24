@@ -1242,3 +1242,132 @@ class TestRepositories(unittest.TestCase):
         theme_repo = core.FileThemeRepository(Path("."))
         self.assertIsInstance(repo, core.HeroRepository)
         self.assertIsInstance(theme_repo, core.ThemeRepository)
+
+
+class InMemoryHeroRepository:
+    """Fake hero repository for injection tests."""
+
+    def __init__(self, heroes):
+        self.heroes = heroes
+
+    def load_heroes(self):
+        return self.heroes
+
+
+class InMemoryThemeRepository:
+    """Fake theme repository for injection tests."""
+
+    def __init__(self, themes):
+        self.themes = [dict(t) for t in themes]
+
+    def load_themes(self, include_hidden=True):
+        if not include_hidden:
+            return [t for t in self.themes if not t.get("is_hidden", False)]
+        return self.themes
+
+    def save_themes(self, themes):
+        self.themes = [dict(t) for t in themes]
+
+
+class TestRepositoryInjection(unittest.TestCase):
+    """Tests for R1b: CRUD functions accept injected repositories."""
+
+    def test_add_theme_uses_injected_repositories(self):
+        """add_theme persists via the injected theme_repo, reads heroes from hero_repo."""
+        hero_repo = InMemoryHeroRepository(
+            [
+                {"id": "axe", "name": "Axe", "positions": [3]},
+                {"id": "lina", "name": "Lina", "positions": [2]},
+            ]
+        )
+        theme_repo = InMemoryThemeRepository(
+            [{"name": "Existing", "hero_ids": ["axe"]}]
+        )
+
+        success, message = core.add_theme(
+            "New Theme",
+            description="d",
+            hero_ids=["lina"],
+            hero_repo=hero_repo,
+            theme_repo=theme_repo,
+        )
+
+        self.assertTrue(success, message)
+        saved_names = [t["name"] for t in theme_repo.themes]
+        self.assertIn("New Theme", saved_names)
+
+    def test_update_theme_uses_injected_repositories(self):
+        """update_theme adds heroes via the injected repositories."""
+        hero_repo = InMemoryHeroRepository(
+            [
+                {"id": "axe", "name": "Axe", "positions": [3]},
+                {"id": "lina", "name": "Lina", "positions": [2]},
+            ]
+        )
+        theme_repo = InMemoryThemeRepository([{"name": "T", "hero_ids": ["axe"]}])
+
+        success, message = core.update_theme(
+            "T", add_hero_ids=["lina"], hero_repo=hero_repo, theme_repo=theme_repo
+        )
+
+        self.assertTrue(success, message)
+        self.assertEqual(theme_repo.themes[0]["hero_ids"], ["axe", "lina"])
+
+    def test_hide_unhide_theme_use_injected_repository(self):
+        """hide_theme/unhide_theme flip is_hidden via the injected repository."""
+        theme_repo = InMemoryThemeRepository([{"name": "T", "hero_ids": ["axe"]}])
+
+        success, message = core.hide_theme("T", theme_repo=theme_repo)
+        self.assertTrue(success, message)
+        self.assertTrue(theme_repo.themes[0]["is_hidden"])
+
+        success, message = core.unhide_theme("T", theme_repo=theme_repo)
+        self.assertTrue(success, message)
+        self.assertFalse(theme_repo.themes[0]["is_hidden"])
+
+    def test_update_theme_feedback_uses_injected_repository(self):
+        """update_theme_feedback adjusts feedback_score via the injected repository."""
+        theme_repo = InMemoryThemeRepository([{"name": "T", "hero_ids": ["axe"]}])
+
+        success, message = core.update_theme_feedback("T", 1, theme_repo=theme_repo)
+
+        self.assertTrue(success, message)
+        self.assertEqual(theme_repo.themes[0]["feedback_score"], 1)
+
+    def test_remove_theme_uses_injected_repository(self):
+        """remove_theme deletes the theme via the injected repository."""
+        theme_repo = InMemoryThemeRepository(
+            [{"name": "T", "hero_ids": ["axe"]}, {"name": "U", "hero_ids": []}]
+        )
+
+        success, message = core.remove_theme("T", theme_repo=theme_repo)
+
+        self.assertTrue(success, message)
+        self.assertEqual([t["name"] for t in theme_repo.themes], ["U"])
+
+    def test_read_helpers_use_injected_repositories(self):
+        """get_all_theme_names/status/hero_names read from injected repositories."""
+        hero_repo = InMemoryHeroRepository([{"id": "axe_id", "name": "Axe"}])
+        theme_repo = InMemoryThemeRepository(
+            [
+                {"name": "T", "hero_ids": ["axe"], "is_hidden": False},
+                {"name": "H", "hero_ids": [], "is_hidden": True},
+            ]
+        )
+
+        self.assertEqual(core.get_all_theme_names(theme_repo=theme_repo), ["H", "T"])
+        self.assertEqual(
+            core.get_all_theme_names(include_hidden=False, theme_repo=theme_repo),
+            ["T"],
+        )
+        self.assertEqual(
+            core.get_all_themes_with_status(theme_repo=theme_repo),
+            [
+                {"name": "T", "is_hidden": False},
+                {"name": "H", "is_hidden": True},
+            ],
+        )
+        self.assertEqual(
+            core.get_all_hero_names(hero_repo=hero_repo),
+            {"axe": "axe_id"},
+        )

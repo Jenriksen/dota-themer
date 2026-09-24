@@ -610,18 +610,24 @@ def get_theme_suggestion(
     }
 
 
-def add_theme(theme_name, description="", hero_ids=None):
+def add_theme(
+    theme_name, description="", hero_ids=None, hero_repo=None, theme_repo=None
+):
     """
-    Add a new theme to themes.json.
+    Add a new theme via the theme repository.
 
     Args:
         theme_name: Name of the new theme
         description: Optional description of the theme
         hero_ids: List of hero IDs that match this theme
+        hero_repo: Hero repository to read from (defaults to the file repository)
+        theme_repo: Theme repository to read/write (defaults to the file repository)
 
     Returns:
         tuple: (success: bool, message: str)
     """
+    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
     logger.info(f"Attempting to add theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -632,8 +638,8 @@ def add_theme(theme_name, description="", hero_ids=None):
 
     # Load existing themes (include hidden for duplicate checking)
     try:
-        themes = load_themes(include_hidden=True)
-        heroes = load_heroes()
+        themes = theme_repo.load_themes(include_hidden=True)
+        heroes = hero_repo.load_heroes()
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
         return False, f"Failed to load data: {str(e)}"
@@ -690,9 +696,9 @@ def add_theme(theme_name, description="", hero_ids=None):
     # Sort themes by name
     themes.sort(key=lambda t: t["name"])
 
-    # Save back to file
+    # Save back to the repository
     try:
-        save_themes(themes)
+        theme_repo.save_themes(themes)
 
         logger.info(
             f"Successfully added theme: {theme_name} with {len(validated_hero_ids)} heroes"
@@ -707,7 +713,12 @@ def add_theme(theme_name, description="", hero_ids=None):
 
 
 def update_theme(
-    theme_name, add_hero_ids=None, remove_hero_ids=None, new_description=None
+    theme_name,
+    add_hero_ids=None,
+    remove_hero_ids=None,
+    new_description=None,
+    hero_repo=None,
+    theme_repo=None,
 ):
     """
     Update an existing theme by adding/removing heroes or changing description.
@@ -721,6 +732,8 @@ def update_theme(
     Returns:
         tuple: (success: bool, message: str)
     """
+    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
     logger.info(f"Attempting to update theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -731,8 +744,8 @@ def update_theme(
 
     # Load existing themes and heroes (include hidden)
     try:
-        themes = load_themes(include_hidden=True)
-        heroes = load_heroes()
+        themes = theme_repo.load_themes(include_hidden=True)
+        heroes = hero_repo.load_heroes()
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
         return False, f"Failed to load data: {str(e)}"
@@ -783,7 +796,7 @@ def update_theme(
 
     # Save back to file
     try:
-        save_themes(themes)
+        theme_repo.save_themes(themes)
 
         logger.info(f"Successfully updated theme: {theme_name}")
         return (
@@ -795,7 +808,7 @@ def update_theme(
         return False, f"Failed to save theme: {str(e)}"
 
 
-def hide_theme(theme_name):
+def hide_theme(theme_name, theme_repo=None):
     """
     Hide a theme (mark as hidden so it doesn't appear in suggestions).
 
@@ -805,6 +818,7 @@ def hide_theme(theme_name):
     Returns:
         tuple: (success: bool, message: str)
     """
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
     logger.info(f"Attempting to hide theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -815,7 +829,7 @@ def hide_theme(theme_name):
 
     # Load existing themes
     try:
-        themes = load_themes()
+        themes = theme_repo.load_themes()
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
         return False, f"Failed to load themes: {str(e)}"
@@ -842,7 +856,7 @@ def hide_theme(theme_name):
 
     # Save back to file
     try:
-        save_themes(themes)
+        theme_repo.save_themes(themes)
 
         logger.info(f"Successfully hid theme: {theme_name}")
         return (
@@ -854,7 +868,7 @@ def hide_theme(theme_name):
         return False, f"Failed to save theme: {str(e)}"
 
 
-def unhide_theme(theme_name):
+def unhide_theme(theme_name, theme_repo=None):
     """
     Unhide a theme (mark as visible so it appears in suggestions).
 
@@ -864,6 +878,7 @@ def unhide_theme(theme_name):
     Returns:
         tuple: (success: bool, message: str)
     """
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
     logger.info(f"Attempting to unhide theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -874,7 +889,7 @@ def unhide_theme(theme_name):
 
     # Load existing themes (include hidden ones)
     try:
-        themes = load_themes(include_hidden=True)
+        themes = theme_repo.load_themes(include_hidden=True)
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
         return False, f"Failed to load themes: {str(e)}"
@@ -906,7 +921,7 @@ def unhide_theme(theme_name):
 
     # Save back to file
     try:
-        save_themes(themes)
+        theme_repo.save_themes(themes)
 
         logger.info(f"Successfully unhid theme: {theme_name}")
         return (
@@ -918,7 +933,7 @@ def unhide_theme(theme_name):
         return False, f"Failed to save theme: {str(e)}"
 
 
-def update_theme_feedback(theme_name, delta):
+def update_theme_feedback(theme_name, delta, theme_repo=None):
     """
     Update the feedback score for a theme.
 
@@ -939,7 +954,7 @@ def update_theme_feedback(theme_name, delta):
 
     # Load existing themes
     try:
-        themes = load_themes(include_hidden=True)
+        themes = theme_repo.load_themes(include_hidden=True)
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
         return False, f"Failed to load themes: {str(e)}"
@@ -968,7 +983,7 @@ def update_theme_feedback(theme_name, delta):
 
     # Save back to file
     try:
-        save_themes(themes)
+        theme_repo.save_themes(themes)
 
         logger.info(f"Successfully updated feedback for theme: {theme_name}")
         return (
@@ -980,7 +995,7 @@ def update_theme_feedback(theme_name, delta):
         return False, f"Failed to save feedback: {str(e)}"
 
 
-def remove_theme(theme_name):
+def remove_theme(theme_name, theme_repo=None):
     """
     Remove a theme from themes.json.
 
@@ -990,6 +1005,7 @@ def remove_theme(theme_name):
     Returns:
         tuple: (success: bool, message: str)
     """
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
     logger.info(f"Attempting to remove theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -1000,7 +1016,7 @@ def remove_theme(theme_name):
 
     # Load existing themes (include hidden)
     try:
-        themes = load_themes(include_hidden=True)
+        themes = theme_repo.load_themes(include_hidden=True)
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
         return False, f"Failed to load themes: {str(e)}"
@@ -1027,7 +1043,7 @@ def remove_theme(theme_name):
 
     # Save back to file
     try:
-        save_themes(themes)
+        theme_repo.save_themes(themes)
 
         logger.info(f"Successfully removed theme: {theme_name}")
         return True, f"Theme '{theme_name}' removed successfully"
@@ -1036,7 +1052,7 @@ def remove_theme(theme_name):
         return False, f"Failed to save themes: {str(e)}"
 
 
-def get_all_theme_names(include_hidden=True):
+def get_all_theme_names(include_hidden=True, theme_repo=None):
     """
     Get a list of all theme names.
 
@@ -1046,29 +1062,32 @@ def get_all_theme_names(include_hidden=True):
     Returns:
         list: Sorted list of theme names
     """
-    themes = load_themes(include_hidden=include_hidden)
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    themes = theme_repo.load_themes(include_hidden=include_hidden)
     return sorted([t["name"] for t in themes])
 
 
-def get_all_themes_with_status():
+def get_all_themes_with_status(theme_repo=None):
     """
     Get all themes with their hidden status.
 
     Returns:
         list: List of dicts with 'name' and 'is_hidden' for each theme
     """
-    themes = load_themes(include_hidden=True)
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    themes = theme_repo.load_themes(include_hidden=True)
     return [{"name": t["name"], "is_hidden": t.get("is_hidden", False)} for t in themes]
 
 
-def get_all_hero_names():
+def get_all_hero_names(hero_repo=None):
     """
     Get a list of all hero names with their IDs.
 
     Returns:
         dict: Mapping of hero name (lowercase) to hero ID
     """
-    heroes = load_heroes()
+    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
+    heroes = hero_repo.load_heroes()
     return {h["name"].lower(): h["id"] for h in heroes}
 
 
