@@ -69,6 +69,38 @@ class FileHeroRepository:
             raise
 
 
+class CachedHeroRepository:
+    """Hero repository wrapper that loads from the delegate once per process."""
+
+    def __init__(self, delegate):
+        self.delegate = delegate
+        self._cache = None
+
+    def load_heroes(self):
+        if self._cache is None:
+            self._cache = self.delegate.load_heroes()
+        return self._cache
+
+
+class CachedThemeRepository:
+    """Theme repository wrapper that caches loads and invalidates on save."""
+
+    def __init__(self, delegate):
+        self.delegate = delegate
+        self._cache = None
+
+    def load_themes(self, include_hidden=True):
+        if self._cache is None:
+            self._cache = self.delegate.load_themes()
+        if not include_hidden:
+            return [t for t in self._cache if not t.get("is_hidden", False)]
+        return self._cache
+
+    def save_themes(self, themes):
+        self._cache = None
+        return self.delegate.save_themes(themes)
+
+
 def load_heroes():
     """Load heroes via the default hero repository."""
     return FileHeroRepository(DATA_DIR).load_heroes()
@@ -556,7 +588,11 @@ def _try_configuration(heroes, config):
 
 
 def get_theme_suggestion(
-    party_size=2, use_weighted=False, require_position_coverage=False
+    party_size=2,
+    use_weighted=False,
+    require_position_coverage=False,
+    hero_repo=None,
+    theme_repo=None,
 ):
     """
     Get a theme suggestion for a given party size.
@@ -577,8 +613,10 @@ def get_theme_suggestion(
         },
     )
 
-    heroes = load_heroes()
-    themes = load_themes(include_hidden=False)
+    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
+    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    heroes = hero_repo.load_heroes()
+    themes = theme_repo.load_themes(include_hidden=False)
 
     # Select a theme with filtering and weighting options
     theme = select_theme(
