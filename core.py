@@ -1090,6 +1090,89 @@ def remove_theme(theme_name, theme_repo=None):
         return False, f"Failed to save themes: {str(e)}"
 
 
+class HeroResolver:
+    """Single hero-name resolution service (R2a).
+
+    One contract for every call site: exact ID, exact name
+    (case-insensitive), alias (case-insensitive), then fuzzy scoring
+    with the same threshold the modification-thread path used.
+    """
+
+    def __init__(self, hero_repo):
+        self.hero_repo = hero_repo
+        self._heroes = None
+
+    def _load_heroes(self):
+        if self._heroes is None:
+            self._heroes = self.hero_repo.load_heroes()
+        return self._heroes
+
+    def resolve(self, name):
+        """Resolve one hero name/ID/alias to a hero ID, or None."""
+        if not name or not name.strip():
+            return None
+        name = name.strip()
+        name_lower = name.lower()
+        heroes = self._load_heroes()
+
+        for hero in heroes:
+            if hero["id"] == name:
+                return hero["id"]
+
+        best_match = None
+        best_score = 0
+        for hero in heroes:
+            hero_name_lower = hero["name"].lower()
+            aliases = hero.get("aliases", [])
+
+            if hero_name_lower == name_lower:
+                return hero["id"]
+            for alias in aliases:
+                if alias.lower() == name_lower:
+                    return hero["id"]
+
+            score = 0
+            if name_lower in hero_name_lower or hero_name_lower in name_lower:
+                score = len(name_lower) * 2
+            else:
+                min_len = min(len(name_lower), len(hero_name_lower))
+                for i in range(min_len):
+                    if name_lower[i] == hero_name_lower[i]:
+                        score += 2
+                    else:
+                        break
+                for alias in aliases:
+                    alias_lower = alias.lower()
+                    if name_lower in alias_lower or alias_lower in name_lower:
+                        score = max(score, len(name_lower) * 2)
+                    else:
+                        for i in range(min(len(name_lower), len(alias_lower))):
+                            if name_lower[i] == alias_lower[i]:
+                                score += 2
+                            else:
+                                break
+
+            if score > best_score:
+                best_score = score
+                best_match = hero["id"]
+
+        if best_match and best_score >= len(name_lower):
+            return best_match
+        return None
+
+    def resolve_all(self, names):
+        """Resolve a list of names; returns (hero_ids, invalid_names)."""
+        hero_ids = []
+        invalid = []
+        for name in names:
+            hero_id = self.resolve(name)
+            if hero_id is None:
+                invalid.append(name)
+            else:
+                hero_ids.append(hero_id)
+        return hero_ids, invalid
+
+
 def get_all_theme_names(include_hidden=True, theme_repo=None):
     """
     Get a list of all theme names.

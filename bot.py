@@ -21,6 +21,7 @@ logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 # invalidate the theme cache on save (R1d)
 HERO_REPO = core.CachedHeroRepository(core.FileHeroRepository(core.DATA_DIR))
 THEME_REPO = core.CachedThemeRepository(core.FileThemeRepository(core.DATA_DIR))
+HERO_RESOLVER = core.HeroResolver(HERO_REPO)
 
 # Configure bot
 intents = discord.Intents.default()
@@ -424,78 +425,7 @@ async def on_message(message):
     if not any('"' in s for s in hero_names) and '"' not in hero_part:
         hero_names = hero_part.split()
 
-    # Convert hero names/aliases to IDs
-    hero_ids = []
-    invalid_heroes = []
-    all_heroes = HERO_REPO.load_heroes()
-
-    for name in hero_names:
-        # Try exact match (case-insensitive)
-        matched = False
-        name_lower = name.lower()
-
-        # Check all heroes for match
-        best_match = None
-        best_score = 0  # Higher is better
-
-        for hero in all_heroes:
-            hero_name_lower = hero["name"].lower()
-            hero_id = hero["id"]
-
-            # Check exact match on name
-            if hero_name_lower == name_lower:
-                hero_ids.append(hero["id"])
-                matched = True
-                break
-
-            # Check aliases
-            aliases = hero.get("aliases", [])
-            for alias in aliases:
-                if alias.lower() == name_lower:
-                    hero_ids.append(hero["id"])
-                    matched = True
-                    break
-            if matched:
-                break
-
-            # Simple fuzzy matching: count matching characters
-            # Score based on: exact matches, prefix matches, substring matches
-            score = 0
-
-            # Check if one string contains the other
-            if name_lower in hero_name_lower or hero_name_lower in name_lower:
-                score = len(name_lower) * 2
-            else:
-                # Count matching characters in sequence
-                min_len = min(len(name_lower), len(hero_name_lower))
-                for i in range(min_len):
-                    if name_lower[i] == hero_name_lower[i]:
-                        score += 2
-                    else:
-                        break
-
-                # Also check aliases
-                for alias in aliases:
-                    alias_lower = alias.lower()
-                    if name_lower in alias_lower or alias_lower in name_lower:
-                        score = max(score, len(name_lower) * 2)
-                    else:
-                        for i in range(min(len(name_lower), len(alias_lower))):
-                            if name_lower[i] == alias_lower[i]:
-                                score += 2
-                            else:
-                                break
-
-            if score > best_score:
-                best_score = score
-                best_match = hero["id"]
-
-        if not matched and best_match and best_score >= len(name_lower):
-            hero_ids.append(best_match)
-            matched = True
-
-        if not matched:
-            invalid_heroes.append(name)
+    hero_ids, invalid_heroes = HERO_RESOLVER.resolve_all(hero_names)
 
     if invalid_heroes:
         await message.channel.send(
@@ -528,7 +458,9 @@ async def on_message(message):
                 # Actually we need to fetch the specific theme
                 themes = THEME_REPO.load_themes(include_hidden=True)
                 theme = next(t for t in themes if t["name"] == theme_name)
-                matching_heroes = core.get_heroes_by_ids(theme["hero_ids"], all_heroes)
+                matching_heroes = core.get_heroes_by_ids(
+                    theme["hero_ids"], HERO_REPO.load_heroes()
+                )
                 matching_heroes.sort(key=lambda h: h["name"])
 
                 new_response = f"**Theme:** {theme['name']}"
@@ -695,7 +627,7 @@ async def add_theme_command(ctx, theme_name: str, *args):
 
     # Load hero names once; a load failure must not silently reclassify args
     try:
-        hero_name_to_id = core.get_all_hero_names(hero_repo=HERO_REPO)
+        HERO_RESOLVER.resolve("")
     except Exception as e:
         logger.error(f"Failed to load heroes for addtheme: {e}")
         await ctx.send("❌ Failed to load hero data. Please try again later.")
@@ -706,40 +638,20 @@ async def add_theme_command(ctx, theme_name: str, *args):
     hero_names = []
 
     if len(args) >= 1:
-        # Check if the first arg looks like a description (has spaces or is quoted)
-        # For simplicity, we'll treat the first arg as description if it doesn't match a hero
         # If first arg is not a hero, it's the description
-        if args[0].lower() not in hero_name_to_id:
+        if HERO_RESOLVER.resolve(args[0]) is None:
             description = args[0]
             hero_names = list(args[1:])
         else:
             hero_names = list(args)
 
     # Convert hero names to IDs
-    hero_ids = []
-    invalid_heroes = []
-
-    for name in hero_names:
-        # Try exact match first (by name)
-        hero_id = hero_name_to_id.get(name.lower())
-        if hero_id:
-            hero_ids.append(hero_id)
-        else:
-            # Try as direct ID
-            try:
-                heroes = HERO_REPO.load_heroes()
-                valid_ids = {h["id"] for h in heroes}
-                if name in valid_ids:
-                    hero_ids.append(name)
-                else:
-                    invalid_heroes.append(name)
-            except Exception:
-                invalid_heroes.append(name)
+    hero_ids, invalid_heroes = HERO_RESOLVER.resolve_all(hero_names)
 
     if invalid_heroes:
         await ctx.send(
             f"⚠️ Invalid hero names/IDs: {', '.join(invalid_heroes)}. "
-            f"Valid heroes: {', '.join(sorted(hero_name_to_id.keys())[:10])}..."
+            f"Valid heroes: {', '.join(sorted(h['name'].lower() for h in HERO_RESOLVER._load_heroes())[:10])}..."
         )
         return
 
@@ -914,33 +826,17 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
 
     # Convert hero names to IDs
     try:
-        hero_name_to_id = core.get_all_hero_names(hero_repo=HERO_REPO)
+        HERO_RESOLVER.resolve("")
     except Exception as e:
         logger.error(f"Failed to load heroes for updatetheme: {e}")
         await ctx.send("❌ Failed to load hero data. Please try again later.")
         return
-    hero_ids = []
-    invalid_heroes = []
-
-    for name in args:
-        hero_id = hero_name_to_id.get(name.lower())
-        if hero_id:
-            hero_ids.append(hero_id)
-        else:
-            try:
-                heroes = HERO_REPO.load_heroes()
-                valid_ids = {h["id"] for h in heroes}
-                if name in valid_ids:
-                    hero_ids.append(name)
-                else:
-                    invalid_heroes.append(name)
-            except Exception:
-                invalid_heroes.append(name)
+    hero_ids, invalid_heroes = HERO_RESOLVER.resolve_all(list(args))
 
     if invalid_heroes:
         await ctx.send(
             f"⚠️ Invalid hero names/IDs: {', '.join(invalid_heroes)}. "
-            f"Valid heroes: {', '.join(sorted(hero_name_to_id.keys())[:10])}..."
+            f"Valid heroes: {', '.join(sorted(h['name'].lower() for h in HERO_RESOLVER._load_heroes())[:10])}..."
         )
         return
 
