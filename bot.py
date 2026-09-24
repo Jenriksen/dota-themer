@@ -245,14 +245,11 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
     )
 
     # Update the feedback score
-    success, message = core.update_theme_feedback(
-        theme_name, delta, theme_repo=THEME_REPO
-    )
-
-    if success:
+    try:
+        message = core.update_theme_feedback(theme_name, delta, theme_repo=THEME_REPO)
         logger.info(f"Feedback updated: {message}")
-    else:
-        logger.warning(f"Failed to update feedback: {message}")
+    except core.ThemeError as e:
+        logger.warning(f"Failed to update feedback: {e}")
 
 
 @bot.event
@@ -301,14 +298,11 @@ async def on_reaction_remove(reaction, user):
     )
 
     # Update the feedback score
-    success, message = core.update_theme_feedback(
-        theme_name, delta, theme_repo=THEME_REPO
-    )
-
-    if success:
+    try:
+        message = core.update_theme_feedback(theme_name, delta, theme_repo=THEME_REPO)
         logger.info(f"Feedback updated: {message}")
-    else:
-        logger.warning(f"Failed to update feedback: {message}")
+    except core.ThemeError as e:
+        logger.warning(f"Failed to update feedback: {e}")
 
 
 @bot.event
@@ -435,16 +429,19 @@ async def on_message(message):
         return
 
     # Apply the modification
-    if action == "add":
-        success, message_text = core.update_theme(
-            theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
-        )
-    else:  # remove
-        success, message_text = core.update_theme(
-            theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
-        )
+    try:
+        if action == "add":
+            message_text = core.update_theme(
+                theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
+            )
+        else:  # remove
+            message_text = core.update_theme(
+                theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
+            )
+    except core.ThemeError as e:
+        await message.channel.send(f"❌ {e}")
+        return
 
-    if success:
         # Update the original theme message
         try:
             original_message = await message.channel.fetch_message(
@@ -656,16 +653,15 @@ async def add_theme_command(ctx, theme_name: str, *args):
         return
 
     # Add the theme
-    success, message = core.add_theme(
-        theme_name, description, hero_ids, theme_repo=THEME_REPO
-    )
-
-    if success:
+    try:
+        message = core.add_theme(
+            theme_name, description, hero_ids, theme_repo=THEME_REPO
+        )
         logger.info(f"Theme added by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
-    else:
-        logger.warning(f"Failed to add theme for {ctx.author}: {message}")
-        await ctx.send(f"❌ {message}")
+    except core.ThemeError as e:
+        logger.warning(f"Failed to add theme for {ctx.author}: {e}")
+        await ctx.send(f"❌ {e}")
 
 
 @bot.command(name="hidetheme", help="Hide a theme from suggestions")
@@ -681,14 +677,13 @@ async def hide_theme_command(ctx, theme_name: str):
     """
     logger.info(f"Hide theme command from {ctx.author}: {theme_name}")
 
-    success, message = core.hide_theme(theme_name, theme_repo=THEME_REPO)
-
-    if success:
+    try:
+        message = core.hide_theme(theme_name, theme_repo=THEME_REPO)
         logger.info(f"Theme hidden by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
-    else:
-        logger.warning(f"Failed to hide theme for {ctx.author}: {message}")
-        await ctx.send(f"❌ {message}")
+    except core.ThemeError as e:
+        logger.warning(f"Failed to hide theme for {ctx.author}: {e}")
+        await ctx.send(f"❌ {e}")
 
 
 @bot.command(name="unhidetheme", help="Make a hidden theme visible again")
@@ -704,14 +699,13 @@ async def unhide_theme_command(ctx, theme_name: str):
     """
     logger.info(f"Unhide theme command from {ctx.author}: {theme_name}")
 
-    success, message = core.unhide_theme(theme_name, theme_repo=THEME_REPO)
-
-    if success:
+    try:
+        message = core.unhide_theme(theme_name, theme_repo=THEME_REPO)
         logger.info(f"Theme unhidden by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
-    else:
-        logger.warning(f"Failed to unhide theme for {ctx.author}: {message}")
-        await ctx.send(f"❌ {message}")
+    except core.ThemeError as e:
+        logger.warning(f"Failed to unhide theme for {ctx.author}: {e}")
+        await ctx.send(f"❌ {e}")
 
 
 @bot.command(
@@ -841,21 +835,20 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
         return
 
     # Update the theme
-    if action == "add":
-        success, message = core.update_theme(
-            theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
-        )
-    else:  # remove
-        success, message = core.update_theme(
-            theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
-        )
-
-    if success:
+    try:
+        if action == "add":
+            message = core.update_theme(
+                theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
+            )
+        else:  # remove
+            message = core.update_theme(
+                theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
+            )
         logger.info(f"Theme updated by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
-    else:
-        logger.warning(f"Failed to update theme for {ctx.author}: {message}")
-        await ctx.send(f"❌ {message}")
+    except core.ThemeError as e:
+        logger.warning(f"Failed to update theme for {ctx.author}: {e}")
+        await ctx.send(f"❌ {e}")
 
 
 @bot.command(name="listthemes", help="List all available themes")

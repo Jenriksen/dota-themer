@@ -991,7 +991,7 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_add_theme_valid(self):
         """add_theme adds a new theme successfully."""
-        success, message = core.add_theme(
+        message = core.add_theme(
             "New Theme",
             "A test theme",
             ["antimage", "zuus"],
@@ -999,7 +999,6 @@ class TestThemeManagement(unittest.TestCase):
             theme_repo=self.theme_repo,
         )
 
-        self.assertTrue(success)
         self.assertIn("added successfully", message)
         self.assertEqual(
             [t["name"] for t in self.theme_repo.themes],
@@ -1008,46 +1007,45 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_add_theme_duplicate(self):
         """add_theme rejects duplicate theme names."""
-        success, message = core.add_theme(
-            "carry duo",
-            "Description",
-            ["pudge"],
-            hero_repo=self.hero_repo,
-            theme_repo=self.theme_repo,
-        )
-        self.assertFalse(success)
-        self.assertIn("already exists", message)
+        with self.assertRaises(core.ThemeAlreadyExistsError) as ctx:
+            core.add_theme(
+                "carry duo",
+                "Description",
+                ["pudge"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+        self.assertIn("already exists", str(ctx.exception))
 
     def test_add_theme_empty_name(self):
         """add_theme rejects empty theme name."""
-        success, message = core.add_theme(
-            "", "Description", hero_repo=self.hero_repo, theme_repo=self.theme_repo
-        )
-        self.assertFalse(success)
-        self.assertIn("cannot be empty", message)
+        with self.assertRaises(core.EmptyThemeNameError):
+            core.add_theme(
+                "", "Description", hero_repo=self.hero_repo, theme_repo=self.theme_repo
+            )
 
     def test_add_theme_invalid_hero(self):
         """add_theme rejects invalid hero IDs."""
-        success, message = core.add_theme(
-            "Invalid Hero Theme",
-            "Description",
-            ["antimage", "nonexistent_hero"],
-            hero_repo=self.hero_repo,
-            theme_repo=self.theme_repo,
-        )
-        self.assertFalse(success)
-        self.assertIn("Invalid hero IDs", message)
+        with self.assertRaises(core.InvalidHeroIdsError) as ctx:
+            core.add_theme(
+                "Invalid Hero Theme",
+                "Description",
+                ["antimage", "nonexistent_hero"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+        self.assertIn("Invalid hero IDs", str(ctx.exception))
 
     def test_add_theme_hero_ids_sorted_deduplicated(self):
         """add_theme stores hero_ids sorted with duplicates removed."""
-        success, message = core.add_theme(
+        message = core.add_theme(
             "Sorted Theme",
             "Sorting test",
             ["zuus", "antimage", "pudge", "antimage", "zuus"],
             hero_repo=self.hero_repo,
             theme_repo=self.theme_repo,
         )
-        self.assertTrue(success)
+        self.assertIn("added successfully", message)
 
         theme = next(
             (t for t in self.theme_repo.themes if t["name"] == "Sorted Theme"), None
@@ -1057,27 +1055,27 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_add_theme_duplicate_hero_set(self):
         """add_theme rejects a theme whose hero set matches an existing theme."""
-        success, message = core.add_theme(
-            "Duplicate Hero Set",
-            "Duplicate hero set",
-            ["juggernaut", "antimage"],
-            hero_repo=self.hero_repo,
-            theme_repo=self.theme_repo,
-        )
+        with self.assertRaises(core.DuplicateHeroSetError) as ctx:
+            core.add_theme(
+                "Duplicate Hero Set",
+                "Duplicate hero set",
+                ["juggernaut", "antimage"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
 
-        self.assertFalse(success)
-        self.assertIn("Hero set already used", message)
-        self.assertIn("Carry Duo", message)
+        self.assertIn("Hero set already used", str(ctx.exception))
+        self.assertIn("Carry Duo", str(ctx.exception))
 
     def test_update_theme_add_heroes(self):
         """update_theme adds heroes to existing theme."""
-        success, message = core.update_theme(
+        message = core.update_theme(
             "Carry Duo",
             add_hero_ids=["zuus"],
             hero_repo=self.hero_repo,
             theme_repo=self.theme_repo,
         )
-        self.assertTrue(success)
+        self.assertIn("updated successfully", message)
 
         theme = next(
             (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
@@ -1086,13 +1084,13 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_update_theme_remove_heroes(self):
         """update_theme removes heroes from existing theme."""
-        success, message = core.update_theme(
+        message = core.update_theme(
             "Carry Duo",
             remove_hero_ids=["antimage"],
             hero_repo=self.hero_repo,
             theme_repo=self.theme_repo,
         )
-        self.assertTrue(success)
+        self.assertIn("updated successfully", message)
 
         theme = next(
             (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
@@ -1101,14 +1099,14 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_update_theme_nonexistent(self):
         """update_theme rejects nonexistent theme."""
-        success, message = core.update_theme(
-            "NonexistentTheme12345",
-            add_hero_ids=["antimage"],
-            hero_repo=self.hero_repo,
-            theme_repo=self.theme_repo,
-        )
-        self.assertFalse(success)
-        self.assertIn("not found", message)
+        with self.assertRaises(core.ThemeNotFoundError) as ctx:
+            core.update_theme(
+                "NonexistentTheme12345",
+                add_hero_ids=["antimage"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+        self.assertIn("not found", str(ctx.exception))
 
     def test_save_themes_is_atomic_write(self):
         """save_themes writes via temp file and os.replace, not in-place truncation."""
@@ -1274,7 +1272,7 @@ class TestRepositoryInjection(unittest.TestCase):
             [{"name": "Existing", "hero_ids": ["axe"]}]
         )
 
-        success, message = core.add_theme(
+        message = core.add_theme(
             "New Theme",
             description="d",
             hero_ids=["lina"],
@@ -1282,7 +1280,7 @@ class TestRepositoryInjection(unittest.TestCase):
             theme_repo=theme_repo,
         )
 
-        self.assertTrue(success, message)
+        self.assertIn("added successfully", message)
         saved_names = [t["name"] for t in theme_repo.themes]
         self.assertIn("New Theme", saved_names)
 
@@ -1296,32 +1294,32 @@ class TestRepositoryInjection(unittest.TestCase):
         )
         theme_repo = InMemoryThemeRepository([{"name": "T", "hero_ids": ["axe"]}])
 
-        success, message = core.update_theme(
+        message = core.update_theme(
             "T", add_hero_ids=["lina"], hero_repo=hero_repo, theme_repo=theme_repo
         )
 
-        self.assertTrue(success, message)
+        self.assertIn("updated successfully", message)
         self.assertEqual(theme_repo.themes[0]["hero_ids"], ["axe", "lina"])
 
     def test_hide_unhide_theme_use_injected_repository(self):
         """hide_theme/unhide_theme flip is_hidden via the injected repository."""
         theme_repo = InMemoryThemeRepository([{"name": "T", "hero_ids": ["axe"]}])
 
-        success, message = core.hide_theme("T", theme_repo=theme_repo)
-        self.assertTrue(success, message)
+        message = core.hide_theme("T", theme_repo=theme_repo)
+        self.assertIn("hidden successfully", message)
         self.assertTrue(theme_repo.themes[0]["is_hidden"])
 
-        success, message = core.unhide_theme("T", theme_repo=theme_repo)
-        self.assertTrue(success, message)
+        message = core.unhide_theme("T", theme_repo=theme_repo)
+        self.assertIn("unhidden successfully", message)
         self.assertFalse(theme_repo.themes[0]["is_hidden"])
 
     def test_update_theme_feedback_uses_injected_repository(self):
         """update_theme_feedback adjusts feedback_score via the injected repository."""
         theme_repo = InMemoryThemeRepository([{"name": "T", "hero_ids": ["axe"]}])
 
-        success, message = core.update_theme_feedback("T", 1, theme_repo=theme_repo)
+        message = core.update_theme_feedback("T", 1, theme_repo=theme_repo)
 
-        self.assertTrue(success, message)
+        self.assertIn("feedback updated", message)
         self.assertEqual(theme_repo.themes[0]["feedback_score"], 1)
 
     def test_remove_theme_uses_injected_repository(self):
@@ -1330,9 +1328,9 @@ class TestRepositoryInjection(unittest.TestCase):
             [{"name": "T", "hero_ids": ["axe"]}, {"name": "U", "hero_ids": []}]
         )
 
-        success, message = core.remove_theme("T", theme_repo=theme_repo)
+        message = core.remove_theme("T", theme_repo=theme_repo)
 
-        self.assertTrue(success, message)
+        self.assertIn("removed successfully", message)
         self.assertEqual([t["name"] for t in theme_repo.themes], ["U"])
 
     def test_read_helpers_use_injected_repositories(self):
@@ -1495,3 +1493,103 @@ class TestHeroResolver(unittest.TestCase):
         resolver.resolve("Axe")
         resolver.resolve("zuus")
         self.assertEqual(repo.load_calls, 1)
+
+
+class TestTypedResults(unittest.TestCase):
+    """R3: mutation functions raise typed exceptions and return message strings."""
+
+    def setUp(self):
+        self.hero_repo = InMemoryHeroRepository(
+            [
+                {"id": "axe", "name": "Axe", "positions": [3]},
+                {"id": "zuus", "name": "Zeus", "positions": [2]},
+            ]
+        )
+        self.theme_repo = InMemoryThemeRepository(
+            [{"name": "Existing", "description": "", "hero_ids": ["axe"]}]
+        )
+
+    def test_add_theme_success_returns_message(self):
+        """Successful add_theme returns the success message string."""
+        message = core.add_theme(
+            "New", "d", ["zuus"], hero_repo=self.hero_repo, theme_repo=self.theme_repo
+        )
+        self.assertIsInstance(message, str)
+        self.assertIn("added successfully", message)
+
+    def test_add_theme_failures_raise_typed_exceptions(self):
+        """Each add_theme failure raises its own exception type."""
+        with self.assertRaises(core.EmptyThemeNameError):
+            core.add_theme("", hero_repo=self.hero_repo, theme_repo=self.theme_repo)
+        with self.assertRaises(core.ThemeAlreadyExistsError):
+            core.add_theme(
+                "existing",
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+        with self.assertRaises(core.InvalidHeroIdsError):
+            core.add_theme(
+                "New",
+                hero_ids=["bogus"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+        with self.assertRaises(core.DuplicateHeroSetError):
+            core.add_theme(
+                "Dup Set",
+                hero_ids=["axe"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+
+    def test_theme_not_found_raises_typed_exception(self):
+        """update/hide/unhide/feedback/remove raise ThemeNotFoundError."""
+        kwargs = {"theme_repo": self.theme_repo}
+        with self.assertRaises(core.ThemeNotFoundError):
+            core.update_theme("Missing", add_hero_ids=["axe"], **kwargs)
+        with self.assertRaises(core.ThemeNotFoundError):
+            core.hide_theme("Missing", **kwargs)
+        with self.assertRaises(core.ThemeNotFoundError):
+            core.unhide_theme("Missing", **kwargs)
+        with self.assertRaises(core.ThemeNotFoundError):
+            core.update_theme_feedback("Missing", 1, **kwargs)
+        with self.assertRaises(core.ThemeNotFoundError):
+            core.remove_theme("Missing", **kwargs)
+
+    def test_exceptions_are_theme_error_subclasses_with_messages(self):
+        """All typed exceptions derive from ThemeError and carry messages."""
+        for exc in (
+            core.EmptyThemeNameError,
+            core.ThemeAlreadyExistsError,
+            core.InvalidHeroIdsError,
+            core.DuplicateHeroSetError,
+            core.ThemeNotFoundError,
+            core.ThemeDataError,
+        ):
+            self.assertTrue(issubclass(exc, core.ThemeError))
+        try:
+            core.hide_theme("Missing", theme_repo=self.theme_repo)
+        except core.ThemeNotFoundError as e:
+            self.assertIn("not found", str(e))
+
+    def test_load_failure_raises_theme_data_error(self):
+        """Repository load/save failures surface as ThemeDataError."""
+
+        class BrokenRepo:
+            def load_themes(self, include_hidden=True):
+                raise OSError("disk on fire")
+
+            def save_themes(self, themes):
+                raise OSError("disk on fire")
+
+        with self.assertRaises(core.ThemeDataError):
+            core.add_theme(
+                "New",
+                hero_repo=self.hero_repo,
+                theme_repo=BrokenRepo(),
+            )
+
+    def test_remove_theme_success_returns_message(self):
+        """Successful remove_theme returns the success message string."""
+        message = core.remove_theme("Existing", theme_repo=self.theme_repo)
+        self.assertIn("removed successfully", message)

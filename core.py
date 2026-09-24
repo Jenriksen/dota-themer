@@ -28,6 +28,34 @@ OFFLANE_POSITIONS = {3, 4}  # Offlaner + Soft Support
 LANE_NAMES = {1: "Safelane", 2: "Mid", 3: "Offlane", 4: "Offlane", 5: "Safelane"}
 
 
+class ThemeError(Exception):
+    """Base class for all theme mutation errors."""
+
+
+class EmptyThemeNameError(ThemeError):
+    """Theme name was empty or whitespace."""
+
+
+class ThemeAlreadyExistsError(ThemeError):
+    """A theme with the same name already exists."""
+
+
+class InvalidHeroIdsError(ThemeError):
+    """One or more hero IDs do not exist in the hero data."""
+
+
+class DuplicateHeroSetError(ThemeError):
+    """Another theme already uses the exact same hero set."""
+
+
+class ThemeNotFoundError(ThemeError):
+    """No theme with the given name exists."""
+
+
+class ThemeDataError(ThemeError):
+    """The theme data could not be loaded or saved."""
+
+
 @runtime_checkable
 class HeroRepository(Protocol):
     """Interface for hero persistence."""
@@ -670,7 +698,7 @@ def add_theme(
 
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
-        return False, "Theme name cannot be empty"
+        raise EmptyThemeNameError("Theme name cannot be empty")
 
     theme_name = theme_name.strip()
 
@@ -680,13 +708,13 @@ def add_theme(
         heroes = hero_repo.load_heroes()
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
-        return False, f"Failed to load data: {str(e)}"
+        raise ThemeDataError(f"Failed to load data: {str(e)}") from e
 
     # Check if theme already exists
     for theme in themes:
         if theme["name"].lower() == theme_name.lower():
             logger.warning(f"Theme '{theme_name}' already exists")
-            return False, f"Theme '{theme_name}' already exists"
+            raise ThemeAlreadyExistsError(f"Theme '{theme_name}' already exists")
 
     # Validate hero IDs if provided
     valid_hero_ids = {h["id"] for h in heroes}
@@ -697,9 +725,8 @@ def add_theme(
 
         if invalid_ids:
             logger.warning(f"Ignoring invalid hero IDs: {invalid_ids}")
-            return (
-                False,
-                f"Invalid hero IDs: {', '.join(sorted(invalid_ids))}. Valid IDs: {', '.join(sorted(valid_hero_ids)[:20])}...",
+            raise InvalidHeroIdsError(
+                f"Invalid hero IDs: {', '.join(sorted(invalid_ids))}. Valid IDs: {', '.join(sorted(valid_hero_ids)[:20])}..."
             )
 
         # Remove duplicates
@@ -716,9 +743,8 @@ def add_theme(
                 logger.warning(
                     f"Theme '{theme_name}' has same hero set as '{theme['name']}'"
                 )
-                return (
-                    False,
-                    f"Hero set already used by theme '{theme['name']}'",
+                raise DuplicateHeroSetError(
+                    f"Hero set already used by theme '{theme['name']}'"
                 )
 
     # Create new theme
@@ -741,13 +767,10 @@ def add_theme(
         logger.info(
             f"Successfully added theme: {theme_name} with {len(validated_hero_ids)} heroes"
         )
-        return (
-            True,
-            f"Theme '{theme_name}' added successfully with {len(validated_hero_ids)} heroes",
-        )
+        return f"Theme '{theme_name}' added successfully with {len(validated_hero_ids)} heroes"
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
-        return False, f"Failed to save theme: {str(e)}"
+        raise ThemeDataError(f"Failed to save theme: {str(e)}") from e
 
 
 def update_theme(
@@ -776,7 +799,7 @@ def update_theme(
 
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
-        return False, "Theme name cannot be empty"
+        raise EmptyThemeNameError("Theme name cannot be empty")
 
     theme_name = theme_name.strip()
 
@@ -786,7 +809,7 @@ def update_theme(
         heroes = hero_repo.load_heroes()
     except Exception as e:
         logger.error(f"Failed to load themes or heroes: {e}")
-        return False, f"Failed to load data: {str(e)}"
+        raise ThemeDataError(f"Failed to load data: {str(e)}") from e
 
     # Find the theme to update
     theme_index = None
@@ -797,9 +820,8 @@ def update_theme(
 
     if theme_index is None:
         logger.warning(f"Theme '{theme_name}' not found")
-        return (
-            False,
-            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        raise ThemeNotFoundError(
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}..."
         )
 
     # Get valid hero IDs
@@ -837,13 +859,10 @@ def update_theme(
         theme_repo.save_themes(themes)
 
         logger.info(f"Successfully updated theme: {theme_name}")
-        return (
-            True,
-            f"Theme '{theme_name}' updated successfully. Now has {len(current_hero_ids)} heroes",
-        )
+        return f"Theme '{theme_name}' updated successfully. Now has {len(current_hero_ids)} heroes"
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
-        return False, f"Failed to save theme: {str(e)}"
+        raise ThemeDataError(f"Failed to save theme: {str(e)}") from e
 
 
 def hide_theme(theme_name, theme_repo=None):
@@ -861,7 +880,7 @@ def hide_theme(theme_name, theme_repo=None):
 
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
-        return False, "Theme name cannot be empty"
+        raise EmptyThemeNameError("Theme name cannot be empty")
 
     theme_name = theme_name.strip()
 
@@ -870,7 +889,7 @@ def hide_theme(theme_name, theme_repo=None):
         themes = theme_repo.load_themes()
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
-        return False, f"Failed to load themes: {str(e)}"
+        raise ThemeDataError(f"Failed to load themes: {str(e)}") from e
 
     # Find the theme to hide
     theme_index = None
@@ -881,9 +900,8 @@ def hide_theme(theme_name, theme_repo=None):
 
     if theme_index is None:
         logger.warning(f"Theme '{theme_name}' not found")
-        return (
-            False,
-            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        raise ThemeNotFoundError(
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}..."
         )
 
     # Hide the theme
@@ -897,13 +915,10 @@ def hide_theme(theme_name, theme_repo=None):
         theme_repo.save_themes(themes)
 
         logger.info(f"Successfully hid theme: {theme_name}")
-        return (
-            True,
-            f"Theme '{theme_name}' hidden successfully. It will no longer appear in suggestions.",
-        )
+        return f"Theme '{theme_name}' hidden successfully. It will no longer appear in suggestions."
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
-        return False, f"Failed to save theme: {str(e)}"
+        raise ThemeDataError(f"Failed to save theme: {str(e)}") from e
 
 
 def unhide_theme(theme_name, theme_repo=None):
@@ -921,7 +936,7 @@ def unhide_theme(theme_name, theme_repo=None):
 
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
-        return False, "Theme name cannot be empty"
+        raise EmptyThemeNameError("Theme name cannot be empty")
 
     theme_name = theme_name.strip()
 
@@ -930,7 +945,7 @@ def unhide_theme(theme_name, theme_repo=None):
         themes = theme_repo.load_themes(include_hidden=True)
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
-        return False, f"Failed to load themes: {str(e)}"
+        raise ThemeDataError(f"Failed to load themes: {str(e)}") from e
 
     # Find the theme to unhide
     theme_index = None
@@ -941,15 +956,14 @@ def unhide_theme(theme_name, theme_repo=None):
 
     if theme_index is None:
         logger.warning(f"Theme '{theme_name}' not found")
-        return (
-            False,
-            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        raise ThemeNotFoundError(
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}..."
         )
 
     # Check if theme is already visible
     if not themes[theme_index].get("is_hidden", False):
         logger.info(f"Theme '{theme_name}' is already visible")
-        return True, f"Theme '{theme_name}' is already visible."
+        return f"Theme '{theme_name}' is already visible."
 
     # Unhide the theme
     themes[theme_index]["is_hidden"] = False
@@ -962,13 +976,10 @@ def unhide_theme(theme_name, theme_repo=None):
         theme_repo.save_themes(themes)
 
         logger.info(f"Successfully unhid theme: {theme_name}")
-        return (
-            True,
-            f"Theme '{theme_name}' unhidden successfully. It will now appear in suggestions.",
-        )
+        return f"Theme '{theme_name}' unhidden successfully. It will now appear in suggestions."
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
-        return False, f"Failed to save theme: {str(e)}"
+        raise ThemeDataError(f"Failed to save theme: {str(e)}") from e
 
 
 def update_theme_feedback(theme_name, delta, theme_repo=None):
@@ -986,7 +997,7 @@ def update_theme_feedback(theme_name, delta, theme_repo=None):
 
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
-        return False, "Theme name cannot be empty"
+        raise EmptyThemeNameError("Theme name cannot be empty")
 
     theme_name = theme_name.strip()
 
@@ -995,7 +1006,7 @@ def update_theme_feedback(theme_name, delta, theme_repo=None):
         themes = theme_repo.load_themes(include_hidden=True)
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
-        return False, f"Failed to load themes: {str(e)}"
+        raise ThemeDataError(f"Failed to load themes: {str(e)}") from e
 
     # Find the theme to update
     theme_index = None
@@ -1006,10 +1017,7 @@ def update_theme_feedback(theme_name, delta, theme_repo=None):
 
     if theme_index is None:
         logger.warning(f"Theme '{theme_name}' not found")
-        return (
-            False,
-            f"Theme '{theme_name}' not found.",
-        )
+        raise ThemeNotFoundError(f"Theme '{theme_name}' not found.")
 
     # Update feedback score
     themes[theme_index]["feedback_score"] = (
@@ -1024,13 +1032,10 @@ def update_theme_feedback(theme_name, delta, theme_repo=None):
         theme_repo.save_themes(themes)
 
         logger.info(f"Successfully updated feedback for theme: {theme_name}")
-        return (
-            True,
-            f"Theme '{theme_name}' feedback updated to {themes[theme_index]['feedback_score']}",
-        )
+        return f"Theme '{theme_name}' feedback updated to {themes[theme_index]['feedback_score']}"
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
-        return False, f"Failed to save feedback: {str(e)}"
+        raise ThemeDataError(f"Failed to save feedback: {str(e)}") from e
 
 
 def remove_theme(theme_name, theme_repo=None):
@@ -1048,7 +1053,7 @@ def remove_theme(theme_name, theme_repo=None):
 
     if not theme_name or not theme_name.strip():
         logger.warning("Theme name cannot be empty")
-        return False, "Theme name cannot be empty"
+        raise EmptyThemeNameError("Theme name cannot be empty")
 
     theme_name = theme_name.strip()
 
@@ -1057,7 +1062,7 @@ def remove_theme(theme_name, theme_repo=None):
         themes = theme_repo.load_themes(include_hidden=True)
     except Exception as e:
         logger.error(f"Failed to load themes: {e}")
-        return False, f"Failed to load themes: {str(e)}"
+        raise ThemeDataError(f"Failed to load themes: {str(e)}") from e
 
     # Find and remove the theme
     theme_index = None
@@ -1068,9 +1073,8 @@ def remove_theme(theme_name, theme_repo=None):
 
     if theme_index is None:
         logger.warning(f"Theme '{theme_name}' not found")
-        return (
-            False,
-            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}...",
+        raise ThemeNotFoundError(
+            f"Theme '{theme_name}' not found. Available themes: {', '.join(sorted([t['name'] for t in themes])[:20])}..."
         )
 
     # Remove the theme
@@ -1084,10 +1088,10 @@ def remove_theme(theme_name, theme_repo=None):
         theme_repo.save_themes(themes)
 
         logger.info(f"Successfully removed theme: {theme_name}")
-        return True, f"Theme '{theme_name}' removed successfully"
+        return f"Theme '{theme_name}' removed successfully"
     except Exception as e:
         logger.error(f"Failed to save themes: {e}")
-        return False, f"Failed to save themes: {str(e)}"
+        raise ThemeDataError(f"Failed to save themes: {str(e)}") from e
 
 
 class HeroResolver:
