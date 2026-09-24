@@ -12,9 +12,6 @@ from pathlib import Path
 
 import core
 
-HEROES_TABLE = "heroes"
-THEMES_TABLE = "themes"
-
 
 def _connect(db_path):
     """Open a connection with JSON-serializing adapters registered."""
@@ -23,14 +20,14 @@ def _connect(db_path):
 
 def _ensure_schema(conn):
     """Create the heroes/themes tables if they do not exist."""
-    conn.execute(f"""
-        CREATE TABLE IF NOT EXISTS {HEROES_TABLE} (
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS heroes (
             id TEXT PRIMARY KEY,
             data TEXT NOT NULL
         )
         """)
-    conn.execute(f"""
-        CREATE TABLE IF NOT EXISTS {THEMES_TABLE} (
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS themes (
             name TEXT PRIMARY KEY,
             data TEXT NOT NULL
         )
@@ -48,9 +45,7 @@ class SqliteHeroRepository:
         conn = _connect(self.db_path)
         try:
             _ensure_schema(conn)
-            rows = conn.execute(
-                f"SELECT data FROM {HEROES_TABLE} ORDER BY id"
-            ).fetchall()
+            rows = conn.execute("SELECT data FROM heroes ORDER BY id").fetchall()
             return [json.loads(row[0]) for row in rows]
         finally:
             conn.close()
@@ -61,10 +56,10 @@ class SqliteHeroRepository:
         try:
             _ensure_schema(conn)
             conn.execute("BEGIN")
-            conn.execute(f"DELETE FROM {HEROES_TABLE}")
+            conn.execute("DELETE FROM heroes")
             for hero in heroes:
                 conn.execute(
-                    f"INSERT INTO {HEROES_TABLE} (id, data) VALUES (?, ?)",
+                    "INSERT INTO heroes (id, data) VALUES (?, ?)",
                     (hero["id"], json.dumps(hero)),
                 )
             conn.commit()
@@ -86,9 +81,7 @@ class SqliteThemeRepository:
         conn = _connect(self.db_path)
         try:
             _ensure_schema(conn)
-            rows = conn.execute(
-                f"SELECT data FROM {THEMES_TABLE} ORDER BY name"
-            ).fetchall()
+            rows = conn.execute("SELECT data FROM themes ORDER BY name").fetchall()
         finally:
             conn.close()
         themes = []
@@ -109,9 +102,9 @@ class SqliteThemeRepository:
             _ensure_schema(conn)
             serialized = [(t["name"], json.dumps(t)) for t in themes]
             conn.execute("BEGIN")
-            conn.execute(f"DELETE FROM {THEMES_TABLE}")
+            conn.execute("DELETE FROM themes")
             conn.executemany(
-                f"INSERT INTO {THEMES_TABLE} (name, data) VALUES (?, ?)",
+                "INSERT INTO themes (name, data) VALUES (?, ?)",
                 serialized,
             )
             conn.commit()
