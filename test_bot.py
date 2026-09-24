@@ -91,10 +91,13 @@ class TestBotCommands(unittest.TestCase):
         self.assertIn("helptheme", bot_content)
 
     def test_formats_response_correctly(self):
-        """Bot formats response with theme, description, heroes."""
+        """Bot formats response via the presentation module."""
         bot_content = read_bot_file()
-        self.assertIn("**Theme:**", bot_content)
-        self.assertIn("**Heroes:**", bot_content)
+        self.assertIn("presentation.render_theme_suggestion(", bot_content)
+        with open("presentation.py", encoding="utf-8") as f:
+            presentation_content = f.read()
+        self.assertIn("**Theme:**", presentation_content)
+        self.assertIn("**Heroes:**", presentation_content)
 
 
 class TestErrorHandling(unittest.TestCase):

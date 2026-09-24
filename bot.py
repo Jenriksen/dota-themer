@@ -13,6 +13,7 @@ from discord.ext import commands, tasks
 import __version__
 import core
 import logging_config
+import presentation
 
 # Get logger for this module
 logger = logging_config.get_logger(logging_config.LOGGER_BOT)
@@ -173,24 +174,9 @@ async def on_reaction_add(reaction, user):
                 heroes_list = "Unknown"
 
             # Post instructions in thread
-            instructions = f"""
-**Theme:** {theme_name}
-**Current Heroes:** {heroes_list}
-
-To modify this theme, reply with:
-- "Add HeroName" to add a hero
-- "Remove HeroName" to remove a hero
-- "+HeroName" or "+ HeroName" to add
-- "-HeroName" or "- HeroName" to remove
-
-Examples:
-- "Add Anti Mage"
-- "Remove Bloodseeker"
-- "+PA"
-- "-BS"
-
-Type "Done", "Cancel", "Exit", or "Quit" to finish.
-"""
+            instructions = presentation.render_modification_instructions(
+                theme_name=theme_name, heroes_list=heroes_list
+            )
             await thread.send(instructions)
 
             # Track the active modification thread
@@ -449,27 +435,19 @@ async def on_message(message):
             )
             if original_message.id in theme_suggestion_messages:
                 # Re-fetch theme and rebuild the message
-                new_suggestion = core.get_theme_suggestion(
-                    2, hero_repo=HERO_REPO, theme_repo=THEME_REPO
-                )  # Re-fetch for that theme
-                # Actually we need to fetch the specific theme
                 themes = THEME_REPO.load_themes(include_hidden=True)
                 theme = next(t for t in themes if t["name"] == theme_name)
                 matching_heroes = core.get_heroes_by_ids(
                     theme["hero_ids"], HERO_REPO.load_heroes()
                 )
                 matching_heroes.sort(key=lambda h: h["name"])
-
-                new_response = f"**Theme:** {theme['name']}"
-                if theme.get("description"):
-                    new_response += f"\n**Description:** {theme['description']}"
-                new_response += (
-                    f"\n**Heroes:** {core.format_hero_list(matching_heroes)}"
+                new_response = presentation.render_theme_suggestion(
+                    theme_name=theme["name"],
+                    description=theme.get("description", ""),
+                    heroes_display=core.format_hero_list(matching_heroes),
+                    hero_count=len(matching_heroes),
+                    feedback_score=theme.get("feedback_score", 0),
                 )
-                new_response += f"\n**Feedback:** {theme.get('feedback_score', 0)} 👍👎"
-                new_response += f"\n*({len(matching_heroes)} heroes match this theme)*"
-                new_response += f"\n\nReact with 👍 to upvote this theme, or 👎 to downvote it! (Voting locks after 2 hours)"
-
                 await original_message.edit(content=new_response)
         except Exception as e:
             logger.warning(f"Failed to update original message: {e}")
@@ -505,14 +483,13 @@ async def theme_command(ctx, party_size: int = 2):
         party_size, hero_repo=HERO_REPO, theme_repo=THEME_REPO
     )
 
-    # Format the response
-    response = f"**Theme:** {suggestion['theme']}"
-    if suggestion["description"]:
-        response += f"\n**Description:** {suggestion['description']}"
-    response += f"\n**Heroes:** {suggestion['heroes']}"
-    response += f"\n**Feedback:** {suggestion['feedback_score']} 👍👎"
-    response += f"\n*({suggestion['hero_count']} heroes match this theme)*"
-    response += f"\n\nReact with 👍 to upvote this theme, or 👎 to downvote it! (Voting locks after 2 hours)"
+    response = presentation.render_theme_suggestion(
+        theme_name=suggestion["theme"],
+        description=suggestion["description"],
+        heroes_display=suggestion["heroes"],
+        hero_count=suggestion["hero_count"],
+        feedback_score=suggestion["feedback_score"],
+    )
 
     sent_message = await ctx.send(response)
 
@@ -759,24 +736,9 @@ async def update_theme_command(
         try:
             thread = await ctx.message.create_thread(name=f"Modify: {theme_name}")
 
-            instructions = f"""
-**Theme:** {theme_name}
-**Current Heroes:** {heroes_list}
-
-To modify this theme, reply with:
-- "Add HeroName" to add a hero
-- "Remove HeroName" to remove a hero
-- "+HeroName" or "+ HeroName" to add
-- "-HeroName" or "- HeroName" to remove
-
-Examples:
-- "Add Anti Mage"
-- "Remove Bloodseeker"
-- "+PA"
-- "-BS"
-
-Type "Done", "Cancel", "Exit", or "Quit" to finish.
-"""
+            instructions = presentation.render_modification_instructions(
+                theme_name=theme_name, heroes_list=heroes_list
+            )
             await thread.send(instructions)
 
             # Track the active modification thread
