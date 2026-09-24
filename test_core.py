@@ -1361,3 +1361,83 @@ class TestRepositoryInjection(unittest.TestCase):
             core.get_all_hero_names(hero_repo=hero_repo),
             {"axe": "axe_id"},
         )
+
+
+class LoadCountingHeroRepository:
+    """Delegate that counts load calls."""
+
+    def __init__(self, heroes):
+        self.heroes = heroes
+        self.load_calls = 0
+
+    def load_heroes(self):
+        self.load_calls += 1
+        return self.heroes
+
+
+class LoadCountingThemeRepository:
+    """Delegate that counts load calls and tracks saved data."""
+
+    def __init__(self, themes):
+        self.themes = themes
+        self.load_calls = 0
+        self.saved = None
+
+    def load_themes(self, include_hidden=True):
+        self.load_calls += 1
+        return self.themes
+
+    def save_themes(self, themes):
+        self.saved = themes
+
+
+class TestCachedRepositories(unittest.TestCase):
+    """Tests for R1d: caching repository wrappers."""
+
+    def test_cached_hero_repository_loads_delegate_once(self):
+        """Repeated load_heroes calls hit the delegate only once."""
+        delegate = LoadCountingHeroRepository([{"id": "axe", "name": "Axe"}])
+        repo = core.CachedHeroRepository(delegate)
+
+        self.assertEqual(repo.load_heroes(), [{"id": "axe", "name": "Axe"}])
+        self.assertEqual(repo.load_heroes(), [{"id": "axe", "name": "Axe"}])
+        self.assertEqual(repo.load_heroes(), [{"id": "axe", "name": "Axe"}])
+        self.assertEqual(delegate.load_calls, 1)
+
+    def test_cached_theme_repository_loads_delegate_once(self):
+        """Repeated load_themes calls hit the delegate only once."""
+        delegate = LoadCountingThemeRepository([{"name": "T", "hero_ids": []}])
+        repo = core.CachedThemeRepository(delegate)
+
+        self.assertEqual(repo.load_themes(), [{"name": "T", "hero_ids": []}])
+        self.assertEqual(repo.load_themes(), [{"name": "T", "hero_ids": []}])
+        self.assertEqual(delegate.load_calls, 1)
+
+    def test_cached_theme_repository_invalidates_after_save(self):
+        """save_themes clears the cache so the next load re-reads the delegate."""
+        delegate = LoadCountingThemeRepository([{"name": "T", "hero_ids": []}])
+        delegate.load_themes = lambda include_hidden=True: (
+            delegate.saved if delegate.saved is not None else delegate.themes
+        )
+        repo = core.CachedThemeRepository(delegate)
+
+        self.assertEqual(repo.load_themes(), [{"name": "T", "hero_ids": []}])
+        repo.save_themes([{"name": "New", "hero_ids": ["h1"]}])
+        self.assertEqual(repo.load_themes(), [{"name": "New", "hero_ids": ["h1"]}])
+
+    def test_get_theme_suggestion_uses_injected_repositories(self):
+        """get_theme_suggestion reads via injected repositories, not files."""
+        hero_repo = LoadCountingHeroRepository(
+            [{"id": "axe", "name": "Axe", "positions": [3]}]
+        )
+        theme_repo = LoadCountingThemeRepository(
+            [{"name": "Axes Only", "description": "d", "hero_ids": ["axe"]}]
+        )
+
+        suggestion = core.get_theme_suggestion(
+            1, hero_repo=hero_repo, theme_repo=theme_repo
+        )
+
+        self.assertEqual(suggestion["theme"], "Axes Only")
+        self.assertEqual(hero_repo.load_calls, 1)
+        self.assertEqual(theme_repo.load_calls, 1)

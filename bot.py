@@ -17,6 +17,11 @@ import logging_config
 # Get logger for this module
 logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 
+# Repository singletons: load data once per process, cache reads,
+# invalidate the theme cache on save (R1d)
+HERO_REPO = core.CachedHeroRepository(core.FileHeroRepository(core.DATA_DIR))
+THEME_REPO = core.CachedThemeRepository(core.FileThemeRepository(core.DATA_DIR))
+
 # Configure bot
 intents = discord.Intents.default()
 intents.message_content = True
@@ -151,14 +156,14 @@ async def on_reaction_add(reaction, user):
 
             # Get theme details for instructions
             try:
-                themes = core.load_themes(include_hidden=True)
+                themes = THEME_REPO.load_themes(include_hidden=True)
                 theme = next(t for t in themes if t["name"] == theme_name)
                 heroes_list = ", ".join(
                     sorted(
                         [
                             h["name"]
                             for h in core.get_heroes_by_ids(
-                                theme["hero_ids"], core.load_heroes()
+                                theme["hero_ids"], HERO_REPO.load_heroes()
                             )
                         ]
                     )
@@ -239,7 +244,9 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
     )
 
     # Update the feedback score
-    success, message = core.update_theme_feedback(theme_name, delta)
+    success, message = core.update_theme_feedback(
+        theme_name, delta, theme_repo=THEME_REPO
+    )
 
     if success:
         logger.info(f"Feedback updated: {message}")
@@ -293,7 +300,9 @@ async def on_reaction_remove(reaction, user):
     )
 
     # Update the feedback score
-    success, message = core.update_theme_feedback(theme_name, delta)
+    success, message = core.update_theme_feedback(
+        theme_name, delta, theme_repo=THEME_REPO
+    )
 
     if success:
         logger.info(f"Feedback updated: {message}")
@@ -418,7 +427,7 @@ async def on_message(message):
     # Convert hero names/aliases to IDs
     hero_ids = []
     invalid_heroes = []
-    all_heroes = core.load_heroes()
+    all_heroes = HERO_REPO.load_heroes()
 
     for name in hero_names:
         # Try exact match (case-insensitive)
@@ -497,9 +506,13 @@ async def on_message(message):
 
     # Apply the modification
     if action == "add":
-        success, message_text = core.update_theme(theme_name, add_hero_ids=hero_ids)
+        success, message_text = core.update_theme(
+            theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
+        )
     else:  # remove
-        success, message_text = core.update_theme(theme_name, remove_hero_ids=hero_ids)
+        success, message_text = core.update_theme(
+            theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
+        )
 
     if success:
         # Update the original theme message
@@ -509,9 +522,11 @@ async def on_message(message):
             )
             if original_message.id in theme_suggestion_messages:
                 # Re-fetch theme and rebuild the message
-                new_suggestion = core.get_theme_suggestion(2)  # Re-fetch for that theme
+                new_suggestion = core.get_theme_suggestion(
+                    2, hero_repo=HERO_REPO, theme_repo=THEME_REPO
+                )  # Re-fetch for that theme
                 # Actually we need to fetch the specific theme
-                themes = core.load_themes(include_hidden=True)
+                themes = THEME_REPO.load_themes(include_hidden=True)
                 theme = next(t for t in themes if t["name"] == theme_name)
                 matching_heroes = core.get_heroes_by_ids(theme["hero_ids"], all_heroes)
                 matching_heroes.sort(key=lambda h: h["name"])
@@ -557,7 +572,9 @@ async def theme_command(ctx, party_size: int = 2):
         await ctx.send("Party size must be between 1 and 5.")
         return
 
-    suggestion = core.get_theme_suggestion(party_size)
+    suggestion = core.get_theme_suggestion(
+        party_size, hero_repo=HERO_REPO, theme_repo=THEME_REPO
+    )
 
     # Format the response
     response = f"**Theme:** {suggestion['theme']}"
@@ -678,7 +695,7 @@ async def add_theme_command(ctx, theme_name: str, *args):
 
     # Load hero names once; a load failure must not silently reclassify args
     try:
-        hero_name_to_id = core.get_all_hero_names()
+        hero_name_to_id = core.get_all_hero_names(hero_repo=HERO_REPO)
     except Exception as e:
         logger.error(f"Failed to load heroes for addtheme: {e}")
         await ctx.send("❌ Failed to load hero data. Please try again later.")
@@ -710,7 +727,7 @@ async def add_theme_command(ctx, theme_name: str, *args):
         else:
             # Try as direct ID
             try:
-                heroes = core.load_heroes()
+                heroes = HERO_REPO.load_heroes()
                 valid_ids = {h["id"] for h in heroes}
                 if name in valid_ids:
                     hero_ids.append(name)
@@ -727,7 +744,9 @@ async def add_theme_command(ctx, theme_name: str, *args):
         return
 
     # Add the theme
-    success, message = core.add_theme(theme_name, description, hero_ids)
+    success, message = core.add_theme(
+        theme_name, description, hero_ids, theme_repo=THEME_REPO
+    )
 
     if success:
         logger.info(f"Theme added by {ctx.author}: {theme_name}")
@@ -750,7 +769,7 @@ async def hide_theme_command(ctx, theme_name: str):
     """
     logger.info(f"Hide theme command from {ctx.author}: {theme_name}")
 
-    success, message = core.hide_theme(theme_name)
+    success, message = core.hide_theme(theme_name, theme_repo=THEME_REPO)
 
     if success:
         logger.info(f"Theme hidden by {ctx.author}: {theme_name}")
@@ -773,7 +792,7 @@ async def unhide_theme_command(ctx, theme_name: str):
     """
     logger.info(f"Unhide theme command from {ctx.author}: {theme_name}")
 
-    success, message = core.unhide_theme(theme_name)
+    success, message = core.unhide_theme(theme_name, theme_repo=THEME_REPO)
 
     if success:
         logger.info(f"Theme unhidden by {ctx.author}: {theme_name}")
@@ -815,14 +834,14 @@ async def update_theme_command(
 
         # Get theme details for instructions
         try:
-            themes = core.load_themes(include_hidden=True)
+            themes = THEME_REPO.load_themes(include_hidden=True)
             theme = next(t for t in themes if t["name"] == theme_name)
             heroes_list = ", ".join(
                 sorted(
                     [
                         h["name"]
                         for h in core.get_heroes_by_ids(
-                            theme["hero_ids"], core.load_heroes()
+                            theme["hero_ids"], HERO_REPO.load_heroes()
                         )
                     ]
                 )
@@ -895,7 +914,7 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
 
     # Convert hero names to IDs
     try:
-        hero_name_to_id = core.get_all_hero_names()
+        hero_name_to_id = core.get_all_hero_names(hero_repo=HERO_REPO)
     except Exception as e:
         logger.error(f"Failed to load heroes for updatetheme: {e}")
         await ctx.send("❌ Failed to load hero data. Please try again later.")
@@ -909,7 +928,7 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
             hero_ids.append(hero_id)
         else:
             try:
-                heroes = core.load_heroes()
+                heroes = HERO_REPO.load_heroes()
                 valid_ids = {h["id"] for h in heroes}
                 if name in valid_ids:
                     hero_ids.append(name)
@@ -927,9 +946,13 @@ Type "Done", "Cancel", "Exit", or "Quit" to finish.
 
     # Update the theme
     if action == "add":
-        success, message = core.update_theme(theme_name, add_hero_ids=hero_ids)
+        success, message = core.update_theme(
+            theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
+        )
     else:  # remove
-        success, message = core.update_theme(theme_name, remove_hero_ids=hero_ids)
+        success, message = core.update_theme(
+            theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
+        )
 
     if success:
         logger.info(f"Theme updated by {ctx.author}: {theme_name}")
@@ -945,7 +968,7 @@ async def list_themes_command(ctx):
     logger.info(f"List themes command from {ctx.author}")
 
     try:
-        themes = core.get_all_themes_with_status()
+        themes = core.get_all_themes_with_status(theme_repo=THEME_REPO)
     except Exception as e:
         logger.error(f"Failed to load themes for listthemes: {e}")
         await ctx.send("❌ Failed to load theme data. Please try again later.")
@@ -980,7 +1003,7 @@ async def list_heroes_command(ctx):
     logger.info(f"List heroes command from {ctx.author}")
 
     try:
-        heroes = core.load_heroes()
+        heroes = HERO_REPO.load_heroes()
         hero_list = sorted([h["name"] for h in heroes])
     except Exception as e:
         logger.error(f"Failed to load heroes: {e}")

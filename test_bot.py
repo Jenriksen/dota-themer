@@ -119,3 +119,45 @@ class TestErrorHandling(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRepositoryWiring(unittest.TestCase):
+    """Tests for R1d: bot constructs cached repositories and passes them to core."""
+
+    def test_constructs_cached_repositories_at_startup(self):
+        """bot.py creates CachedHeroRepository/CachedThemeRepository singletons."""
+        content = read_bot_file()
+        self.assertIn("CachedHeroRepository", content)
+        self.assertIn("CachedThemeRepository", content)
+
+    def test_no_direct_file_loads_in_bot(self):
+        """bot.py no longer calls core.load_heroes/core.load_themes directly."""
+        content = read_bot_file()
+        self.assertNotIn("core.load_heroes()", content)
+        self.assertNotIn("core.load_themes(", content)
+
+    def test_no_uncached_mutation_calls(self):
+        """Mutation calls pass theme_repo so the cache stays coherent."""
+        content = read_bot_file()
+        for call in ("core.add_theme(", "core.update_theme(", "core.hide_theme("):
+            self.assertIn(call, content)
+        # Every mutation call site must carry theme_repo=THEME_REPO
+        import re
+
+        for pattern in (
+            r"core\.add_theme\(",
+            r"core\.update_theme\(",
+            r"core\.hide_theme\(",
+            r"core\.unhide_theme\(",
+            r"core\.update_theme_feedback\(",
+            r"core\.remove_theme\(",
+        ):
+            for m in re.finditer(pattern, content):
+                call_end = content.index(
+                    ")",
+                    content.index(
+                        pattern.replace("\\.", ".").replace("\\(", "("), m.start()
+                    ),
+                )
+                segment = content[m.start() : call_end]
+                self.assertIn("theme_repo=", segment, f"{segment} must pass theme_repo")
