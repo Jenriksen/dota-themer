@@ -179,3 +179,27 @@ class TestHeroResolverWiring(unittest.TestCase):
         content = read_bot_file()
         self.assertNotIn("best_score", content)
         self.assertNotIn("hero_name_to_id", content)
+
+
+class TestSessionStateWiring(unittest.TestCase):
+    """Tests for R5a: bot uses the SessionState object for session tracking."""
+
+    def test_constructs_session_state(self):
+        """bot.py creates a SessionState singleton."""
+        content = read_bot_file()
+        self.assertIn("session_state.SessionState()", content)
+
+    def test_no_raw_session_dicts(self):
+        """The three module-level session dicts are gone from bot.py."""
+        content = read_bot_file()
+        self.assertNotIn("theme_suggestion_messages", content)
+        self.assertNotIn("active_modification_threads", content)
+        self.assertNotIn("messages_with_active_threads", content)
+
+    def test_uses_session_state_accessors(self):
+        """bot.py reads/writes session data via SessionState methods."""
+        content = read_bot_file()
+        self.assertIn("SESSION_STATE.register_suggestion(", content)
+        self.assertIn("SESSION_STATE.register_thread(", content)
+        self.assertIn("SESSION_STATE.remove_thread(", content)
+        self.assertIn("SESSION_STATE.is_locked(", content)

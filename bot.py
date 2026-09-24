@@ -5,7 +5,7 @@ Provides theme suggestions via Discord commands.
 
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional, Set
+from typing import Optional
 
 import discord
 from discord.ext import commands, tasks
@@ -14,6 +14,7 @@ import __version__
 import core
 import logging_config
 import presentation
+import session_state
 
 # Get logger for this module
 logger = logging_config.get_logger(logging_config.LOGGER_BOT)
@@ -24,6 +25,9 @@ HERO_REPO = core.CachedHeroRepository(core.FileHeroRepository(core.DATA_DIR))
 THEME_REPO = core.CachedThemeRepository(core.FileThemeRepository(core.DATA_DIR))
 HERO_RESOLVER = core.HeroResolver(HERO_REPO)
 
+# Session state: theme suggestions and active modification threads (R5a)
+SESSION_STATE = session_state.SessionState()
+
 # Configure bot
 intents = discord.Intents.default()
 intents.message_content = True
@@ -31,36 +35,14 @@ intents.reactions = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Track theme suggestion messages for feedback
-# Maps message_id to {"theme_name": str, "timestamp": datetime, "locked": bool}
-theme_suggestion_messages: Dict[int, Dict[str, Any]] = {}
-
-# Track active modification threads
-# Maps thread_id to {"theme_name": str, "user_id": int, "created_at": datetime, "message_id": int}
-active_modification_threads: Dict[int, Dict[str, Any]] = {}
-
-# Track which message_ids have active modification threads
-messages_with_active_threads: Set[int] = set()
-
 
 @tasks.loop(seconds=60)  # Check every minute
 async def cleanup_task():
     """Clean up inactive modification threads after 10 minutes of inactivity."""
-    current_time = datetime.now(timezone.utc)
-    inactive_threads = []
-
-    for thread_id, thread_info in active_modification_threads.items():
-        # Check if thread is older than 10 minutes
-        time_elapsed = current_time - thread_info["created_at"]
-        if time_elapsed >= timedelta(minutes=10):
-            inactive_threads.append(thread_id)
+    inactive_threads = SESSION_STATE.inactive_threads(cutoff=timedelta(minutes=10))
 
     # Remove inactive threads from tracking and archive Discord threads
     for thread_id in inactive_threads:
-        thread_info = active_modification_threads[thread_id]
-        message_id = thread_info.get("message_id")
-        if message_id in messages_with_active_threads:
-            messages_with_active_threads.remove(message_id)
 
         # Archive the Discord thread
         try:
@@ -73,7 +55,7 @@ async def cleanup_task():
         except Exception as e:
             logger.warning(f"Failed to archive thread {thread_id}: {e}")
 
-        del active_modification_threads[thread_id]
+        SESSION_STATE.remove_thread(thread_id)
 
 
 @bot.event
@@ -111,22 +93,22 @@ async def on_reaction_add(reaction, user):
 
     # Check if this is a theme suggestion message
     message_id = reaction.message.id
-    if message_id not in theme_suggestion_messages:
+    message_info = SESSION_STATE.get_suggestion(message_id=message_id)
+    if message_info is None:
         return
 
-    message_info = theme_suggestion_messages[message_id]
     theme_name = message_info["theme_name"]
 
     # Handle question mark reaction - start modification thread
     if str(reaction.emoji) == "❓":
         # Check if theme message is locked (2+ hours old)
-        if message_info.get("locked", False):
+        if SESSION_STATE.is_locked(message_id):
             return
 
         time_elapsed = datetime.now(timezone.utc) - message_info["timestamp"]
         if time_elapsed >= timedelta(hours=2):
             # Lock the voting and modification
-            message_info["locked"] = True
+            SESSION_STATE.lock_suggestion(message_id)
             try:
                 await reaction.message.add_reaction("🔒")
             except Exception:
@@ -134,7 +116,7 @@ async def on_reaction_add(reaction, user):
             return
 
         # Check if there's already an active modification thread for this message
-        message_has_active_thread = message_id in messages_with_active_threads
+        message_has_active_thread = SESSION_STATE.message_has_active_thread(message_id)
 
         if message_has_active_thread:
             # Just remove the ❓ reaction - clicking again will restart
@@ -180,13 +162,12 @@ async def on_reaction_add(reaction, user):
             await thread.send(instructions)
 
             # Track the active modification thread
-            active_modification_threads[thread.id] = {
-                "theme_name": theme_name,
-                "user_id": user.id,
-                "created_at": datetime.now(timezone.utc),
-                "message_id": message_id,
-            }
-            messages_with_active_threads.add(message_id)
+            SESSION_STATE.register_thread(
+                thread_id=thread.id,
+                theme_name=theme_name,
+                user_id=user.id,
+                message_id=message_id,
+            )
 
             logger.info(
                 f"Started modification thread for theme '{theme_name}' by {user}"
@@ -203,14 +184,14 @@ async def on_reaction_add(reaction, user):
         return
 
     # Check if voting is locked (2 hours have passed)
-    if message_info["locked"]:
+    if SESSION_STATE.is_locked(message_id):
         return
 
     # Check if 2 hours have passed since message was created
     time_elapsed = datetime.now(timezone.utc) - message_info["timestamp"]
     if time_elapsed >= timedelta(hours=2):
         # Lock the voting
-        message_info["locked"] = True
+        SESSION_STATE.lock_suggestion(message_id)
         try:
             await reaction.message.add_reaction("🔒")
         except Exception:
@@ -254,13 +235,12 @@ async def on_reaction_remove(reaction, user):
 
     # Check if this is a theme suggestion message
     message_id = reaction.message.id
-    if message_id not in theme_suggestion_messages:
+    message_info = SESSION_STATE.get_suggestion(message_id=message_id)
+    if message_info is None:
         return
 
-    message_info = theme_suggestion_messages[message_id]
-
     # Check if voting is locked
-    if message_info["locked"]:
+    if SESSION_STATE.is_locked(message_id):
         return
 
     # Check if 2 hours have passed
@@ -303,8 +283,8 @@ async def on_message(message):
 
     # Check if this message is in an active modification thread
     is_thread_message = message.channel.type == discord.ChannelType.public_thread
-    in_active_thread = (
-        is_thread_message and message.channel.id in active_modification_threads
+    in_active_thread = is_thread_message and SESSION_STATE.has_thread(
+        message.channel.id
     )
 
     # If it's a command in a thread, still process the command normally
@@ -317,7 +297,7 @@ async def on_message(message):
 
     # From here on, we're handling non-command messages in active modification threads
     thread_id = message.channel.id
-    thread_info = active_modification_threads[thread_id]
+    thread_info = SESSION_STATE.get_thread(thread_id=thread_id)
     theme_name = thread_info["theme_name"]
 
     # Get the message content
@@ -336,17 +316,14 @@ async def on_message(message):
                 logger.warning(f"Failed to archive thread {thread_id}: {e}")
 
             # Remove thread from tracking
-            message_id_to_clean = thread_info.get("message_id")
-            if message_id_to_clean in messages_with_active_threads:
-                messages_with_active_threads.remove(message_id_to_clean)
-            del active_modification_threads[thread_id]
+            SESSION_STATE.remove_thread(thread_id)
 
             # Re-add ❓ reaction to the original message if it exists
             try:
                 original_message = await message.channel.fetch_message(
                     message.channel.parent_id
                 )
-                if original_message.id in theme_suggestion_messages:
+                if SESSION_STATE.has_suggestion(original_message.id):
                     # Remove ✅ and re-add ❓
                     try:
                         await original_message.clear_reaction("✅")
@@ -433,7 +410,7 @@ async def on_message(message):
             original_message = await message.channel.fetch_message(
                 message.channel.parent_id
             )
-            if original_message.id in theme_suggestion_messages:
+            if SESSION_STATE.has_suggestion(original_message.id):
                 # Re-fetch theme and rebuild the message
                 themes = THEME_REPO.load_themes(include_hidden=True)
                 theme = next(t for t in themes if t["name"] == theme_name)
@@ -494,11 +471,9 @@ async def theme_command(ctx, party_size: int = 2):
     sent_message = await ctx.send(response)
 
     # Store the message_id with metadata for reaction handling
-    theme_suggestion_messages[sent_message.id] = {
-        "theme_name": suggestion["theme"],
-        "timestamp": datetime.now(timezone.utc),
-        "locked": False,
-    }
+    SESSION_STATE.register_suggestion(
+        message_id=sent_message.id, theme_name=suggestion["theme"]
+    )
 
     # Add bot's own reactions to make it easier for users
     # Note: Bot's own reactions are explicitly excluded in on_reaction_add
@@ -509,7 +484,7 @@ async def theme_command(ctx, party_size: int = 2):
     except Exception as e:
         logger.warning(f"Failed to add reactions to message: {e}")
         # Clean up tracking if reactions couldn't be added
-        theme_suggestion_messages.pop(sent_message.id, None)
+        SESSION_STATE.remove_suggestion(sent_message.id)
 
 
 @bot.command(
@@ -711,9 +686,12 @@ async def update_theme_command(
     if action is None:
         # Check if this is a reply to a theme suggestion message
         replied_message = ctx.message.reference
-        if replied_message and replied_message.message_id in theme_suggestion_messages:
-            message_info = theme_suggestion_messages[replied_message.message_id]
-            theme_name = message_info["theme_name"]
+        if replied_message and SESSION_STATE.has_suggestion(replied_message.message_id):
+            message_info = SESSION_STATE.get_suggestion(
+                message_id=replied_message.message_id
+            )
+            if message_info is not None:
+                theme_name = message_info["theme_name"]
 
         # Get theme details for instructions
         try:
@@ -742,18 +720,16 @@ async def update_theme_command(
             await thread.send(instructions)
 
             # Track the active modification thread
-            active_modification_threads[thread.id] = {
-                "theme_name": theme_name,
-                "user_id": ctx.author.id,
-                "created_at": datetime.now(timezone.utc),
-                "message_id": ctx.message.id,
-            }
-            messages_with_active_threads.add(ctx.message.id)
+            SESSION_STATE.register_thread(
+                thread_id=thread.id,
+                theme_name=theme_name,
+                user_id=ctx.author.id,
+                message_id=ctx.message.id,
+            )
 
             # Add ✅ reaction to original message if it's from the bot
-            if (
-                ctx.message.reference
-                and ctx.message.reference.message_id in theme_suggestion_messages
+            if ctx.message.reference and SESSION_STATE.has_suggestion(
+                ctx.message.reference.message_id
             ):
                 try:
                     message = await ctx.fetch_message(ctx.message.reference.message_id)
