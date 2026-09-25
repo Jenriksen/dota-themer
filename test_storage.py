@@ -164,31 +164,16 @@ class TestJsonToSqliteMigration(unittest.TestCase):
 
 
 class TestBackendSelection(unittest.TestCase):
-    """create_repositories selects the backend from the environment."""
+    """create_repositories always builds the SQLite repositories (#52)."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.data_dir = Path(self.tmp.name)
-        self.env = os.environ.copy()
 
-    def tearDown(self):
-        os.environ.clear()
-        os.environ.update(self.env)
-
-    def test_default_backend_is_json(self):
-        """Without configuration, the JSON repositories come back."""
-        os.environ.pop("DOTA_THEMER_BACKEND", None)
-        hero_repo, theme_repo = storage.create_repositories(self.data_dir)
-        import core
-
-        self.assertIsInstance(hero_repo, core.FileHeroRepository)
-        self.assertIsInstance(theme_repo, core.FileThemeRepository)
-
-    def test_sqlite_backend_creates_sqlite_repositories(self):
-        """DOTA_THEMER_BACKEND=sqlite selects the SQLite repositories."""
+    def test_always_returns_sqlite_repositories(self):
+        """SQLite is the only backend; JSON data is imported once."""
         write_json_data(self.data_dir, heroes=[HERO], themes=[THEME])
-        os.environ["DOTA_THEMER_BACKEND"] = "sqlite"
         hero_repo, theme_repo = storage.create_repositories(self.data_dir)
         self.assertIsInstance(hero_repo, storage.SqliteHeroRepository)
         self.assertIsInstance(theme_repo, storage.SqliteThemeRepository)
@@ -196,11 +181,12 @@ class TestBackendSelection(unittest.TestCase):
         self.assertEqual(hero_repo.load_heroes(), [HERO])
         self.assertEqual(len(theme_repo.load_themes()), 1)
 
-    def test_unknown_backend_raises(self):
-        """An unrecognized backend name is a configuration error."""
-        os.environ["DOTA_THEMER_BACKEND"] = "postgres"
-        with self.assertRaises(ValueError):
-            storage.create_repositories(self.data_dir)
+    def test_no_json_repository_classes_remain(self):
+        """The File repositories are removed from the codebase (#52)."""
+        import core
+
+        self.assertFalse(hasattr(core, "FileHeroRepository"))
+        self.assertFalse(hasattr(core, "FileThemeRepository"))
 
 
 class TestSqliteRepositoriesSatisfyProtocols(unittest.TestCase):

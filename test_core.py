@@ -4,6 +4,7 @@ Ensures functionality survives through refactorings.
 """
 
 import json
+import sqlite3
 import sys
 import unittest
 from io import StringIO
@@ -453,16 +454,16 @@ class TestDataFileErrors(unittest.TestCase):
     def tearDown(self):
         core.DATA_DIR = self.original_data_dir
 
-    def test_load_heroes_file_not_found(self):
-        """load_heroes raises FileNotFoundError for missing file."""
+    def test_load_heroes_missing_data_dir(self):
+        """load_heroes raises sqlite3.OperationalError for missing data dir."""
         core.DATA_DIR = Path("/nonexistent/path")
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(sqlite3.OperationalError):
             core.load_heroes()
 
-    def test_load_themes_file_not_found(self):
-        """load_themes raises FileNotFoundError for missing file."""
+    def test_load_themes_missing_data_dir(self):
+        """load_themes raises sqlite3.OperationalError for missing data dir."""
         core.DATA_DIR = Path("/nonexistent/path")
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(sqlite3.OperationalError):
             core.load_themes()
 
     def test_load_heroes_malformed_json(self):
@@ -501,19 +502,19 @@ class TestDataFileErrors(unittest.TestCase):
     def test_get_all_theme_names_propagates_load_failure(self):
         """get_all_theme_names raises on load failure, not silent empty list."""
         core.DATA_DIR = Path("/nonexistent/path")
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(sqlite3.OperationalError):
             core.get_all_theme_names()
 
     def test_get_all_hero_names_propagates_load_failure(self):
         """get_all_hero_names raises on load failure, not silent empty dict."""
         core.DATA_DIR = Path("/nonexistent/path")
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(sqlite3.OperationalError):
             core.get_all_hero_names()
 
     def test_get_all_themes_with_status_propagates_load_failure(self):
         """get_all_themes_with_status raises on load failure, not empty list."""
         core.DATA_DIR = Path("/nonexistent/path")
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(sqlite3.OperationalError):
             core.get_all_themes_with_status()
 
 
@@ -1108,52 +1109,33 @@ class TestThemeManagement(unittest.TestCase):
             )
         self.assertIn("not found", str(ctx.exception))
 
-    def test_save_themes_is_atomic_write(self):
-        """save_themes writes via temp file and os.replace, not in-place truncation."""
-        import os
+    def test_save_themes_is_transactional(self):
+        """save_themes persists the full list in one SQLite transaction."""
         import tempfile
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             core.DATA_DIR = Path(tmp_dir)
             themes = [{"name": "T1", "hero_ids": ["h1"]}]
             core.save_themes(themes)
+            loaded = core.load_themes()
+            self.assertEqual(len(loaded), 1)
+            self.assertEqual(loaded[0]["name"], "T1")
+            self.assertEqual(loaded[0]["hero_ids"], ["h1"])
 
-            with open(Path(tmp_dir) / "themes.json") as f:
-                self.assertEqual(json.load(f), themes)
-            # No leftover temp files
-            leftovers = [p for p in os.listdir(tmp_dir) if p != "themes.json"]
-            self.assertEqual(leftovers, [])
-
-    def test_save_themes_cleans_up_on_serialization_failure(self):
-        """save_themes removes the temp file and re-raises on failure."""
-        import os
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            core.DATA_DIR = Path(tmp_dir)
-            with patch("json.dump", side_effect=TypeError("boom")):
-                with self.assertRaises(TypeError):
-                    core.save_themes([{"name": "T", "hero_ids": []}])
-            # Temp file must not remain in the data directory
-            leftovers = [p for p in os.listdir(tmp_dir) if p != "themes.json"]
-            self.assertEqual(leftovers, [])
-
-    def test_save_themes_no_truncation_of_existing_file_on_failure(self):
-        """save_themes leaves the existing themes.json intact on serialization failure."""
+    def test_save_themes_rollback_leaves_existing_data_intact(self):
+        """A failed save leaves previously persisted themes intact (#52)."""
         import tempfile
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             core.DATA_DIR = Path(tmp_dir)
             original = [{"name": "Original", "hero_ids": ["h1"]}]
-            with open(Path(tmp_dir) / "themes.json", "w") as f:
-                json.dump(original, f)
-
-            with patch("json.dump", side_effect=TypeError("boom")):
-                with self.assertRaises(TypeError):
-                    core.save_themes([{"bad": object()}])
-
-            with open(Path(tmp_dir) / "themes.json") as f:
-                self.assertEqual(json.load(f), original)
+            core.save_themes(original)
+            with self.assertRaises(KeyError):
+                core.save_themes([{"bad": object()}])
+            self.assertEqual(
+                [t["name"] for t in core.load_themes()],
+                ["Original"],
+            )
 
 
 if __name__ == "__main__":
@@ -1163,73 +1145,10 @@ if __name__ == "__main__":
 class TestRepositories(unittest.TestCase):
     """Tests for the repository seam (R1a: pure extraction)."""
 
-    def test_file_hero_repository_loads_heroes_from_data_dir(self):
-        """FileHeroRepository returns the hero list parsed from heroes.json."""
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            data_dir = Path(tmp_dir)
-            heroes = [{"id": "axe", "name": "Axe", "positions": [3]}]
-            with open(data_dir / "heroes.json", "w") as f:
-                json.dump(heroes, f)
-
-            repo = core.FileHeroRepository(data_dir)
-            self.assertEqual(repo.load_heroes(), heroes)
-
-    def test_file_theme_repository_load_defaults_and_filters_hidden(self):
-        """FileThemeRepository defaults is_hidden/feedback_score and filters."""
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            data_dir = Path(tmp_dir)
-            themes = [
-                {"name": "T1"},
-                {"name": "T2", "is_hidden": True},
-                {"name": "T3", "feedback_score": 5},
-            ]
-            with open(data_dir / "themes.json", "w") as f:
-                json.dump(themes, f)
-
-            repo = core.FileThemeRepository(data_dir)
-            loaded = repo.load_themes()
-            self.assertEqual(
-                loaded,
-                [
-                    {"name": "T1", "is_hidden": False, "feedback_score": 0},
-                    {"name": "T2", "is_hidden": True, "feedback_score": 0},
-                    {"name": "T3", "is_hidden": False, "feedback_score": 5},
-                ],
-            )
-            self.assertEqual(
-                repo.load_themes(include_hidden=False),
-                [
-                    {"name": "T1", "is_hidden": False, "feedback_score": 0},
-                    {"name": "T3", "is_hidden": False, "feedback_score": 5},
-                ],
-            )
-
-    def test_file_theme_repository_save_themes_is_atomic(self):
-        """FileThemeRepository.save_themes atomically writes themes.json."""
-        import os
-        import tempfile
-
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            data_dir = Path(tmp_dir)
-            repo = core.FileThemeRepository(data_dir)
-            themes = [{"name": "T1", "hero_ids": ["h1"]}]
-            repo.save_themes(themes)
-
-            with open(data_dir / "themes.json") as f:
-                self.assertEqual(json.load(f), themes)
-            leftovers = [p for p in os.listdir(tmp_dir) if p != "themes.json"]
-            self.assertEqual(leftovers, [])
-
-    def test_file_repositories_satisfy_repository_protocols(self):
-        """File repositories implement the HeroRepository/ThemeRepository protocols."""
-        repo = core.FileHeroRepository(Path("."))
-        theme_repo = core.FileThemeRepository(Path("."))
-        self.assertIsInstance(repo, core.HeroRepository)
-        self.assertIsInstance(theme_repo, core.ThemeRepository)
+    def test_json_repositories_are_removed(self):
+        """The File repository classes are gone from core (#52)."""
+        self.assertFalse(hasattr(core, "FileHeroRepository"))
+        self.assertFalse(hasattr(core, "FileThemeRepository"))
 
 
 class InMemoryHeroRepository:

@@ -185,9 +185,10 @@ class TestSessionStateWiring(unittest.TestCase):
     """Tests for R5a: bot uses the SessionState object for session tracking."""
 
     def test_constructs_session_state(self):
-        """bot.py creates a SessionState singleton."""
+        """bot.py creates a SessionState singleton, persisted to SQLite (#52)."""
         content = read_bot_file()
-        self.assertIn("session_state.SessionState()", content)
+        self.assertIn("session_state.SessionState(", content)
+        self.assertIn("SqliteSessionStore(", content)
 
     def test_no_raw_session_dicts(self):
         """The three module-level session dicts are gone from bot.py."""

@@ -1,13 +1,15 @@
-"""SQLite storage backend and JSON migration for dota-themer.
+"""SQLite storage for dota-themer (#52).
 
-Implements the HeroRepository/ThemeRepository contracts from core behind
-SQLite, selected via DOTA_THEMER_BACKEND=json|sqlite (issue #34). The JSON
-files remain the default until the sqlite backend is explicitly enabled.
+SQLite is the only storage backend: heroes, themes, and the bot session
+(message/thread tracking) all persist to a single database file. The JSON
+data files are read once by the one-shot JSON migration when the database
+does not exist yet.
 """
 
 import json
 import os
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
 
 import core
@@ -33,6 +35,29 @@ def _ensure_schema(conn):
             data TEXT NOT NULL
         )
         """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS suggestion_messages (
+            message_id INTEGER PRIMARY KEY,
+            theme_name TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            locked BOOLEAN NOT NULL DEFAULT FALSE
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS modification_threads (
+            thread_id INTEGER PRIMARY KEY,
+            theme_name TEXT NOT NULL,
+            user_id INTEGER NOT NULL,
+            message_id INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (message_id)
+                REFERENCES suggestion_messages(message_id)
+        )
+    """)
+    conn.execute("""
+        CREATE INDEX IF NOT EXISTS idx_messages_with_threads
+        ON modification_threads(message_id)
+    """)
 
 
 class SqliteHeroRepository:
@@ -116,6 +141,133 @@ class SqliteThemeRepository:
             conn.close()
 
 
+def _parse_dt(value):
+    """Parse an ISO 8601 timestamp from the database into an aware datetime."""
+    return datetime.fromisoformat(value)
+
+
+def _format_dt(value):
+    """Serialize a datetime to ISO 8601, assuming naive values are UTC."""
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.isoformat()
+
+
+class SqliteSessionStore:
+    """Message/thread session tracking backed by SQLite tables (#52)."""
+
+    def __init__(self, db_path):
+        self.db_path = Path(db_path)
+
+    def load_suggestions(self):
+        """Return {message_id: {theme_name, timestamp, locked}} from the db."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            rows = conn.execute(
+                "SELECT message_id, theme_name, timestamp, locked"
+                " FROM suggestion_messages"
+            ).fetchall()
+        finally:
+            conn.close()
+        return {
+            int(row[0]): {
+                "theme_name": row[1],
+                "timestamp": _parse_dt(row[2]),
+                "locked": bool(row[3]),
+            }
+            for row in rows
+        }
+
+    def load_threads(self):
+        """Return {thread_id: {theme_name, user_id, message_id, created_at}}."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            rows = conn.execute(
+                "SELECT thread_id, theme_name, user_id, message_id, created_at"
+                " FROM modification_threads"
+            ).fetchall()
+        finally:
+            conn.close()
+        return {
+            int(row[0]): {
+                "theme_name": row[1],
+                "user_id": int(row[2]),
+                "message_id": int(row[3]),
+                "created_at": _parse_dt(row[4]),
+            }
+            for row in rows
+        }
+
+    def save_suggestion(self, message_id, info):
+        """Insert or replace one suggestion row."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            conn.execute(
+                "INSERT OR REPLACE INTO suggestion_messages"
+                " (message_id, theme_name, timestamp, locked)"
+                " VALUES (?, ?, ?, ?)",
+                (
+                    message_id,
+                    info["theme_name"],
+                    _format_dt(info["timestamp"]),
+                    bool(info["locked"]),
+                ),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    def delete_suggestion(self, message_id):
+        """Remove one suggestion row (threads keep their message_id value)."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            conn.execute(
+                "DELETE FROM suggestion_messages WHERE message_id = ?",
+                (message_id,),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    def save_thread(self, thread_id, info):
+        """Insert or replace one thread row."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            conn.execute(
+                "INSERT OR REPLACE INTO modification_threads"
+                " (thread_id, theme_name, user_id, message_id, created_at)"
+                " VALUES (?, ?, ?, ?, ?)",
+                (
+                    thread_id,
+                    info["theme_name"],
+                    info["user_id"],
+                    info["message_id"],
+                    _format_dt(info["created_at"]),
+                ),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    def delete_thread(self, thread_id):
+        """Remove one thread row."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            conn.execute(
+                "DELETE FROM modification_threads WHERE thread_id = ?",
+                (thread_id,),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+
 def migrate_json_to_sqlite(data_dir, db_path):
     """Import the JSON data files into the SQLite database once.
 
@@ -137,19 +289,15 @@ def migrate_json_to_sqlite(data_dir, db_path):
 
 
 def create_repositories(data_dir):
-    """Build the (hero_repo, theme_repo) pair for the configured backend.
+    """Build the (hero_repo, theme_repo) pair: always SQLite (#52).
 
-    Backend is read from DOTA_THEMER_BACKEND: "json" (default) or "sqlite".
+    The JSON data files are imported once on first use, when the database
+    file does not exist yet.
     """
-    backend = os.environ.get("DOTA_THEMER_BACKEND", "json").lower()
     data_dir = Path(data_dir)
-    if backend == "json":
-        return core.FileHeroRepository(data_dir), core.FileThemeRepository(data_dir)
-    if backend == "sqlite":
-        db_path = data_dir / "dota.db"
-        migrate_json_to_sqlite(data_dir, db_path)
-        return SqliteHeroRepository(db_path), SqliteThemeRepository(db_path)
-    raise ValueError(f"Unknown storage backend: {backend!r}. Use 'json' or 'sqlite'.")
+    db_path = data_dir / snapshot.DB_FILENAME
+    migrate_json_to_sqlite(data_dir, db_path)
+    return SqliteHeroRepository(db_path), SqliteThemeRepository(db_path)
 
 
 def build_snapshot_config():

@@ -75,28 +75,6 @@ class ThemeRepository(Protocol):
         """Persist the list of theme dicts."""
 
 
-class FileHeroRepository:
-    """Hero persistence backed by heroes.json in a data directory."""
-
-    def __init__(self, data_dir):
-        self.data_dir = Path(data_dir)
-
-    def load_heroes(self):
-        """Load heroes from JSON file."""
-        logger.debug("Loading heroes from heroes.json")
-        try:
-            with open(self.data_dir / "heroes.json", "r") as f:
-                heroes = json.load(f)
-            logger.info(f"Loaded {len(heroes)} heroes")
-            return heroes
-        except FileNotFoundError as e:
-            logger.error(f"Heroes file not found: {e}")
-            raise
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in heroes file: {e}")
-            raise
-
-
 class CachedHeroRepository:
     """Hero repository wrapper that loads from the delegate once per process."""
 
@@ -129,89 +107,41 @@ class CachedThemeRepository:
         return self.delegate.save_themes(themes)
 
 
+def _default_hero_repo():
+    """Build the process-wide default hero repository (SQLite, #52).
+
+    storage imports core, so the import is deferred to call time.
+    """
+    hero_repo, _ = _default_repositories()
+    return hero_repo
+
+
+def _default_theme_repo():
+    """Build the process-wide default theme repository (SQLite, #52)."""
+    _, theme_repo = _default_repositories()
+    return theme_repo
+
+
+def _default_repositories():
+    """Build the default repository pair (SQLite, #52), migrating JSON once."""
+    import storage
+
+    return storage.create_repositories(DATA_DIR)
+
+
 def load_heroes():
     """Load heroes via the default hero repository."""
-    return FileHeroRepository(DATA_DIR).load_heroes()
-
-
-class FileThemeRepository:
-    """Theme persistence backed by themes.json in a data directory."""
-
-    def __init__(self, data_dir):
-        self.data_dir = Path(data_dir)
-
-    def load_themes(self, include_hidden=True):
-        """Load themes from JSON file.
-
-        Args:
-            include_hidden: If False, filter out themes with is_hidden=True
-
-        Returns:
-            list: List of theme dicts, optionally filtered
-        """
-        logger.debug("Loading themes from themes.json")
-        try:
-            with open(self.data_dir / "themes.json", "r") as f:
-                themes = json.load(f)
-
-            # Ensure all themes have is_hidden and feedback_score fields for backward compatibility
-            for theme in themes:
-                if "is_hidden" not in theme:
-                    theme["is_hidden"] = False
-                if "feedback_score" not in theme:
-                    theme["feedback_score"] = 0
-
-            # Filter hidden themes if requested
-            if not include_hidden:
-                themes = [t for t in themes if not t.get("is_hidden", False)]
-
-            logger.info(f"Loaded {len(themes)} themes")
-            return themes
-        except FileNotFoundError as e:
-            logger.error(f"Themes file not found: {e}")
-            raise
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in themes file: {e}")
-            raise
-
-    def save_themes(self, themes):
-        """
-        Save themes to JSON file atomically.
-
-        Writes to a temporary file in the data directory, then atomically
-        replaces themes.json via os.replace, so a crash mid-write can never
-        leave a truncated or partial themes.json behind.
-
-        Args:
-            themes: List of theme dicts to persist
-
-        Raises:
-            OSError: If the temporary file cannot be created or replaced
-            Any exception raised by json.dump (e.g. TypeError)
-        """
-        themes_path = self.data_dir / "themes.json"
-        fd, tmp_path = tempfile.mkstemp(dir=self.data_dir, suffix=".tmp")
-        try:
-            with os.fdopen(fd, "w") as f:
-                json.dump(themes, f, indent=2)
-            os.replace(tmp_path, themes_path)
-            logger.debug(f"Atomically saved {len(themes)} themes to {themes_path}")
-        except Exception:
-            try:
-                os.unlink(tmp_path)
-            except OSError:
-                pass
-            raise
+    return _default_hero_repo().load_heroes()
 
 
 def load_themes(include_hidden=True):
     """Load themes via the default theme repository."""
-    return FileThemeRepository(DATA_DIR).load_themes(include_hidden=include_hidden)
+    return _default_theme_repo().load_themes(include_hidden=include_hidden)
 
 
 def save_themes(themes):
     """Save themes via the default theme repository."""
-    FileThemeRepository(DATA_DIR).save_themes(themes)
+    _default_theme_repo().save_themes(themes)
 
 
 def get_heroes_by_ids(hero_ids, all_heroes):
@@ -641,8 +571,8 @@ def get_theme_suggestion(
         },
     )
 
-    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    hero_repo = hero_repo or _default_hero_repo()
+    theme_repo = theme_repo or _default_theme_repo()
     heroes = hero_repo.load_heroes()
     themes = theme_repo.load_themes(include_hidden=False)
 
@@ -692,8 +622,8 @@ def add_theme(
     Returns:
         tuple: (success: bool, message: str)
     """
-    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    hero_repo = hero_repo or _default_hero_repo()
+    theme_repo = theme_repo or _default_theme_repo()
     logger.info(f"Attempting to add theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -793,8 +723,8 @@ def update_theme(
     Returns:
         tuple: (success: bool, message: str)
     """
-    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    hero_repo = hero_repo or _default_hero_repo()
+    theme_repo = theme_repo or _default_theme_repo()
     logger.info(f"Attempting to update theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -875,7 +805,7 @@ def hide_theme(theme_name, theme_repo=None):
     Returns:
         tuple: (success: bool, message: str)
     """
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    theme_repo = theme_repo or _default_theme_repo()
     logger.info(f"Attempting to hide theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -931,7 +861,7 @@ def unhide_theme(theme_name, theme_repo=None):
     Returns:
         tuple: (success: bool, message: str)
     """
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    theme_repo = theme_repo or _default_theme_repo()
     logger.info(f"Attempting to unhide theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -1048,7 +978,7 @@ def remove_theme(theme_name, theme_repo=None):
     Returns:
         tuple: (success: bool, message: str)
     """
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    theme_repo = theme_repo or _default_theme_repo()
     logger.info(f"Attempting to remove theme: {theme_name}")
 
     if not theme_name or not theme_name.strip():
@@ -1187,7 +1117,7 @@ def get_all_theme_names(include_hidden=True, theme_repo=None):
     Returns:
         list: Sorted list of theme names
     """
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    theme_repo = theme_repo or _default_theme_repo()
     themes = theme_repo.load_themes(include_hidden=include_hidden)
     return sorted([t["name"] for t in themes])
 
@@ -1199,7 +1129,7 @@ def get_all_themes_with_status(theme_repo=None):
     Returns:
         list: List of dicts with 'name' and 'is_hidden' for each theme
     """
-    theme_repo = theme_repo or FileThemeRepository(DATA_DIR)
+    theme_repo = theme_repo or _default_theme_repo()
     themes = theme_repo.load_themes(include_hidden=True)
     return [{"name": t["name"], "is_hidden": t.get("is_hidden", False)} for t in themes]
 
@@ -1211,7 +1141,7 @@ def get_all_hero_names(hero_repo=None):
     Returns:
         dict: Mapping of hero name (lowercase) to hero ID
     """
-    hero_repo = hero_repo or FileHeroRepository(DATA_DIR)
+    hero_repo = hero_repo or _default_hero_repo()
     heroes = hero_repo.load_heroes()
     return {h["name"].lower(): h["id"] for h in heroes}
 
