@@ -320,8 +320,7 @@ def build_snapshot_config():
     if not os.environ.get("DOTA_THEMER_S3_BUCKET"):
         return None
     return snapshot.SnapshotConfig.from_env(
-        Path(os.environ.get("DOTA_THEMER_DATA_DIR", str(core.DATA_DIR)))
-        / snapshot.DB_FILENAME
+        core.resolve_data_dir() / snapshot.DB_FILENAME
     )
 
 

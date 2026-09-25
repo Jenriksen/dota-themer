@@ -141,6 +141,63 @@ if __name__ == "__main__":
     unittest.main()
 
 
+if __name__ == "__main__":
+    unittest.main()
+
+
+class TestDataDirResolution(unittest.TestCase):
+    """DOTA_THEMER_DATA_DIR relocates the database consistently (#54)."""
+
+    def setUp(self):
+        import os
+
+        self.env = os.environ.copy()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def tearDown(self):
+        import os
+
+        os.environ.clear()
+        os.environ.update(self.env)
+
+    def test_resolve_data_dir_honors_env(self):
+        """core.resolve_data_dir prefers DOTA_THEMER_DATA_DIR over the default."""
+        import os
+
+        os.environ["DOTA_THEMER_DATA_DIR"] = self.tmp.name
+        self.assertEqual(core.resolve_data_dir(), Path(self.tmp.name))
+
+    def test_resolve_data_dir_defaults_to_packaged_data(self):
+        """Without the env var the packaged data directory is used."""
+        import os
+
+        os.environ.pop("DOTA_THEMER_DATA_DIR", None)
+        self.assertEqual(core.resolve_data_dir(), core.DATA_DIR)
+
+    def test_snapshot_config_uses_env_data_dir(self):
+        """build_snapshot_config resolves db_path through the env data dir."""
+        import os
+
+        import storage
+
+        os.environ["DOTA_THEMER_S3_BUCKET"] = "my-bucket"
+        os.environ["DOTA_THEMER_DATA_DIR"] = self.tmp.name
+        try:
+            config = storage.build_snapshot_config()
+            self.assertEqual(config.db_path, Path(self.tmp.name) / snapshot.DB_FILENAME)
+        finally:
+            os.environ.pop("DOTA_THEMER_S3_BUCKET", None)
+
+    def test_bot_uses_env_resolved_data_dir(self):
+        """bot.py never hardcodes core.DATA_DIR for its storage wiring."""
+        content = Path(__file__).parent.joinpath("bot.py").read_text()
+        self.assertIn("storage.create_repositories(_data_dir)", content)
+        self.assertIn("SqliteSessionStore(_db_path)", content)
+        self.assertNotIn("storage.create_repositories(core.DATA_DIR)", content)
+        self.assertNotIn("SqliteSessionStore(core.DATA_DIR", content)
+
+
 class TestLocalDebugDefaults(unittest.TestCase):
     """Local debugging needs zero configuration (#34 follow-up)."""
 

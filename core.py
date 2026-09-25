@@ -19,6 +19,18 @@ logger = logging_config.get_logger(logging_config.LOGGER_CORE)
 # Load data files
 DATA_DIR = Path(__file__).parent / "data"
 
+
+def resolve_data_dir():
+    """Data directory for the SQLite database and JSON seed files.
+
+    DOTA_THEMER_DATA_DIR relocates the database (and S3 snapshot
+    push/pull) for IaC-rendered deployments; the default keeps local
+    debugging on the packaged data/ directory with zero configuration.
+    """
+    env_dir = os.environ.get("DOTA_THEMER_DATA_DIR")
+    return Path(env_dir) if env_dir else DATA_DIR
+
+
 # Lane-position mapping (from CONTEXT.md)
 SAFELANE_POSITIONS = {1, 5}  # Carry + Hard Support
 MID_POSITIONS = {2}  # Midlaner
@@ -126,7 +138,7 @@ def _default_repositories():
     """Build the default repository pair (SQLite, #52), migrating JSON once."""
     import storage
 
-    return storage.create_repositories(DATA_DIR)
+    return storage.create_repositories(resolve_data_dir())
 
 
 def load_heroes():

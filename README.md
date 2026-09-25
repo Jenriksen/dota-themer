@@ -456,6 +456,9 @@ docker run -e DISCORD_TOKEN=your_token -e LOG_LEVEL=INFO dota-themer
 | `LOG_FORMAT` | Log format (`json` or `text`) | `text` | No |
 | `LOG_FILE` | Log file path | None | No |
 | `ENV` | Environment name | `development` | No |
+| `DOTA_THEMER_DATA_DIR` | Directory for `dota.db` and the JSON seed files | `./data` | No |
+| `DOTA_THEMER_S3_BUCKET` | S3 bucket for database snapshots (enables snapshot push/pull) | None | No |
+| `DOTA_THEMER_S3_PREFIX` | S3 key prefix for database snapshots | None | No |
 
 ### Discord Bot Permissions
 
