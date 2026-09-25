@@ -205,6 +205,7 @@ async def handle_vote_reaction(reaction, user, message_info, emoji):
     try:
         message = core.update_theme_feedback(theme_name, delta, theme_repo=THEME_REPO)
         logger.info(f"Feedback updated: {message}")
+        await refresh_suggestion_display(reaction.message, theme_name)
     except core.ThemeError as e:
         logger.warning(f"Failed to update feedback: {e}")
 
@@ -215,6 +216,18 @@ async def add_lock_reaction(reaction):
         await reaction.message.add_reaction("\U0001f512")
     except Exception:
         pass
+
+
+async def refresh_suggestion_display(message, theme_name):
+    """Best-effort edit of a suggestion message after a feedback update (#51).
+
+    A failed edit (deleted message, permissions) is logged, never raised,
+    so the vote that was already persisted is unaffected.
+    """
+    try:
+        await message.edit(content=render_suggestion_for_theme(theme_name))
+    except Exception as e:
+        logger.warning(f"Failed to update suggestion display: {e}")
 
 
 def build_heroes_list_text(theme_name):
@@ -256,6 +269,12 @@ async def on_reaction_remove(reaction, user):
     if message_info is None:
         return
 
+    await handle_vote_removal(reaction, user, message_info)
+
+
+async def handle_vote_removal(reaction, user, message_info):
+    """Apply a removed thumbs-up/down vote to the feedback score."""
+    message_id = reaction.message.id
     decision = VOTE_LOCK_POLICY.evaluate(SESSION_STATE, message_id=message_id)
     if not decision.allowed:
         return
@@ -279,6 +298,7 @@ async def on_reaction_remove(reaction, user):
     try:
         message = core.update_theme_feedback(theme_name, delta, theme_repo=THEME_REPO)
         logger.info(f"Feedback updated: {message}")
+        await refresh_suggestion_display(reaction.message, theme_name)
     except core.ThemeError as e:
         logger.warning(f"Failed to update feedback: {e}")
 
@@ -382,6 +402,21 @@ async def end_modification_session(message, thread_id):
         logger.warning(f"Failed to end modification session: {e}")
 
 
+def render_suggestion_for_theme(theme_name):
+    """Re-render a theme's suggestion text from the current store (#51)."""
+    themes = THEME_REPO.load_themes(include_hidden=True)
+    theme = next(t for t in themes if t["name"] == theme_name)
+    matching_heroes = core.get_heroes_by_ids(theme["hero_ids"], HERO_REPO.load_heroes())
+    matching_heroes.sort(key=lambda h: h["name"])
+    return presentation.render_theme_suggestion(
+        theme_name=theme["name"],
+        description=theme.get("description", ""),
+        heroes_display=core.format_hero_list(matching_heroes),
+        hero_count=len(matching_heroes),
+        feedback_score=theme.get("feedback_score", 0),
+    )
+
+
 async def refresh_original_suggestion(message, theme_name):
     """Re-render the original theme suggestion after a modification."""
     try:
@@ -389,19 +424,7 @@ async def refresh_original_suggestion(message, theme_name):
         if original_message is not None and SESSION_STATE.has_suggestion(
             original_message.id
         ):
-            themes = THEME_REPO.load_themes(include_hidden=True)
-            theme = next(t for t in themes if t["name"] == theme_name)
-            matching_heroes = core.get_heroes_by_ids(
-                theme["hero_ids"], HERO_REPO.load_heroes()
-            )
-            matching_heroes.sort(key=lambda h: h["name"])
-            new_response = presentation.render_theme_suggestion(
-                theme_name=theme["name"],
-                description=theme.get("description", ""),
-                heroes_display=core.format_hero_list(matching_heroes),
-                hero_count=len(matching_heroes),
-                feedback_score=theme.get("feedback_score", 0),
-            )
+            new_response = render_suggestion_for_theme(theme_name)
             await original_message.edit(content=new_response)
     except Exception as e:
         logger.warning(f"Failed to update original message: {e}")
