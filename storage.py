@@ -60,6 +60,14 @@ def _ensure_schema(conn):
     """)
 
 
+def _log_save_size(theme_count, size_kib):
+    """Log the database size after a save (single source for the message)."""
+    import logging_config
+
+    logger = logging_config.get_logger("storage")
+    logger.info(f"Saved {theme_count} themes; database size: {size_kib:.1f} KiB")
+
+
 class SqliteHeroRepository:
     """Hero persistence backed by a SQLite table."""
 
@@ -139,6 +147,8 @@ class SqliteThemeRepository:
             raise
         finally:
             conn.close()
+        size_kib = self.db_path.stat().st_size / 1024
+        _log_save_size(len(themes), size_kib)
 
 
 def _parse_dt(value):

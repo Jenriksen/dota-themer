@@ -80,6 +80,18 @@ class TestSqliteThemeRepository(unittest.TestCase):
             [dict(THEME, is_hidden=False, feedback_score=0)],
         )
 
+    def test_save_logs_db_size_in_kilobytes(self):
+        """A save logs the resulting database size in KiB (#54 request)."""
+        import logging
+
+        with self.assertLogs("storage", level="INFO") as captured:
+            self.repo.save_themes([THEME])
+        messages = [record.getMessage() for record in captured.records]
+        size_lines = [m for m in messages if "KiB" in m]
+        self.assertEqual(len(size_lines), 1)
+        expected_kib = self.db_path.stat().st_size / 1024
+        self.assertIn(f"{expected_kib:.1f} KiB", size_lines[0])
+
     def test_load_applies_json_repository_defaults(self):
         """Loaded themes get is_hidden=False and feedback_score=0 defaults."""
         self.repo.save_themes([{"name": "T1"}])
