@@ -273,3 +273,21 @@ class TestStorageWiring(unittest.TestCase):
         content = read_bot_file()
         self.assertIn("snapshot.pull_snapshot(", content)
         self.assertIn("SnapshottingThemeRepository(", content)
+
+
+class TestOriginalMessageLookup(unittest.TestCase):
+    """Regression guards for #50: channel ids must never be message ids."""
+
+    def test_no_fetch_message_with_parent_id(self):
+        """bot.py never passes parent_id to fetch_message."""
+        content = read_bot_file()
+        self.assertNotIn(
+            "fetch_message(\n                message.channel.parent_id", content
+        )
+        self.assertNotIn("fetch_message(message.channel.parent_id)", content)
+
+    def test_original_message_fetched_via_tracked_id(self):
+        """fetch_original_message resolves the stored message id."""
+        content = read_bot_file()
+        self.assertIn("async def fetch_original_message(", content)
+        self.assertIn('parent.fetch_message(thread_info["message_id"])', content)
