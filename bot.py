@@ -344,6 +344,20 @@ async def on_message(message):
     )
 
 
+async def fetch_original_message(message):
+    """Fetch the original suggestion message tracked for this thread.
+
+    The thread's parent_id is a channel, not a message; the suggestion's
+    message id is tracked in session state when the thread is registered
+    (#50: passing parent_id to fetch_message raised 10008 Unknown Message).
+    """
+    thread_info = SESSION_STATE.get_thread(thread_id=message.channel.id)
+    if thread_info is None:
+        return None
+    parent = await bot.fetch_channel(message.channel.parent_id)
+    return await parent.fetch_message(thread_info["message_id"])
+
+
 async def end_modification_session(message, thread_id):
     """End a modification session: confirm, archive, restore reactions."""
     try:
@@ -354,20 +368,16 @@ async def end_modification_session(message, thread_id):
         except Exception as e:
             logger.warning(f"Failed to archive thread {thread_id}: {e}")
 
+        original_message = await fetch_original_message(message)
         SESSION_STATE.remove_thread(thread_id)
-
-        try:
-            original_message = await message.channel.fetch_message(
-                message.channel.parent_id
-            )
-            if SESSION_STATE.has_suggestion(original_message.id):
-                try:
-                    await original_message.clear_reaction("\u2705")
-                    await original_message.add_reaction("\u2753")
-                except Exception as e:
-                    logger.warning(f"Failed to restore \u2753 reaction: {e}")
-        except Exception:
-            pass
+        if original_message is not None and SESSION_STATE.has_suggestion(
+            original_message.id
+        ):
+            try:
+                await original_message.clear_reaction("\u2705")
+                await original_message.add_reaction("\u2753")
+            except Exception as e:
+                logger.warning(f"Failed to restore \u2753 reaction: {e}")
     except Exception as e:
         logger.warning(f"Failed to end modification session: {e}")
 
@@ -375,10 +385,10 @@ async def end_modification_session(message, thread_id):
 async def refresh_original_suggestion(message, theme_name):
     """Re-render the original theme suggestion after a modification."""
     try:
-        original_message = await message.channel.fetch_message(
-            message.channel.parent_id
-        )
-        if SESSION_STATE.has_suggestion(original_message.id):
+        original_message = await fetch_original_message(message)
+        if original_message is not None and SESSION_STATE.has_suggestion(
+            original_message.id
+        ):
             themes = THEME_REPO.load_themes(include_hidden=True)
             theme = next(t for t in themes if t["name"] == theme_name)
             matching_heroes = core.get_heroes_by_ids(
