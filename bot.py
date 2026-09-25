@@ -28,7 +28,9 @@ logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 _snapshot_config = storage.build_snapshot_config()
 if _snapshot_config is not None:
     snapshot.pull_snapshot(_snapshot_config.db_path, _snapshot_config)
-_hero_repo, _theme_repo = storage.create_repositories(core.DATA_DIR)
+_data_dir = core.resolve_data_dir()
+_db_path = _data_dir / snapshot.DB_FILENAME
+_hero_repo, _theme_repo = storage.create_repositories(_data_dir)
 
 
 def _maybe_wrap_snapshots(repo):
@@ -50,7 +52,7 @@ HERO_RESOLVER = core.HeroResolver(HERO_REPO)
 # Session state: theme suggestions and active modification threads (R5a),
 # persisted to SQLite so tracking survives restarts (#52).
 SESSION_STATE = session_state.SessionState(
-    persistence=storage.SqliteSessionStore(core.DATA_DIR / snapshot.DB_FILENAME)
+    persistence=storage.SqliteSessionStore(_db_path)
 )
 VOTE_LOCK_POLICY = session_state.VoteLockPolicy()
 
