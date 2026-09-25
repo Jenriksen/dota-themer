@@ -11,6 +11,7 @@ import sqlite3
 from pathlib import Path
 
 import core
+import snapshot
 
 
 def _connect(db_path):
@@ -149,6 +150,21 @@ def create_repositories(data_dir):
         migrate_json_to_sqlite(data_dir, db_path)
         return SqliteHeroRepository(db_path), SqliteThemeRepository(db_path)
     raise ValueError(f"Unknown storage backend: {backend!r}. Use 'json' or 'sqlite'.")
+
+
+def build_snapshot_config():
+    """Return the S3 snapshot config, or None when S3 is not configured.
+
+    All configuration comes from the environment so deployments can be
+    rendered as IaC; an unconfigured environment keeps local debugging
+    fully functional (json backend, no S3 traffic).
+    """
+    if not os.environ.get("DOTA_THEMER_S3_BUCKET"):
+        return None
+    return snapshot.SnapshotConfig.from_env(
+        Path(os.environ.get("DOTA_THEMER_DATA_DIR", str(core.DATA_DIR)))
+        / snapshot.DB_FILENAME
+    )
 
 
 class SnapshottingThemeRepository:
