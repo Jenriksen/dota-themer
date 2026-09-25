@@ -82,3 +82,8 @@ logs/
 
 # Mypy
 .mypy_cache/
+# SQLite database (generated at runtime, #34)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

@@ -26,9 +26,8 @@ logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 # invalidate the theme cache on save (R1d). Backend is selected via
 # DOTA_THEMER_BACKEND=json|sqlite (#34); S3 snapshot push/pull is
 # enabled by DOTA_THEMER_S3_BUCKET.
-_snapshot_config = None
-if os.environ.get("DOTA_THEMER_S3_BUCKET"):
-    _snapshot_config = snapshot.SnapshotConfig.from_env(core.DATA_DIR / "dota.db")
+_snapshot_config = storage.build_snapshot_config()
+if _snapshot_config is not None:
     snapshot.pull_snapshot(_snapshot_config.db_path, _snapshot_config)
 _hero_repo, _theme_repo = storage.create_repositories(core.DATA_DIR)
 

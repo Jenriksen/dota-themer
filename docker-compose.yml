@@ -17,6 +17,14 @@ services:
       # S3 snapshots (optional): pull at startup, push after every save
       - DOTA_THEMER_S3_BUCKET=${DOTA_THEMER_S3_BUCKET:-}
       - DOTA_THEMER_S3_PREFIX=${DOTA_THEMER_S3_PREFIX:-}
+      # AWS credentials pass through for the S3 snapshot client (IaC:
+      # everything is env-configurable; unset means boto3 falls back to
+      # its default chain - IAM role, ~/.aws, etc.)
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
+      - AWS_REGION=${AWS_REGION:-}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - LOG_FORMAT=${LOG_FORMAT:-json}
       - LOG_FILE=/app/logs/dota-themer.log
