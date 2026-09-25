@@ -177,8 +177,8 @@ dota-themer/
 ├── requirements.txt        # Python dependencies
 ├── .env.example            # Example environment variables
 └── data/
-    ├── heroes.json          # Hero definitions (120 heroes)
-    └── themes.json          # Theme definitions (52 themes)
+    ├── heroes.json          # Hero definitions (120 heroes, seed data)
+    └── themes.json          # Theme definitions (52 themes, seed data)
 └── scripts/
     └── pre-commit-hook.sh   # Git pre-commit hook for Black formatting
 ```
@@ -522,7 +522,7 @@ python -m unittest test_core
 ```
 
 **JSON decode errors:**
-Ensure your data files (`data/heroes.json`, `data/themes.json`) are valid JSON. You can validate them at [jsonlint.com](https://jsonlint.com).
+The JSON seed files (`data/heroes.json`, `data/themes.json`) are imported into `data/dota.db` on first use; a decode error at startup means one of them is malformed. You can validate them at [jsonlint.com](https://jsonlint.com).
 
 **All tests pass but bot doesn't connect:**
 - Verify your Discord token is correct

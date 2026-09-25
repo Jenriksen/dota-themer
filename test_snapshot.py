@@ -161,44 +161,29 @@ class TestLocalDebugDefaults(unittest.TestCase):
         import os
 
         for var in (
-            "DOTA_THEMER_BACKEND",
             "DOTA_THEMER_S3_BUCKET",
             "DOTA_THEMER_S3_PREFIX",
         ):
             os.environ.pop(var, None)
 
-    def test_no_env_means_json_backend_no_s3(self):
-        """Bare environment: json repositories, no snapshot config."""
+    def test_no_env_means_sqlite_backend_no_s3(self):
+        """Bare environment: sqlite repositories, no snapshot config."""
         import storage
 
         self._clear_env()
-        hero_repo, theme_repo = storage.create_repositories(Path(self.tmp.name))
-        self.assertIsInstance(hero_repo, core.FileHeroRepository)
-        self.assertIsInstance(theme_repo, core.FileThemeRepository)
-        self.assertIsNone(storage.build_snapshot_config())
-
-    def test_sqlite_without_bucket_has_no_snapshot(self):
-        """sqlite backend without S3 config works and skips snapshots."""
-        import os
-
-        import storage
-
-        self._clear_env()
-        os.environ["DOTA_THEMER_BACKEND"] = "sqlite"
         hero_repo, theme_repo = storage.create_repositories(Path(self.tmp.name))
         self.assertIsInstance(hero_repo, storage.SqliteHeroRepository)
+        self.assertIsInstance(theme_repo, storage.SqliteThemeRepository)
         self.assertIsNone(storage.build_snapshot_config())
 
-    def test_bad_backend_fails_fast_with_clear_message(self):
-        """A typo'd backend name raises immediately, not at first query."""
+    def test_backend_env_variable_is_ignored(self):
+        """DOTA_THEMER_BACKEND no longer selects a backend (#52)."""
         import os
 
         import storage
 
         self._clear_env()
         os.environ["DOTA_THEMER_BACKEND"] = "sqllite"
-        with self.assertRaises(ValueError) as ctx:
-            storage.create_repositories(Path(self.tmp.name))
-        self.assertIn("sqllite", str(ctx.exception))
-        self.assertIn("json", str(ctx.exception))
-        self.assertIn("sqlite", str(ctx.exception))
+        hero_repo, theme_repo = storage.create_repositories(Path(self.tmp.name))
+        self.assertIsInstance(hero_repo, storage.SqliteHeroRepository)
+        self.assertIsInstance(theme_repo, storage.SqliteThemeRepository)

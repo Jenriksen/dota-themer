@@ -23,9 +23,8 @@ import thread_commands
 logger = logging_config.get_logger(logging_config.LOGGER_BOT)
 
 # Repository singletons: load data once per process, cache reads,
-# invalidate the theme cache on save (R1d). Backend is selected via
-# DOTA_THEMER_BACKEND=json|sqlite (#34); S3 snapshot push/pull is
-# enabled by DOTA_THEMER_S3_BUCKET.
+# invalidate the theme cache on save (R1d). SQLite is the only storage
+# backend (#52); S3 snapshot push/pull is enabled by DOTA_THEMER_S3_BUCKET.
 _snapshot_config = storage.build_snapshot_config()
 if _snapshot_config is not None:
     snapshot.pull_snapshot(_snapshot_config.db_path, _snapshot_config)
@@ -48,8 +47,11 @@ HERO_REPO = core.CachedHeroRepository(_hero_repo)
 THEME_REPO = core.CachedThemeRepository(_maybe_wrap_snapshots(_theme_repo))
 HERO_RESOLVER = core.HeroResolver(HERO_REPO)
 
-# Session state: theme suggestions and active modification threads (R5a)
-SESSION_STATE = session_state.SessionState()
+# Session state: theme suggestions and active modification threads (R5a),
+# persisted to SQLite so tracking survives restarts (#52).
+SESSION_STATE = session_state.SessionState(
+    persistence=storage.SqliteSessionStore(core.DATA_DIR / snapshot.DB_FILENAME)
+)
 VOTE_LOCK_POLICY = session_state.VoteLockPolicy()
 
 # Configure bot
