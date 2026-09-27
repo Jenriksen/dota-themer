@@ -16,8 +16,6 @@ OPENDOTA_HEROSTATS_URL = "https://api.opendota.com/api/heroStats"
 USER_AGENT = "dota-themer/1.0 (https://github.com/Jenriksen/dota-themer)"
 REQUEST_TIMEOUT_SECONDS = 15
 
-WINRATE_REFRESH_WEEKS = 1
-
 # heroStats uses legacy localized names for some heroes; map them to the
 # current local display names so winrate lookups succeed.
 HEROSTATS_NAME_ALIASES = {

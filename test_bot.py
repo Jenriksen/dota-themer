@@ -114,7 +114,7 @@ class TestWinrateRefresh(unittest.TestCase):
     def test_starts_weekly_refresh_loop(self):
         bot_content = read_bot_file()
         self.assertIn("winrate_refresh_task.start()", bot_content)
-        self.assertIn("@tasks.loop(weeks=", bot_content)
+        self.assertIn("@tasks.loop(hours=7 * 24)", bot_content)
 
     def test_refresh_failure_does_not_crash_startup(self):
         """refresh_winrates swallows OpenDota errors, so on_ready is safe."""

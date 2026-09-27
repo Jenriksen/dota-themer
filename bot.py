@@ -65,7 +65,7 @@ intents.reactions = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
-@tasks.loop(weeks=opendota_client.WINRATE_REFRESH_WEEKS)
+@tasks.loop(hours=7 * 24)  # Weekly (tasks.loop has no weeks parameter)
 async def winrate_refresh_task():
     """Refresh Turbo winrates from OpenDota weekly."""
     opendota_client.refresh_winrates(HERO_REPO)
