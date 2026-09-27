@@ -100,6 +100,38 @@ class TestBotCommands(unittest.TestCase):
         self.assertIn("**Heroes:**", presentation_content)
 
 
+class TestWinrateRefresh(unittest.TestCase):
+    """The bot refreshes Turbo winrates from OpenDota at startup and weekly."""
+
+    def test_imports_opendota_client(self):
+        bot_content = read_bot_file()
+        self.assertIn("import opendota_client", bot_content)
+
+    def test_refreshes_winrates_on_ready(self):
+        bot_content = read_bot_file()
+        self.assertIn("opendota_client.refresh_winrates(HERO_REPO)", bot_content)
+
+    def test_starts_weekly_refresh_loop(self):
+        bot_content = read_bot_file()
+        self.assertIn("winrate_refresh_task.start()", bot_content)
+        self.assertIn("@tasks.loop(hours=7 * 24)", bot_content)
+
+    def test_refresh_failure_does_not_crash_startup(self):
+        """refresh_winrates swallows OpenDota errors, so on_ready is safe."""
+        from unittest import mock
+
+        import opendota_client
+
+        repo = mock.MagicMock()
+        with mock.patch.object(
+            opendota_client,
+            "fetch_hero_stats",
+            side_effect=opendota_client.OpenDotaError("down"),
+        ):
+            result = opendota_client.refresh_winrates(repo)
+        self.assertIsNone(result)
+
+
 class TestErrorHandling(unittest.TestCase):
     """Tests for error handling in bot."""
 

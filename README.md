@@ -550,7 +550,7 @@ MIT License
 
 ---
 
-**Current Version:** 1.1.0  
+**Current Version:** 1.2.0  
 **Heroes:** 127 (complete Dota 2 roster)  
 **Themes:** 52  
-**Tests:** 273
+**Tests:** 292

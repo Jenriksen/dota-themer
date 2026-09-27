@@ -135,5 +135,41 @@ class TestLocalDataAgainstStructure(unittest.TestCase):
         self.assertEqual(duplicates, [])
 
 
+FIXTURES_DIR = Path(__file__).parent / "tests" / "fixtures"
+HEROES_FIXTURE = FIXTURES_DIR / "opendota_heroes.json"
+HEROSTATS_FIXTURE = FIXTURES_DIR / "opendota_herostats.json"
+
+
+class TestOfflineFixtureDrift(unittest.TestCase):
+    """The pinned API fixture and the repo hero data must agree offline.
+
+    This is the CI-side drift guard (#56 Step 3): no network access,
+    the fixture pins the roster the data was last synced against.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.api_heroes = json.loads(HEROES_FIXTURE.read_text(encoding="utf-8"))
+        cls.local_heroes = json.loads(
+            (Path(__file__).parent / "data" / "heroes.json").read_text(encoding="utf-8")
+        )
+
+    def test_local_roster_matches_pinned_fixture(self):
+        """No drift between data/heroes.json and the pinned API fixture."""
+        report = load_script_module().compare_heroes(self.local_heroes, self.api_heroes)
+        self.assertEqual(report["missing_locally"], [], format_report_drift(report))
+        self.assertEqual(report["not_in_api"], [], format_report_drift(report))
+
+    def test_seed_data_has_no_winrates(self):
+        """Winrates are runtime-fetched only; the seed must not carry them."""
+        stale = [h["name"] for h in self.local_heroes if "turbo_winrate" in h]
+        self.assertEqual(stale, [])
+
+
+def format_report_drift(report):
+    script = load_script_module()
+    return script.format_report(report)
+
+
 if __name__ == "__main__":
     unittest.main()

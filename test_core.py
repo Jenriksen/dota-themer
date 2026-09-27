@@ -9,7 +9,7 @@ import sys
 import unittest
 from io import StringIO
 from pathlib import Path
-from unittest.mock import mock_open, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 import core
 
@@ -106,7 +106,7 @@ class TestFormatHeroList(unittest.TestCase):
         """Single hero formatted correctly."""
         heroes = [{"name": "Axe", "positions": [3, 4]}]
         result = core.format_hero_list(heroes)
-        self.assertEqual(result, "Axe (3,4)")
+        self.assertEqual(result, "- Axe (pos 3,4)")
 
     def test_formats_multiple_heroes(self):
         """Multiple heroes joined with comma and space."""
@@ -115,12 +115,60 @@ class TestFormatHeroList(unittest.TestCase):
             {"name": "Bane", "positions": [4, 5]},
         ]
         result = core.format_hero_list(heroes)
-        self.assertEqual(result, "Axe (3,4), Bane (4,5)")
+        self.assertEqual(result, "- Axe (pos 3,4)\n- Bane (pos 4,5)")
 
     def test_empty_list_returns_empty_string(self):
         """Empty hero list returns empty string."""
         result = core.format_hero_list([])
         self.assertEqual(result, "")
+
+
+class TestCachedHeroRepository(unittest.TestCase):
+    """CachedHeroRepository invalidates its cache on save_heroes."""
+
+    def test_save_heroes_invalidates_cache(self):
+        import core as core_mod
+
+        stored = [{"id": "axe", "name": "Axe"}]
+        delegate = MagicMock()
+        delegate.load_heroes.side_effect = lambda: stored
+        delegate.save_heroes.side_effect = lambda heroes: stored.__setitem__(
+            slice(None), heroes
+        )
+        repo = core_mod.CachedHeroRepository(delegate)
+        first = repo.load_heroes()
+        self.assertIs(first, repo.load_heroes())
+        repo.save_heroes([{"id": "axe", "name": "Axe", "turbo_winrate": 51.0}])
+        second = repo.load_heroes()
+        self.assertEqual(second[0].get("turbo_winrate"), 51.0)
+
+
+class TestFormatHeroListWinrate(unittest.TestCase):
+    """format_hero_list renders one hero per line with positions and winrate."""
+
+    def test_single_hero_line_with_winrate(self):
+        """Single hero renders as '- Name (pos 3,4) - winrate 52.1%'."""
+        heroes = [{"name": "Axe", "positions": [3, 4], "turbo_winrate": 52.1}]
+        result = core.format_hero_list(heroes)
+        self.assertEqual(result, "- Axe (pos 3,4) - winrate 52.1%")
+
+    def test_multiple_heroes_one_per_line(self):
+        """Multiple heroes render as a markdown bullet list, one per line."""
+        heroes = [
+            {"name": "Alchemist", "positions": [1, 3], "turbo_winrate": 52.0},
+            {"name": "Tinker", "positions": [1, 2], "turbo_winrate": 45.3},
+        ]
+        result = core.format_hero_list(heroes)
+        self.assertEqual(
+            result,
+            "- Alchemist (pos 1,3) - winrate 52.0%\n- Tinker (pos 1,2) - winrate 45.3%",
+        )
+
+    def test_hero_without_winrate_omits_winrate_segment(self):
+        """Heroes lacking turbo_winrate render without the winrate segment."""
+        heroes = [{"name": "Axe", "positions": [3, 4]}]
+        result = core.format_hero_list(heroes)
+        self.assertEqual(result, "- Axe (pos 3,4)")
 
 
 class TestSelectTheme(unittest.TestCase):
@@ -207,9 +255,9 @@ class TestGetThemeSuggestion(unittest.TestCase):
     def test_hero_count_matches_heroes_list(self):
         """hero_count matches the number of heroes in the formatted list."""
         result = core.get_theme_suggestion()
-        # Count commas in heroes string + 1 (unless empty)
+        # Count hero lines in the line-based heroes string (unless empty)
         if result["heroes"]:
-            hero_count_from_string = result["heroes"].count(", ") + 1
+            hero_count_from_string = len(result["heroes"].splitlines())
             self.assertEqual(result["hero_count"], hero_count_from_string)
         else:
             self.assertEqual(result["hero_count"], 0)
@@ -410,14 +458,14 @@ class TestEdgeCases(unittest.TestCase):
         """Hero names with special characters are formatted correctly."""
         heroes = [{"name": "Anti-Mage", "positions": [1, 2]}]
         result = core.format_hero_list(heroes)
-        self.assertEqual(result, "Anti-Mage (1,2)")
+        self.assertEqual(result, "- Anti-Mage (pos 1,2)")
 
     def test_format_hero_list_with_multi_digit_positions(self):
         """Positions like 10 would break display - but positions are only 1-5."""
         # This tests the display logic doesn't break with edge case data
         heroes = [{"name": "Test", "positions": [1, 2, 3, 4, 5]}]
         result = core.format_hero_list(heroes)
-        self.assertEqual(result, "Test (1,2,3,4,5)")
+        self.assertEqual(result, "- Test (pos 1,2,3,4,5)")
 
     def test_select_theme_empty_list(self):
         """select_theme with empty themes list raises IndexError."""
@@ -548,13 +596,13 @@ class TestEmptyAndNullData(unittest.TestCase):
         """Hero with empty positions list has empty display."""
         hero = {"name": "Test", "positions": []}
         result = core.format_hero_list([hero])
-        self.assertEqual(result, "Test ()")
+        self.assertEqual(result, "- Test (pos )")
 
     def test_hero_with_single_position(self):
         """Hero with single position formatted without comma."""
         hero = {"name": "Test", "positions": [1]}
         result = core.format_hero_list([hero])
-        self.assertEqual(result, "Test (1)")
+        self.assertEqual(result, "- Test (pos 1)")
 
 
 class TestInvalidInputs(unittest.TestCase):

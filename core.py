@@ -99,6 +99,11 @@ class CachedHeroRepository:
             self._cache = self.delegate.load_heroes()
         return self._cache
 
+    def save_heroes(self, heroes):
+        """Persist heroes and invalidate the cache so loads see new data."""
+        self.delegate.save_heroes(heroes)
+        self._cache = None
+
 
 class CachedThemeRepository:
     """Theme repository wrapper that caches loads and invalidates on save."""
@@ -176,10 +181,21 @@ def get_positions_display(positions):
 
 
 def format_hero_list(heroes):
-    """Format a list of heroes with their positions in parentheses."""
-    return ", ".join(
-        f"{h['name']} ({get_positions_display(h['positions'])})" for h in heroes
-    )
+    """Format heroes as a line-based list with positions and turbo winrate.
+
+    Each hero renders on its own line as a markdown bullet:
+        - Axe (pos 3,4) - winrate 51.2%
+
+    The winrate segment is omitted for heroes without turbo_winrate data.
+    """
+    lines = []
+    for hero in heroes:
+        line = f"- {hero['name']} (pos {get_positions_display(hero['positions'])})"
+        winrate = hero.get("turbo_winrate")
+        if winrate is not None:
+            line += f" - winrate {winrate:.1f}%"
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def has_position_coverage(heroes, positions_needed={1, 2, 3, 4, 5}):
@@ -1172,7 +1188,7 @@ def main():
     output = f"Theme: {suggestion['theme']}"
     if suggestion["description"]:
         output += f"\nDescription: {suggestion['description']}"
-    output += f"\nHeroes: {suggestion['heroes']}"
+    output += "\nHeroes: \n" + suggestion["heroes"]
     output += f"\n({suggestion['hero_count']} heroes match this theme)"
 
     print(output)

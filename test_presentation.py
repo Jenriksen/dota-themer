@@ -13,7 +13,7 @@ class TestRenderThemeSuggestion(unittest.TestCase):
         msg = presentation.render_theme_suggestion(
             theme_name="Undead Heroes",
             description="Undead or skeletal heroes",
-            heroes_display="Abaddon (3,4), Undying (3,4,5)",
+            heroes_display="- Abaddon (pos 3,4) - winrate 51.2%\n- Undying (pos 3,4,5) - winrate 52.0%",
             hero_count=2,
             feedback_score=5,
         )
@@ -21,7 +21,9 @@ class TestRenderThemeSuggestion(unittest.TestCase):
             msg,
             "**Theme:** Undead Heroes\n"
             "**Description:** Undead or skeletal heroes\n"
-            "**Heroes:** Abaddon (3,4), Undying (3,4,5)\n"
+            "**Heroes:**\n"
+            "- Abaddon (pos 3,4) - winrate 51.2%\n"
+            "- Undying (pos 3,4,5) - winrate 52.0%\n"
             "**Feedback:** 5 \U0001f44d\U0001f44e\n"
             "*(2 heroes match this theme)*\n"
             "\n"
