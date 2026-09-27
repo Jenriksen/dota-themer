@@ -177,10 +177,12 @@ dota-themer/
 ├── requirements.txt        # Python dependencies
 ├── .env.example            # Example environment variables
 └── data/
-    ├── heroes.json          # Hero definitions (120 heroes, seed data)
+    ├── heroes.json          # Hero definitions (127 heroes, seed data)
     └── themes.json          # Theme definitions (52 themes, seed data)
 └── scripts/
-    └── pre-commit-hook.sh   # Git pre-commit hook for Black formatting
+    ├── pre-commit-hook.sh   # Git pre-commit hook for Black formatting
+│   ├── compare_opendota.py  # Validates heroes.json against the OpenDota API
+│   └── check_version.py     # Version consistency check for PRs
 ```
 
 ## Development Setup
@@ -548,7 +550,7 @@ MIT License
 
 ---
 
-**Current Version:** 1.0.1  
-**Heroes:** 120 (complete Dota 2 roster)  
+**Current Version:** 1.1.0  
+**Heroes:** 127 (complete Dota 2 roster)  
 **Themes:** 52  
-**Tests:** 140
+**Tests:** 273
