@@ -28,7 +28,8 @@ def render_theme_suggestion(
     lines = [f"**Theme:** {theme_name}"]
     if description:
         lines.append(f"**Description:** {description}")
-    lines.append(f"**Heroes:** {heroes_display}")
+    lines.append(f"**Heroes:**")
+    lines.append(heroes_display)
     lines.append(f"**Feedback:** {feedback_score} {UP_VOTE}{DOWN_VOTE}")
     lines.append(f"*({hero_count} heroes match this theme)*")
     lines.append("")

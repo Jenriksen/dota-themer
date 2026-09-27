@@ -13,6 +13,7 @@ from discord.ext import commands, tasks
 import __version__
 import core
 import logging_config
+import opendota_client
 import presentation
 import session_state
 import snapshot
@@ -64,6 +65,12 @@ intents.reactions = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
+@tasks.loop(weeks=opendota_client.WINRATE_REFRESH_WEEKS)
+async def winrate_refresh_task():
+    """Refresh Turbo winrates from OpenDota weekly."""
+    opendota_client.refresh_winrates(HERO_REPO)
+
+
 @tasks.loop(seconds=60)  # Check every minute
 async def cleanup_task():
     """Clean up inactive modification threads after 10 minutes of inactivity."""
@@ -100,6 +107,9 @@ async def on_ready():
         activity=discord.Game(name="Type !helptheme to get started")
     )
 
+    # Refresh Turbo winrates from OpenDota, then keep them fresh weekly
+    opendota_client.refresh_winrates(HERO_REPO)
+    winrate_refresh_task.start()
     # Start background task for thread cleanup
     cleanup_task.start()
 
