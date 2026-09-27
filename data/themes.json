@@ -14,6 +14,7 @@
       "gyrocopter",
       "hoodwink",
       "juggernaut",
+      "kez",
       "luna",
       "medusa",
       "meepo",
@@ -47,10 +48,11 @@
       "beastmaster",
       "chen",
       "enchantress",
-      "natures_prophet",
+      "largo",
       "lone_druid",
       "lycan",
-      "meepo"
+      "meepo",
+      "natures_prophet"
     ]
   },
   {
@@ -74,8 +76,9 @@
       "abaddon",
       "antimage",
       "doombringer",
-      "shadow_fiend",
+      "enigma",
       "night_stalker",
+      "shadow_fiend",
       "spectre",
       "terrorblade"
     ]
@@ -138,9 +141,10 @@
       "earthshaker",
       "magnataur",
       "meepo",
+      "primal_beast",
       "sven",
-      "tiny",
       "tidehunter",
+      "tiny",
       "wraith_king"
     ]
   },
@@ -164,11 +168,12 @@
     "description": "Heroes with predominantly green color schemes",
     "hero_ids": [
       "clinkz",
-      "natures_prophet",
       "invoker",
+      "largo",
       "leshrac",
       "lycan",
       "naga_siren",
+      "natures_prophet",
       "treant",
       "venomancer"
     ]
@@ -204,6 +209,7 @@
       "legion_commander",
       "life_stealer",
       "ogre_magi",
+      "primal_beast",
       "shadow_demon",
       "slardar",
       "tidehunter",
@@ -256,19 +262,21 @@
     "name": "Masked Heroes",
     "description": "Heroes that wear masks",
     "hero_ids": [
+      "batrider",
       "bounty_hunter",
       "clinkz",
-      "rattletrap",
       "dark_seer",
       "grimstroke",
       "hoodwink",
       "invoker",
       "juggernaut",
+      "kez",
       "monkey_king",
       "morphling",
       "night_stalker",
       "outworld_devourer",
       "pudge",
+      "rattletrap",
       "snapfire"
     ]
   },
@@ -284,32 +292,37 @@
       "bristleback",
       "centaur",
       "chaos_knight",
-      "rattletrap",
       "dawnbreaker",
       "doombringer",
       "dragon_knight",
       "earthshaker",
       "elder_titan",
+      "faceless_void",
       "huskar",
       "juggernaut",
+      "kez",
       "kunkka",
+      "largo",
       "legion_commander",
       "life_stealer",
       "lone_druid",
       "magnataur",
+      "marci",
       "mars",
       "night_stalker",
       "nyx_assassin",
       "omniknight",
+      "primal_beast",
       "pudge",
+      "rattletrap",
       "sand_king",
-      "timbersaw",
       "slardar",
       "snapfire",
       "spirit_breaker",
       "storm_spirit",
       "sven",
       "tidehunter",
+      "timbersaw",
       "tiny",
       "treant",
       "troll_warlord",
@@ -348,9 +361,11 @@
     "description": "Heroes wearing glasses or with vision-related lore",
     "hero_ids": [
       "dazzle",
+      "enigma",
+      "faceless_void",
       "keeper_of_the_light",
-      "zuus",
-      "lina"
+      "lina",
+      "zuus"
     ]
   },
   {
@@ -359,6 +374,8 @@
     "hero_ids": [
       "death_prophet",
       "disruptor",
+      "enigma",
+      "faceless_void",
       "pugna",
       "shadow_demon",
       "silencer",
@@ -396,6 +413,7 @@
       "drow_ranger",
       "ember_spirit",
       "enchantress",
+      "enigma",
       "gyrocopter",
       "jakiro",
       "keeper_of_the_light",
@@ -436,6 +454,7 @@
       "juggernaut",
       "life_stealer",
       "phoenix",
+      "primal_beast",
       "queenofpain",
       "shadow_fiend",
       "vengefulspirit"
@@ -445,11 +464,12 @@
     "name": "Rides a Steed",
     "description": "Heroes that ride mounts or animals into battle",
     "hero_ids": [
+      "batrider",
+      "chaos_knight",
+      "dragon_knight",
       "keeper_of_the_light",
       "snapfire",
-      "spirit_breaker",
-      "chaos_knight",
-      "dragon_knight"
+      "spirit_breaker"
     ]
   },
   {
@@ -463,25 +483,27 @@
       "bristleback",
       "centaur",
       "chaos_knight",
-      "rattletrap",
       "dawnbreaker",
       "doombringer",
       "dragon_knight",
       "earthshaker",
       "huskar",
       "kunkka",
+      "largo",
       "legion_commander",
       "life_stealer",
       "magnataur",
       "night_stalker",
       "omniknight",
+      "primal_beast",
       "pudge",
+      "rattletrap",
       "sand_king",
-      "timbersaw",
       "slardar",
       "spirit_breaker",
       "sven",
       "tidehunter",
+      "timbersaw",
       "tiny",
       "treant",
       "troll_warlord",
@@ -524,10 +546,12 @@
       "dragon_knight",
       "gyrocopter",
       "jakiro",
+      "kez",
       "kunkka",
       "lone_druid",
       "lycan",
       "naga_siren",
+      "primal_beast",
       "queenofpain",
       "riki",
       "shadow_demon",
@@ -556,9 +580,12 @@
     "description": "Heroes that show their teeth prominently",
     "hero_ids": [
       "bloodseeker",
+      "largo",
       "legion_commander",
+      "marci",
       "phantom_assassin",
       "phantom_lancer",
+      "primal_beast",
       "razor",
       "slardar",
       "tidehunter"
@@ -596,28 +623,31 @@
     "name": "Has a Hat",
     "description": "Heroes that wear fabulous hats",
     "hero_ids": [
-      "crystal_maiden",
-      "lina",
-      "zuus",
-      "keeper_of_the_light",
-      "dazzle",
-      "oracle",
+      "batrider",
       "chen",
-      "warlock"
+      "crystal_maiden",
+      "dazzle",
+      "keeper_of_the_light",
+      "largo",
+      "lina",
+      "oracle",
+      "warlock",
+      "zuus"
     ]
   },
   {
     "name": "Bald Heroes",
     "description": "Heroes with no hair at all",
     "hero_ids": [
-      "juggernaut",
       "antimage",
-      "phantom_assassin",
-      "vengefulspirit",
-      "wraith_king",
-      "sven",
       "earthshaker",
-      "omniknight"
+      "faceless_void",
+      "juggernaut",
+      "omniknight",
+      "phantom_assassin",
+      "sven",
+      "vengefulspirit",
+      "wraith_king"
     ]
   },
   {
@@ -660,13 +690,15 @@
     "name": "Scary Faces",
     "description": "Heroes with terrifying visages",
     "hero_ids": [
+      "abaddon",
       "doombringer",
+      "enigma",
+      "faceless_void",
+      "life_stealer",
+      "night_stalker",
+      "shadow_demon",
       "shadow_fiend",
       "terrorblade",
-      "abaddon",
-      "life_stealer",
-      "shadow_demon",
-      "night_stalker",
       "undying"
     ]
   },
@@ -685,13 +717,14 @@
     "name": "Fire Themed",
     "description": "Heroes associated with fire and flames",
     "hero_ids": [
-      "ember_spirit",
-      "phoenix",
+      "batrider",
       "doombringer",
-      "jakiro",
-      "ogre_magi",
       "dragon_knight",
+      "ember_spirit",
+      "jakiro",
       "lina",
+      "ogre_magi",
+      "phoenix",
       "zuus"
     ]
   },
@@ -724,13 +757,14 @@
     "name": "Has a Sword",
     "description": "Heroes that wield swords",
     "hero_ids": [
+      "chaos_knight",
+      "dragon_knight",
       "juggernaut",
+      "kez",
+      "kunkka",
       "legion_commander",
       "phantom_assassin",
       "sven",
-      "kunkka",
-      "chaos_knight",
-      "dragon_knight",
       "templar_assassin",
       "troll_warlord"
     ]
@@ -753,13 +787,14 @@
     "name": "Flying Heroes",
     "description": "Heroes that can fly or have flight abilities",
     "hero_ids": [
-      "gyrocopter",
-      "phoenix",
-      "windranger",
+      "batrider",
       "drow_ranger",
+      "gyrocopter",
       "medusa",
       "morphling",
-      "queenofpain"
+      "phoenix",
+      "queenofpain",
+      "windranger"
     ]
   },
   {
@@ -777,44 +812,48 @@
     "name": "Summoners",
     "description": "Heroes that can summon units",
     "hero_ids": [
-      "warlock",
       "beastmaster",
-      "enchantress",
+      "broodmother",
       "chen",
-      "natures_prophet",
+      "enchantress",
+      "enigma",
       "lone_druid",
       "lycan",
       "meepo",
-      "broodmother"
+      "natures_prophet",
+      "warlock"
     ]
   },
   {
     "name": "Healers",
     "description": "Heroes with healing abilities",
     "hero_ids": [
-      "dazzle",
-      "oracle",
-      "omniknight",
-      "chen",
       "abaddon",
-      "warlock",
-      "keeper_of_the_light"
+      "chen",
+      "dazzle",
+      "keeper_of_the_light",
+      "marci",
+      "omniknight",
+      "oracle",
+      "warlock"
     ]
   },
   {
     "name": "Tanky Heroes",
     "description": "Heroes that can take a beating",
     "hero_ids": [
+      "abaddon",
+      "alchemist",
+      "bristleback",
       "centaur",
+      "dragon_knight",
+      "marci",
+      "omniknight",
+      "primal_beast",
       "tidehunter",
       "timbersaw",
-      "bristleback",
-      "alchemist",
-      "dragon_knight",
-      "abaddon",
-      "omniknight",
-      "wraith_king",
-      "underlord"
+      "underlord",
+      "wraith_king"
     ]
   },
   {

@@ -219,6 +219,39 @@
     "aliases": []
   },
   {
+    "id": "batrider",
+    "name": "Batrider",
+    "primary_role": "Initiator",
+    "positions": [
+      3,
+      4
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "orange"
+      ],
+      "features": [
+        "bat",
+        "fire",
+        "firebomb",
+        "lasso"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": false
+    },
+    "aliases": [
+      "bat"
+    ]
+  },
+  {
     "id": "beastmaster",
     "name": "Beastmaster",
     "primary_role": "Initiator",
@@ -800,7 +833,7 @@
   },
   {
     "id": "doombringer",
-    "name": "Doom Bringer",
+    "name": "Doom",
     "primary_role": "Carry",
     "positions": [
       1,
@@ -1092,6 +1125,74 @@
       "has_sword": false
     },
     "aliases": ["prophet", "natures prophet", "natures"]
+  },
+  {
+    "id": "enigma",
+    "name": "Enigma",
+    "primary_role": "Initiator",
+    "positions": [
+      3,
+      4,
+      5
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "purple"
+      ],
+      "features": [
+        "void",
+        "black_hole",
+        "eidolons",
+        "space",
+        "mysterious"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    },
+    "aliases": []
+  },
+  {
+    "id": "faceless_void",
+    "name": "Faceless Void",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      3
+    ],
+    "visual_attributes": {
+      "colors": [
+        "purple",
+        "blue"
+      ],
+      "features": [
+        "void",
+        "time",
+        "chrono",
+        "mace",
+        "no_face"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    },
+    "aliases": [
+      "void",
+      "fv"
+    ]
   },
   {
     "id": "grimstroke",
@@ -1389,6 +1490,40 @@
     "aliases": ["KotL"]
   },
   {
+    "id": "kez",
+    "name": "Kez",
+    "primary_role": "Carry",
+    "positions": [
+      1,
+      2
+    ],
+    "visual_attributes": {
+      "colors": [
+        "black",
+        "red"
+      ],
+      "features": [
+        "bird",
+        "raven",
+        "kazurai_katana",
+        "shodo_sai",
+        "dagger",
+        "birdfolk",
+        "dual_weapons"
+      ],
+      "has_hair": false,
+      "has_horns": false,
+      "has_wings": true,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": true,
+      "has_staff": false,
+      "has_sword": true
+    },
+    "aliases": []
+  },
+  {
     "id": "kunkka",
     "name": "Kunkka",
     "primary_role": "Initiator",
@@ -1418,6 +1553,39 @@
       "has_mask": false,
       "has_staff": false,
       "has_sword": true
+    },
+    "aliases": []
+  },
+  {
+    "id": "largo",
+    "name": "Largo",
+    "primary_role": "Support",
+    "positions": [
+      3,
+      4
+    ],
+    "visual_attributes": {
+      "colors": [
+        "green",
+        "blue"
+      ],
+      "features": [
+        "frog",
+        "bard",
+        "guitar",
+        "music",
+        "tongue",
+        "shells"
+      ],
+      "has_hair": true,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": true,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
     },
     "aliases": []
   },
@@ -1737,6 +1905,38 @@
         "skewer"
       ],
       "has_hair": false,
+      "has_horns": false,
+      "has_wings": false,
+      "has_tail": false,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    },
+    "aliases": []
+  },
+  {
+    "id": "marci",
+    "name": "Marci",
+    "primary_role": "Support",
+    "positions": [
+      4,
+      5
+    ],
+    "visual_attributes": {
+      "colors": [
+        "white",
+        "blue"
+      ],
+      "features": [
+        "fists",
+        "bodyguard",
+        "mute",
+        "companion",
+        "punch"
+      ],
+      "has_hair": true,
       "has_horns": false,
       "has_wings": false,
       "has_tail": false,
@@ -2202,7 +2402,7 @@
   },
   {
     "id": "outworld_devourer",
-    "name": "Outworld Devourer",
+    "name": "Outworld Destroyer",
     "primary_role": "Carry",
     "positions": [
       1,
@@ -2361,6 +2561,39 @@
       "has_sword": false
     },
     "aliases": []
+  },
+  {
+    "id": "primal_beast",
+    "name": "Primal Beast",
+    "primary_role": "Initiator",
+    "positions": [
+      3
+    ],
+    "visual_attributes": {
+      "colors": [
+        "brown",
+        "red"
+      ],
+      "features": [
+        "beast",
+        "horns",
+        "claws",
+        "brawler",
+        "colossal"
+      ],
+      "has_hair": false,
+      "has_horns": true,
+      "has_wings": false,
+      "has_tail": true,
+      "has_beard": false,
+      "has_hat": false,
+      "has_mask": false,
+      "has_staff": false,
+      "has_sword": false
+    },
+    "aliases": [
+      "pb"
+    ]
   },
   {
     "id": "puck",

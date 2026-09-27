@@ -1,7 +1,7 @@
 # Dota Themer - Makefile for Development
 # Provides common commands for development and testing
 
-.PHONY: help test test-verbose test-core test-bot test-logging run run-cli clean install
+.PHONY: help test test-verbose test-core test-bot test-logging run run-cli clean install sync-heroes
 
 # Default target
 help:
@@ -21,7 +21,8 @@ help:
 	@echo "  make test-logging   - Run logging tests only"
 	@echo ""
 	@echo "Maintenance:"
-	@echo "  make clean     - Clean build artifacts"
+	@echo "  make clean        - Clean build artifacts"
+	@echo "  make sync-heroes  - Validate heroes.json against the OpenDota API"
 	@echo "  make help      - Show this help message"
 
 # Install dependencies
@@ -60,3 +61,7 @@ clean:
 	rm -rf .mypy_cache
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
+
+# Validate hero data against the OpenDota roster
+sync-heroes:
+	python scripts/compare_opendota.py

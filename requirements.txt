@@ -3,6 +3,8 @@
 discord.py>=2.0.0
 # S3 snapshot storage for the sqlite backend (#34)
 boto3>=1.34.0
+# OpenDota hero data sync script (#56)
+requests>=2.31.0
 
 # Testing (optional, for development)
 # unittest is included in Python standard library
