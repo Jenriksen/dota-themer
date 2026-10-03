@@ -134,6 +134,51 @@ class TestSqliteThemeRepository(unittest.TestCase):
         self.assertEqual(self.repo.load_themes(), [])
 
 
+class TestSqlitePairStatsStore(unittest.TestCase):
+    """SqlitePairStatsStore persists pair stats and refresh state."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.db_path = Path(self.tmp.name) / "dota.db"
+        self.store = storage.SqlitePairStatsStore(self.db_path)
+
+    def test_save_then_load_round_trip(self):
+        """Pair rows saved to SQLite come back with all fields intact."""
+        rows = [{"hero1": "Axe", "hero2": "Bane", "games": 10.5, "wins": 5.25}]
+        self.store.save_pair_stats(rows)
+        self.assertEqual(self.store.load_pair_stats(), rows)
+
+    def test_save_replaces_existing_rows(self):
+        """Saving is a full replace, mirroring the hero/theme repositories."""
+        self.store.save_pair_stats(
+            [{"hero1": "Axe", "hero2": "Bane", "games": 1.0, "wins": 1.0}]
+        )
+        self.store.save_pair_stats(
+            [{"hero1": "Chen", "hero2": "Juggernaut", "games": 2.0, "wins": 1.0}]
+        )
+        self.assertEqual(len(self.store.load_pair_stats()), 1)
+        self.assertEqual(self.store.load_pair_stats()[0]["hero1"], "Chen")
+
+    def test_load_from_empty_db_returns_empty_list(self):
+        """A fresh database yields no pair rows, not an error."""
+        self.assertEqual(self.store.load_pair_stats(), [])
+
+    def test_get_state_missing_returns_default(self):
+        self.assertIsNone(self.store.get_state("last_match_id"))
+        self.assertEqual(self.store.get_state("last_match_id", "0"), "0")
+
+    def test_set_state_round_trip(self):
+        """Refresh state (the match cursor) survives persistence."""
+        self.store.set_state("last_match_id", 12345)
+        self.assertEqual(self.store.get_state("last_match_id"), "12345")
+
+    def test_set_state_overwrites_previous_value(self):
+        self.store.set_state("last_match_id", "1")
+        self.store.set_state("last_match_id", "2")
+        self.assertEqual(self.store.get_state("last_match_id"), "2")
+
+
 class TestJsonToSqliteMigration(unittest.TestCase):
     """migrate_json_to_sqlite imports the JSON files in one transaction."""
 

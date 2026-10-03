@@ -6,6 +6,10 @@ repository so theme suggestions can show current winrates.
 
 The bot refreshes at startup and weekly. API failures are never fatal:
 stored winrates are kept and the next cycle retries.
+
+Also fetches the numeric-id hero name map and public ranked matches
+(https://api.opendota.com/api/publicMatches) used to build the hero
+pair winrate table for lane duo suggestions.
 """
 
 import logging_config
@@ -13,6 +17,8 @@ import logging_config
 logger = logging_config.get_logger(logging_config.LOGGER_CORE)
 
 OPENDOTA_HEROSTATS_URL = "https://api.opendota.com/api/heroStats"
+OPENDOTA_HEROES_URL = "https://api.opendota.com/api/heroes"
+OPENDOTA_PUBLIC_MATCHES_URL = "https://api.opendota.com/api/publicMatches"
 USER_AGENT = "dota-themer/1.0 (https://github.com/Jenriksen/dota-themer)"
 REQUEST_TIMEOUT_SECONDS = 15
 
@@ -40,6 +46,58 @@ def fetch_hero_stats(url=OPENDOTA_HEROSTATS_URL):
         return response.json()
     except Exception as error:
         raise OpenDotaError(f"heroStats request failed: {error}") from error
+
+
+def fetch_hero_names(url=OPENDOTA_HEROES_URL):
+    """Fetch the OpenDota numeric hero id -> display name map.
+
+    Raises OpenDotaError on failure. The names match the local hero
+    display names (same source as the heroStats sync), so pair stats
+    keyed by these names join directly onto the hero repository.
+    """
+    import requests
+
+    try:
+        response = requests.get(
+            url, timeout=REQUEST_TIMEOUT_SECONDS, headers={"User-Agent": USER_AGENT}
+        )
+        response.raise_for_status()
+        return {hero["id"]: hero["localized_name"] for hero in response.json()}
+    except Exception as error:
+        raise OpenDotaError(f"heroes request failed: {error}") from error
+
+
+def fetch_public_matches(
+    less_than_match_id=None, min_rank=None, url=OPENDOTA_PUBLIC_MATCHES_URL
+):
+    """Fetch one page of public ranked matches, newest first.
+
+    Args:
+        less_than_match_id: Only matches with a lower match id (pagination).
+        min_rank: Minimum rank tier (10-80; 50 is roughly high Divine).
+
+    Raises OpenDotaError on failure. Rows for very recent (still live)
+    matches can have zeroed teams until they finish; the aggregation
+    skips those.
+    """
+    import requests
+
+    params = {}
+    if less_than_match_id is not None:
+        params["less_than_match_id"] = less_than_match_id
+    if min_rank is not None:
+        params["min_rank"] = min_rank
+    try:
+        response = requests.get(
+            url,
+            params=params,
+            timeout=REQUEST_TIMEOUT_SECONDS,
+            headers={"User-Agent": USER_AGENT},
+        )
+        response.raise_for_status()
+        return response.json()
+    except Exception as error:
+        raise OpenDotaError(f"publicMatches request failed: {error}") from error
 
 
 def compute_turbo_winrates(api_hero_stats):

@@ -35,6 +35,7 @@
 - Enhanced theme selection: filtering, weighting, validation
 - Discord bot deployed and live in 3 servers
 - Turbo winrate shown per hero in theme suggestions (runtime OpenDota sync, weekly refresh)
+- Lane duo suggestions on theme posts (hero pair winrates from OpenDota publicMatches, daily refresh)
 
 ### 🚧 In Progress — Next Milestone: M4.2 Intelligent Recommendations
 - Winrate-based position recommendations
@@ -42,7 +43,6 @@
 ### 📋 Backlog
 - Additional themes (visual, lore, mechanical)
 - Hero data curation from Liquipedia
-- Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md))
 - Advanced features (winrate recommendations, team validation)
 
 ---
@@ -167,7 +167,7 @@
 - **Deliverables**:
   - [x] Turbo winrate data integrated and shown per hero in theme suggestions (runtime OpenDota sync, weekly refresh)
   - [ ] Winrate-based position recommendations (next up)
-  - [ ] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md))
+  - [x] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md); implemented: pair winrates from OpenDota publicMatches, suggested on theme posts)
   - [ ] Synergy detection between heroes
   - [ ] Counter-picking suggestions
   - [ ] Team composition validation

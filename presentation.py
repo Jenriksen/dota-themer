@@ -11,7 +11,12 @@ DOWN_VOTE = "\U0001f44e"
 
 
 def render_theme_suggestion(
-    theme_name, description, heroes_display, hero_count, feedback_score
+    theme_name,
+    description,
+    heroes_display,
+    hero_count,
+    feedback_score,
+    lane_duos_display="",
 ):
     """Render the theme suggestion message shown in Discord.
 
@@ -21,6 +26,7 @@ def render_theme_suggestion(
         heroes_display: Pre-formatted hero list (e.g. "Axe (3), Zeus (2)")
         hero_count: Number of matching heroes
         feedback_score: Current feedback score
+        lane_duos_display: Pre-formatted lane duo block ("" to omit)
 
     Returns:
         str: The full message text
@@ -30,6 +36,8 @@ def render_theme_suggestion(
         lines.append(f"**Description:** {description}")
     lines.append(f"**Heroes:**")
     lines.append(heroes_display)
+    if lane_duos_display:
+        lines.append(lane_duos_display)
     lines.append(f"**Feedback:** {feedback_score} {UP_VOTE}{DOWN_VOTE}")
     lines.append(f"*({hero_count} heroes match this theme)*")
     lines.append("")
@@ -37,6 +45,28 @@ def render_theme_suggestion(
         f"React with {UP_VOTE} to upvote this theme, or {DOWN_VOTE} to downvote it!"
         " (Voting locks after 2 hours)"
     )
+    return "\n".join(lines)
+
+
+def render_lane_duo_suggestions(duos):
+    """Render the suggested lane duos block for a theme message.
+
+    Args:
+        duos: Suggested duo dicts from combo_stats.suggest_lane_duos
+            ({"lane", "hero1", "hero2", "games", "winrate"}).
+
+    Returns:
+        str: The duo block, or "" when there is nothing to suggest
+        (stats missing or below the minimum sample size).
+    """
+    if not duos:
+        return ""
+    lines = ["**Suggested lane duos:**"]
+    for duo in duos:
+        lines.append(
+            f"{duo['lane']}: {duo['hero1']} + {duo['hero2']} "
+            f"({duo['winrate']:.0f}% over ~{duo['games']:.0f} games)"
+        )
     return "\n".join(lines)
 
 
