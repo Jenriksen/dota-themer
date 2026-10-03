@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Dota Themer - Pre-commit hook for code formatting and version checking
 # 
 # This script can be used as a Git pre-commit hook to ensure:
@@ -37,7 +37,16 @@ echo ""
 # Get the project root (where this script is located)
 # Navigate up from .git/hooks/pre-commit to project root
 PROJECT_ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+# Fallback when invoked directly from scripts/ (not via the .git/hooks symlink)
+[ -d "$PROJECT_ROOT/.git" ] || PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$PROJECT_ROOT"
+
+# Prefer tools from the project virtualenv if it exists, so the hook
+# works without manually activating the venv before committing
+if [ -d "$PROJECT_ROOT/.venv/bin" ]; then
+    PATH="$PROJECT_ROOT/.venv/bin:$PATH"
+    export PATH
+fi
 
 # Get list of staged Python files
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$')
@@ -55,8 +64,13 @@ run_check() {
     local checker_cmd=$2
     local install_instructions=$3
     
+    # Resolve the binary name from the command; checker_name may be a
+    # display label (e.g. "Black") that differs from the binary (black)
+    local checker_bin
+    checker_bin=$(echo "$checker_cmd" | cut -d' ' -f1)
+    
     # Check if the tool is installed
-    if ! command -v "$checker_name" >/dev/null 2>&1; then
+    if ! command -v "$checker_bin" >/dev/null 2>&1; then
         echo -e "${RED}ERROR: $checker_name is not installed.${NC}"
         echo ""
         echo "$install_instructions"

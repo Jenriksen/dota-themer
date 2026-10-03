@@ -29,7 +29,9 @@ jobs:
           enable-cache: true
 
       - name: Install linting tools
-        run: uv pip install --system flake8 black isort mypy
+        # mypy is pinned to match the local dev environment (see .venv);
+        # unpinned upgrades have previously broken this job
+        run: uv pip install --system flake8 black isort mypy==2.4.0
 
       - name: Run Flake8 (PEP8 compliance)
         run: |
@@ -258,7 +260,6 @@ jobs:
     name: Docker Build
     runs-on: ubuntu-latest
     needs: verify
-    if: false  # Disabled until Dockerfile is added
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -272,7 +273,6 @@ jobs:
   trivy:
     name: Trivy (Container Scanning)
     runs-on: ubuntu-latest
-    if: false  # Disabled until Dockerfile is added
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
