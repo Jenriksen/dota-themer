@@ -90,7 +90,7 @@
   - [ ] Audit Log: No logging of who created/modified themes
 - [ ] Theme categories (visual, lore, mechanical)
 - [ ] Winrate-based position recommendations (next up — ROADMAP M4.2)
-- [ ] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme
+- [ ] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md))
 - [ ] Team composition validation
 - [ ] Multiple theme suggestions per request
 - [ ] Theme rotation / daily themes
