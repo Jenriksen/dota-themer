@@ -16,7 +16,7 @@
 ### Success Metrics
 - [x] 8+ themes available (Current: 52 ✅)
 - [x] 100+ heroes with accurate position data (Current: 120 ✅)
-- [ ] Discord bot deployed and active in at least one server
+- [x] Discord bot deployed and active in at least one server (Current: 3 servers ✅)
 - [x] 72+ unit tests passing (Current: 140 ✅)
 - [ ] Regular usage by 50+ unique users/month (Future target)
 
@@ -33,13 +33,16 @@
 - Discord bot integration (bot.py)
 - Position-based features: lane grouping, balanced suggestions
 - Enhanced theme selection: filtering, weighting, validation
+- Discord bot deployed and live in 3 servers
+- Turbo winrate shown per hero in theme suggestions (runtime OpenDota sync, weekly refresh)
 
-### 🚧 In Progress
-- Discord bot deployment (requires token configuration)
+### 🚧 In Progress — Next Milestone: M4.2 Intelligent Recommendations
+- Winrate-based position recommendations
 
 ### 📋 Backlog
 - Additional themes (visual, lore, mechanical)
 - Hero data curation from Liquipedia
+- Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme
 - Advanced features (winrate recommendations, team validation)
 
 ---
@@ -67,18 +70,18 @@
 
 ---
 
-### 🚀 Phase 2: Integration & Enhancement (CURRENT)
+### 🚀 Phase 2: Integration & Enhancement (COMPLETED)
 
-**Milestone M2.1: Discord Integration** 🚧
+**Milestone M2.1: Discord Integration** ✅
 - **Timeline**: Week 1-2
 - **Goals**: Deploy bot to Discord for community access
 - **Deliverables**:
   - [x] bot.py implementation
   - [x] `!theme [party_size]` command
   - [x] `!tr` alias and `!helptheme` command
-  - [ ] Discord bot token configuration
-  - [ ] Bot deployed to production server
-  - [ ] Basic error handling and logging
+  - [x] Discord bot token configuration
+  - [x] Bot deployed to production server (live in 3 servers)
+  - [x] Basic error handling and logging
 - **Success Criteria**:
   - Bot responds to commands in Discord
   - All bot unit tests passing (15 tests)
@@ -141,7 +144,7 @@
 
 ---
 
-### 💡 Phase 4: Advanced Features
+### 💡 Phase 4: Advanced Features (CURRENT)
 
 **Milestone M4.1: Custom Theme Creation** 🎯
 - **Timeline**: Week 8-9
@@ -158,17 +161,19 @@
   - Input validation prevents invalid themes
   - Users can see how to modify themes when a theme is posted
 
-**Milestone M4.2: Intelligent Recommendations** 🎯
+**Milestone M4.2: Intelligent Recommendations** 🚧 (CURRENT)
 - **Timeline**: Week 9-10
 - **Goals**: Provide smarter hero suggestions
 - **Deliverables**:
-  - [ ] Winrate-based position recommendations
+  - [x] Turbo winrate data integrated and shown per hero in theme suggestions (runtime OpenDota sync, weekly refresh)
+  - [ ] Winrate-based position recommendations (next up)
+  - [ ] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme
   - [ ] Synergy detection between heroes
   - [ ] Counter-picking suggestions
   - [ ] Team composition validation
 - **Success Criteria**:
   - Suggestions consider hero synergy
-  - Winrate data integrated (via API or static)
+  - Winrate data integrated (via API or static) ✅
   - Composition warnings for imbalanced teams
 
 **Milestone M4.3: Enhanced User Experience** 🎯
@@ -192,14 +197,14 @@
 
 ### 🏆 Phase 5: Production & Scaling
 
-**Milestone M5.1: Production Deployment** 🎯
+**Milestone M5.1: Production Deployment** ✅
 - **Timeline**: Week 12
 - **Goals**: Deploy to production environment
 - **Deliverables**:
-  - [ ] Docker container for bot
-  - [ ] CI/CD pipeline (GitHub Actions)
-  - [ ] Automated testing on push
-  - [ ] Deployment to cloud hosting
+  - [x] Docker container for bot
+  - [x] CI/CD pipeline (GitHub Actions)
+  - [x] Automated testing on push
+  - [x] Deployment to cloud hosting (bot live in 3 Discord servers)
 - **Success Criteria**:
   - Bot runs in containerized environment
   - Tests run automatically on PRs
@@ -240,7 +245,7 @@
 | Priority | Category | Timeline | Status |
 |----------|----------|----------|--------|
 | P0 (Critical) | Core functionality, bug fixes | Immediate | ✅ Complete |
-| P1 (High) | Discord deployment, data accuracy | Week 1-6 | 🚧 In Progress |
+| P1 (High) | Discord deployment, data accuracy | Week 1-6 | ✅ Complete |
 | P2 (Medium) | Theme expansion, custom themes | Week 7-9 | ⏳ Planned |
 | P3 (Low) | Advanced features, analytics | Week 10+ | ⏳ Backlog |
 
@@ -252,11 +257,10 @@
 - **Discord.py**: Python library for bot functionality (✅ Available)
 - **Dota 2 API**: For hero data verification (Optional, can use static data)
 - **Liquipedia**: For hero position curation (Manual process)
-- **Cloud Hosting**: For production deployment (Future requirement)
+- **Cloud Hosting**: ✅ In place (bot live in 3 Discord servers)
 
 ### Current Blockers
-- ⚠️ **Discord Bot Token**: User action required to configure DISCORD_TOKEN
-- ⚠️ **Production Hosting**: No hosting configured yet
+- None — the bot is deployed and live in 3 Discord servers
 
 ---
 
@@ -289,10 +293,10 @@
 
 ## Success Metrics Dashboard
 
-### Phase 2 Goals (Current)
+### Phase 2 Goals (Completed)
 - [x] Core logic tests passing (104+ tests)
 - [x] Bot logic tests passing (15 tests)
-- [ ] Discord bot deployed and responding
+- [x] Discord bot deployed and responding (live in 3 servers)
 - [ ] 10+ users testing the bot
 
 ### Phase 3 Goals
@@ -302,6 +306,7 @@
 
 ### Phase 4 Goals
 - [x] Custom theme creation working (`!addtheme`, `!updatetheme`)
+- [x] Turbo winrate shown per hero in theme suggestions
 - [ ] 50+ unique users/month
 - [ ] User satisfaction >4/5 stars
 
@@ -317,6 +322,7 @@
 | Date | Change | Author |
 |------|--------|--------|
 | 2024-XX-XX | Initial roadmap created | Vibe Code |
+| 2026-10-03 | Mark Discord deployment complete (3 servers); record Turbo winrate display; set M4.2 as next milestone; add lane-combo winrate research item | Jesper |
 
 ---
 

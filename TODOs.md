@@ -46,14 +46,18 @@
 - [x] Wrapped `get_theme_suggestion()` from core.py
 - [x] Added error handling for invalid inputs
 - [x] Added `!tr` alias and `!helptheme` command
-- [ ] Configure Discord bot token (user action required)
-- [ ] Deploy to Discord server (user action required)
+- [x] Configure Discord bot token
+- [x] Deploy to Discord server (bot live in 3 servers)
 
 ### Documentation
 - [x] Created CONTEXT.md (domain model)
 - [x] Created README.md (usage, structure, examples)
 - [x] Updated README.md with Discord bot info
 - [x] Updated TODOs.md with progress
+
+### Turbo Winrate Integration (via OpenDota)
+- [x] Fetch per-hero Turbo winrates from the OpenDota API at startup and weekly
+- [x] Show Turbo winrate per hero in theme suggestion output
 
 ---
 
@@ -85,7 +89,8 @@
   - [ ] Permissions: No permission system (any user can modify themes)
   - [ ] Audit Log: No logging of who created/modified themes
 - [ ] Theme categories (visual, lore, mechanical)
-- [ ] Winrate-based position recommendations
+- [ ] Winrate-based position recommendations (next up — ROADMAP M4.2)
+- [ ] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme
 - [ ] Team composition validation
 - [ ] Multiple theme suggestions per request
 - [ ] Theme rotation / daily themes
