@@ -58,6 +58,21 @@ def _ensure_schema(conn):
         CREATE INDEX IF NOT EXISTS idx_messages_with_threads
         ON modification_threads(message_id)
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS hero_pair_stats (
+            hero1_name TEXT NOT NULL,
+            hero2_name TEXT NOT NULL,
+            games REAL NOT NULL,
+            wins REAL NOT NULL,
+            PRIMARY KEY (hero1_name, hero2_name)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS combo_state (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    """)
 
 
 def _log_save_size(theme_count, size_kib):
@@ -149,6 +164,80 @@ class SqliteThemeRepository:
             conn.close()
         size_kib = self.db_path.stat().st_size / 1024
         _log_save_size(len(themes), size_kib)
+
+
+class SqlitePairStatsStore:
+    """Hero pair winrate stats backed by SQLite (lane duo suggestions).
+
+    Pair rows are keyed by hero display names. Counts are floats:
+    each refresh cycle decays them so stale patch data fades out.
+    """
+
+    def __init__(self, db_path):
+        self.db_path = Path(db_path)
+
+    def load_pair_stats(self):
+        """Return all pair rows as {hero1, hero2, games, wins} dicts."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            rows = conn.execute(
+                "SELECT hero1_name, hero2_name, games, wins FROM hero_pair_stats"
+            ).fetchall()
+        finally:
+            conn.close()
+        return [
+            {"hero1": row[0], "hero2": row[1], "games": row[2], "wins": row[3]}
+            for row in rows
+        ]
+
+    def save_pair_stats(self, rows):
+        """Replace the pair stats table with the given rows in one transaction."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            serialized = [
+                (row["hero1"], row["hero2"], row["games"], row["wins"]) for row in rows
+            ]
+            conn.execute("BEGIN")
+            conn.execute("DELETE FROM hero_pair_stats")
+            conn.executemany(
+                "INSERT INTO hero_pair_stats"
+                " (hero1_name, hero2_name, games, wins)"
+                " VALUES (?, ?, ?, ?)",
+                serialized,
+            )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def get_state(self, key, default=None):
+        """Read one combo refresh state value (e.g. the match cursor)."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            row = conn.execute(
+                "SELECT value FROM combo_state WHERE key = ?", (key,)
+            ).fetchone()
+        finally:
+            conn.close()
+        return row[0] if row is not None else default
+
+    def set_state(self, key, value):
+        """Write one combo refresh state value."""
+        conn = _connect(self.db_path)
+        try:
+            _ensure_schema(conn)
+            conn.execute(
+                "INSERT OR REPLACE INTO combo_state (key, value) VALUES (?, ?)",
+                (key, str(value)),
+            )
+            conn.commit()
+        finally:
+            conn.close()
 
 
 def _parse_dt(value):

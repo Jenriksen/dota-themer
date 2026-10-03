@@ -60,5 +60,56 @@ class TestRenderModificationInstructions(unittest.TestCase):
         self.assertIn('"Done", "Cancel", "Exit", or "Quit"', msg)
 
 
+class TestRenderLaneDuoSuggestions(unittest.TestCase):
+    """render_lane_duo_suggestions produces the duo block."""
+
+    def test_duo_block_renders_lane_heroes_and_winrate(self):
+        duos = [
+            {
+                "lane": "Safelane",
+                "hero1": "Crystal Maiden",
+                "hero2": "Juggernaut",
+                "games": 30.0,
+                "winrate": 66.7,
+            },
+        ]
+        msg = presentation.render_lane_duo_suggestions(duos)
+        self.assertEqual(
+            msg,
+            "**Suggested lane duos:**\n"
+            "Safelane: Crystal Maiden + Juggernaut (67% over ~30 games)",
+        )
+
+    def test_no_duos_renders_empty_string(self):
+        self.assertEqual(presentation.render_lane_duo_suggestions([]), "")
+
+    def test_suggestion_can_embed_the_duo_block(self):
+        """render_theme_suggestion inserts the block before feedback."""
+        msg = presentation.render_theme_suggestion(
+            theme_name="T",
+            description="",
+            heroes_display="Axe (pos 3,4)",
+            hero_count=1,
+            feedback_score=0,
+            lane_duos_display="**Suggested lane duos:**\nOfflane: Axe + Chen (55% over ~22 games)",
+        )
+        self.assertIn(
+            "Axe (pos 3,4)\n**Suggested lane duos:**\n"
+            "Offlane: Axe + Chen (55% over ~22 games)\n**Feedback:**",
+            msg,
+        )
+
+    def test_suggestion_without_duos_is_unchanged(self):
+        """No lane_duos_display means no duo lines in the message."""
+        msg = presentation.render_theme_suggestion(
+            theme_name="T",
+            description="",
+            heroes_display="Axe (pos 3,4)",
+            hero_count=1,
+            feedback_score=0,
+        )
+        self.assertNotIn("Suggested lane duos", msg)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -29,6 +29,9 @@ services:
       - LOG_FORMAT=${LOG_FORMAT:-json}
       - LOG_FILE=/app/logs/dota-themer.log
       - ENV=production
+      # Lane duo pair stats (optional): daily publicMatches refresh
+      - DOTA_THEMER_COMBO_MIN_RANK=${DOTA_THEMER_COMBO_MIN_RANK:-50}
+      - DOTA_THEMER_COMBO_PAGES=${DOTA_THEMER_COMBO_PAGES:-120}
     volumes:
       # Persist logs
       - ./logs:/app/logs

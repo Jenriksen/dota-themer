@@ -3,6 +3,7 @@ Dota Themer - Discord Bot
 Provides theme suggestions via Discord commands.
 """
 
+import asyncio
 import os
 from datetime import timedelta
 from typing import Optional
@@ -11,6 +12,7 @@ import discord
 from discord.ext import commands, tasks
 
 import __version__
+import combo_stats
 import core
 import logging_config
 import opendota_client
@@ -57,6 +59,10 @@ SESSION_STATE = session_state.SessionState(
 )
 VOTE_LOCK_POLICY = session_state.VoteLockPolicy()
 
+# Hero pair winrates for lane duo suggestions, persisted to the same
+# SQLite database as the rest of the bot state.
+COMBO_STATS = storage.SqlitePairStatsStore(_db_path)
+
 # Configure bot
 intents = discord.Intents.default()
 intents.message_content = True
@@ -69,6 +75,19 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def winrate_refresh_task():
     """Refresh Turbo winrates from OpenDota weekly."""
     opendota_client.refresh_winrates(HERO_REPO)
+
+
+@tasks.loop(hours=24)  # Daily: keep lane duo pair stats fresh
+async def combo_refresh_task():
+    """Refresh hero pair winrates from OpenDota publicMatches daily.
+
+    The refresh makes many sequential API calls (bounded by the stored
+    cursor once caught up), so it runs in an executor to avoid
+    blocking the bot's heartbeat.
+    """
+    await asyncio.get_running_loop().run_in_executor(
+        None, combo_stats.refresh_combo_stats, COMBO_STATS, HERO_REPO
+    )
 
 
 @tasks.loop(seconds=60)  # Check every minute
@@ -110,6 +129,13 @@ async def on_ready():
     # Refresh Turbo winrates from OpenDota, then keep them fresh weekly
     opendota_client.refresh_winrates(HERO_REPO)
     winrate_refresh_task.start()
+    # Build the lane duo pair stats table, then keep it fresh daily;
+    # runs in an executor because it makes many API calls (cheap once
+    # the stored cursor is caught up)
+    asyncio.get_running_loop().run_in_executor(
+        None, combo_stats.refresh_combo_stats, COMBO_STATS, HERO_REPO
+    )
+    combo_refresh_task.start()
     # Start background task for thread cleanup
     cleanup_task.start()
 
@@ -261,6 +287,23 @@ def build_heroes_list_text(theme_name):
         )
     except Exception:
         return "Unknown"
+
+
+def lane_duos_for_theme(theme_name):
+    """Lane duo suggestion block for a theme, or "" when data is thin.
+
+    Best-effort: any failure (missing stats, data problems) omits the
+    block instead of breaking the suggestion.
+    """
+    try:
+        themes = THEME_REPO.load_themes(include_hidden=True)
+        theme = next(t for t in themes if t["name"] == theme_name)
+        heroes = core.get_heroes_by_ids(theme["hero_ids"], HERO_REPO.load_heroes())
+        duos = combo_stats.suggest_lane_duos(heroes, COMBO_STATS.load_pair_stats())
+        return presentation.render_lane_duo_suggestions(duos)
+    except Exception as e:
+        logger.warning(f"Failed to build lane duo suggestions: {e}")
+        return ""
 
 
 @bot.event
@@ -428,6 +471,7 @@ def render_suggestion_for_theme(theme_name):
         heroes_display=core.format_hero_list(matching_heroes),
         hero_count=len(matching_heroes),
         feedback_score=theme.get("feedback_score", 0),
+        lane_duos_display=lane_duos_for_theme(theme_name),
     )
 
 
@@ -470,6 +514,7 @@ async def theme_command(ctx, party_size: int = 2):
         heroes_display=suggestion["heroes"],
         hero_count=suggestion["hero_count"],
         feedback_score=suggestion["feedback_score"],
+        lane_duos_display=lane_duos_for_theme(suggestion["theme"]),
     )
 
     sent_message = await ctx.send(response)

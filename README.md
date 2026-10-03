@@ -17,6 +17,7 @@ See [TODOs.md](TODOs.md) for detailed task tracking.
 - **Enhanced Theme Selection**: Filtered by party size, weighted by hero count, validated for position coverage
 - **Position-Based Features**: Lane-based hero grouping, balanced team suggestions
 - **Visual Attributes**: Heroes include color schemes, features, and visual characteristics for better theme matching
+- **Lane Duo Suggestions**: Theme suggestions include the best hero duo per lane (safelane/offlane), based on pair winrates built from OpenDota public matches
 - **Structured Logging**: JSON and text format logging with configurable levels
 - **Discord Bot**: `!theme [party_size]` command for Discord integration
 
@@ -120,6 +121,7 @@ python bot.py
 - `!listthemes` - List all themes including hidden status
 - `!listheroes` - List all available heroes
 - React with 👍/👎 on a theme suggestion to vote; react with ❓ to open an interactive modification thread
+- Theme suggestions may include a **Suggested lane duos** block: the best hero pair per lane by winrate, built from OpenDota public matches (shown once enough data has accumulated)
 
 ### Optional Logging Configuration
 
@@ -169,7 +171,9 @@ dota-themer/
 ├── TODOs.md                # Task tracking
 ├── core.py                 # Core logic
 ├── bot.py                  # Discord bot
+├── combo_stats.py          # Hero pair winrates for lane duo suggestions
 ├── logging_config.py       # Structured logging configuration
+├── opendota_client.py      # OpenDota API client (winrates, public matches)
 ├── test_core.py            # Core unit tests (104 tests)
 ├── test_bot.py             # Bot unit tests (15 tests)
 ├── test_logging.py          # Logging unit tests (21 tests)
@@ -461,6 +465,8 @@ docker run -e DISCORD_TOKEN=your_token -e LOG_LEVEL=INFO dota-themer
 | `DOTA_THEMER_DATA_DIR` | Directory for `dota.db` and the JSON seed files | `./data` | No |
 | `DOTA_THEMER_S3_BUCKET` | S3 bucket for database snapshots (enables snapshot push/pull) | None | No |
 | `DOTA_THEMER_S3_PREFIX` | S3 key prefix for database snapshots | None | No |
+| `DOTA_THEMER_COMBO_MIN_RANK` | Minimum rank tier of matches sampled for lane duo stats (10-80; 50 = high Divine) | `50` | No |
+| `DOTA_THEMER_COMBO_PAGES` | OpenDota `publicMatches` pages (100 matches each) fetched per daily refresh | `120` | No |
 
 ### Discord Bot Permissions
 
@@ -550,7 +556,7 @@ MIT License
 
 ---
 
-**Current Version:** 1.2.0  
+**Current Version:** 1.3.0  
 **Heroes:** 127 (complete Dota 2 roster)  
 **Themes:** 52  
-**Tests:** 292
+**Tests:** 342
