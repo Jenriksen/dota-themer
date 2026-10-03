@@ -42,7 +42,7 @@
 ### 📋 Backlog
 - Additional themes (visual, lore, mechanical)
 - Hero data curation from Liquipedia
-- Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme
+- Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md))
 - Advanced features (winrate recommendations, team validation)
 
 ---
@@ -167,7 +167,7 @@
 - **Deliverables**:
   - [x] Turbo winrate data integrated and shown per hero in theme suggestions (runtime OpenDota sync, weekly refresh)
   - [ ] Winrate-based position recommendations (next up)
-  - [ ] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme
+  - [ ] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md))
   - [ ] Synergy detection between heroes
   - [ ] Counter-picking suggestions
   - [ ] Team composition validation
