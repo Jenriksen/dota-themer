@@ -287,6 +287,24 @@ class TestHandlerSplit(unittest.TestCase):
         )
 
 
+class TestComboStatsWiring(unittest.TestCase):
+    """Tests for the lane duo pair stats wiring in bot.py."""
+
+    def test_combo_stats_store_and_refresh_wired(self):
+        """bot.py builds the pair stats store and refreshes it daily."""
+        content = read_bot_file()
+        self.assertIn("import combo_stats", content)
+        self.assertIn("storage.SqlitePairStatsStore(", content)
+        self.assertIn("combo_stats.refresh_combo_stats", content)
+        self.assertIn("combo_refresh_task.start()", content)
+
+    def test_suggestions_include_lane_duos(self):
+        """Theme suggestions pass the lane duo block to the renderer."""
+        content = read_bot_file()
+        self.assertIn("lane_duos_display=", content)
+        self.assertIn("combo_stats.suggest_lane_duos(", content)
+
+
 class TestStorageWiring(unittest.TestCase):
     """Tests for #34: backend selection and S3 snapshot wiring in bot.py."""
 
