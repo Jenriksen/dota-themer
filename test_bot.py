@@ -304,6 +304,11 @@ class TestComboStatsWiring(unittest.TestCase):
         self.assertIn("lane_duos_display=", content)
         self.assertIn("combo_stats.suggest_lane_duos(", content)
 
+    def test_pair_stats_writes_push_snapshots(self):
+        """Pair stats writes push S3 snapshots when S3 is configured."""
+        content = read_bot_file()
+        self.assertIn("storage.SnapshottingPairStatsStore(", content)
+
 
 class TestStorageWiring(unittest.TestCase):
     """Tests for #34: backend selection and S3 snapshot wiring in bot.py."""

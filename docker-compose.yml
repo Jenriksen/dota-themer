@@ -15,6 +15,7 @@ services:
       # Storage (#52): SQLite is the only backend; dota.db lives in the
       # writable dota_data volume, auto-populated from the JSON files.
       # S3 snapshots (optional): pull at startup, push after every save
+      # (themes and lane duo pair stats)
       - DOTA_THEMER_S3_BUCKET=${DOTA_THEMER_S3_BUCKET:-}
       - DOTA_THEMER_S3_PREFIX=${DOTA_THEMER_S3_PREFIX:-}
       # AWS credentials pass through for the S3 snapshot client (IaC:

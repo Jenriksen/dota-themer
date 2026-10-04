@@ -330,3 +330,87 @@ class TestSnapshottingThemeRepository(unittest.TestCase):
             wrapper.save_themes([{"name": "T"}])
         except RuntimeError:
             self.fail("push failure must not propagate")
+
+
+class TestSnapshottingPairStatsStore(unittest.TestCase):
+    """SnapshottingPairStatsStore pushes to S3 after every write."""
+
+    def setUp(self):
+        self.pushed = []
+
+    def _wrapper(self, delegate=None, on_write=None):
+        delegate = delegate or self._recording_store()
+        return storage.SnapshottingPairStatsStore(
+            delegate, on_write=on_write or (lambda: self.pushed.append(True))
+        )
+
+    def _recording_store(self):
+        class RecordingStore:
+            def __init__(self):
+                self.rows = []
+                self.state = {}
+
+            def load_pair_stats(self):
+                return list(self.rows)
+
+            def save_pair_stats(self, rows):
+                self.rows = list(rows)
+
+            def get_state(self, key, default=None):
+                return self.state.get(key, default)
+
+            def set_state(self, key, value):
+                self.state[key] = str(value)
+
+        return RecordingStore()
+
+    def test_save_pushes_snapshot(self):
+        """Every save_pair_stats call triggers a snapshot push."""
+        store = self._recording_store()
+        wrapper = self._wrapper(store)
+        wrapper.save_pair_stats(
+            [{"hero1": "Axe", "hero2": "Bane", "games": 1, "wins": 1}]
+        )
+        self.assertEqual(store.rows[0]["hero2"], "Bane")
+        self.assertEqual(self.pushed, [True])
+
+    def test_state_update_pushes_snapshot(self):
+        """Cursor updates push too, so restores resume from the cursor."""
+        store = self._recording_store()
+        wrapper = self._wrapper(store)
+        wrapper.set_state("last_match_id", 42)
+        self.assertEqual(store.state["last_match_id"], "42")
+        self.assertEqual(self.pushed, [True])
+
+    def test_reads_do_not_push(self):
+        """Loads and state reads never upload snapshots."""
+        wrapper = self._wrapper()
+        wrapper.load_pair_stats()
+        wrapper.get_state("last_match_id")
+        self.assertEqual(self.pushed, [])
+
+    def test_push_failure_does_not_break_write(self):
+        """A failing push is logged, not raised: local SQLite is the truth."""
+
+        class FailingPushStore:
+            def load_pair_stats(self):
+                return []
+
+            def save_pair_stats(self, rows):
+                pass
+
+            def get_state(self, key, default=None):
+                return default
+
+            def set_state(self, key, value):
+                pass
+
+        def broken_push():
+            raise RuntimeError("s3 down")
+
+        wrapper = self._wrapper(FailingPushStore(), on_write=broken_push)
+        try:
+            wrapper.save_pair_stats([])
+            wrapper.set_state("last_match_id", 1)
+        except RuntimeError:
+            self.fail("push failure must not propagate")
