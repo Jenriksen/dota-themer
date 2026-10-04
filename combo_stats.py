@@ -21,8 +21,10 @@ logger = logging_config.get_logger(logging_config.LOGGER_CORE)
 # Counts decay once per refresh cycle (daily task); 0.95 keeps roughly a
 # one-month effective window of matches.
 DECAY_FACTOR = 0.95
-# Politeness delay between publicMatches pages, in seconds.
-REQUEST_DELAY_SECONDS = 1.05
+# Politeness delay between publicMatches pages, in seconds. 2.0s keeps
+# the walk at half of OpenDota's anonymous per-minute limit; 429s are
+# additionally retried with backoff in opendota_client.
+REQUEST_DELAY_SECONDS = 2.0
 # Duos below this decayed game count are never suggested.
 MIN_SUGGESTION_GAMES = 20.0
 # At most one suggested duo per lane per theme suggestion.
@@ -48,6 +50,14 @@ def default_pages():
         return max(1, int(os.environ.get("DOTA_THEMER_COMBO_PAGES", "120")))
     except ValueError:
         return 120
+
+
+def default_request_delay():
+    """Delay between publicMatches pages, seconds (env, default 2.0)."""
+    try:
+        return max(0.0, float(os.environ.get("DOTA_THEMER_COMBO_DELAY_SECONDS", "2.0")))
+    except ValueError:
+        return REQUEST_DELAY_SECONDS
 
 
 def extract_pair_counts(matches, hero_names, known_names):
@@ -193,6 +203,7 @@ def refresh_combo_stats(
     hero_repo,
     pages=None,
     min_rank=None,
+    request_delay=None,
     fetch_matches=None,
     fetch_names=None,
     sleep_fn=time.sleep,
@@ -209,6 +220,8 @@ def refresh_combo_stats(
         hero_repo: Hero repository (display names + positions).
         pages: Pages to fetch this cycle (default from the environment).
         min_rank: Minimum rank tier filter (default from the environment).
+        request_delay: Politeness delay between pages in seconds
+            (default from the environment).
         fetch_matches: Page fetcher (injected for tests).
         fetch_names: Hero name map fetcher (injected for tests).
         sleep_fn: Politeness delay function (injected for tests).
@@ -222,6 +235,9 @@ def refresh_combo_stats(
     fetch_names = fetch_names or opendota_client.fetch_hero_names
     pages = pages if pages is not None else default_pages()
     min_rank = min_rank if min_rank is not None else default_min_rank()
+    request_delay = (
+        request_delay if request_delay is not None else default_request_delay()
+    )
 
     try:
         hero_names = fetch_names()
@@ -261,7 +277,7 @@ def refresh_combo_stats(
         processed += len(kept)
         page_newest = max(row["match_id"] for row in kept)
         newest = page_newest if newest is None else max(newest, page_newest)
-        sleep_fn(REQUEST_DELAY_SECONDS)
+        sleep_fn(request_delay)
 
     if processed == 0:
         return 0

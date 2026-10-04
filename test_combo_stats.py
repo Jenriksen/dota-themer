@@ -424,6 +424,39 @@ class TestDefaultsFromEnvironment(unittest.TestCase):
         with patch.dict("os.environ", {"DOTA_THEMER_COMBO_PAGES": "7"}):
             self.assertEqual(combo_stats.default_pages(), 7)
 
+    def test_request_delay_default_is_half_the_api_limit(self):
+        """2s spacing keeps the walk at half of OpenDota's per-minute cap."""
+        with patch.dict("os.environ", {}, clear=True):
+            self.assertEqual(combo_stats.default_request_delay(), 2.0)
+
+    def test_invalid_request_delay_falls_back(self):
+        with patch.dict("os.environ", {"DOTA_THEMER_COMBO_DELAY_SECONDS": "soon"}):
+            self.assertEqual(combo_stats.default_request_delay(), 2.0)
+
+    def test_request_delay_from_environment(self):
+        with patch.dict("os.environ", {"DOTA_THEMER_COMBO_DELAY_SECONDS": "0.5"}):
+            self.assertEqual(combo_stats.default_request_delay(), 0.5)
+
+
+class TestRequestDelayUsage(unittest.TestCase):
+    """The refresh paces pages with the configured delay."""
+
+    def test_refresh_sleeps_between_pages(self):
+        matches = [make_match(i, TEAM_A, TEAM_A) for i in range(1000, 1250)]
+        delays = []
+        processed = combo_stats.refresh_combo_stats(
+            FakeStatsStore(),
+            FakeHeroRepo(KNOWN_NAMES),
+            pages=5,
+            min_rank=50,
+            request_delay=0.25,
+            fetch_matches=FakePublicMatches(matches),
+            fetch_names=lambda: NAMES,
+            sleep_fn=delays.append,
+        )
+        self.assertEqual(processed, 250)
+        self.assertEqual(delays, [0.25, 0.25, 0.25])
+
 
 if __name__ == "__main__":
     unittest.main()

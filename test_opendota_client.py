@@ -9,7 +9,122 @@ import unittest
 from unittest import mock
 from unittest.mock import MagicMock
 
+import requests
+
 import opendota_client
+
+
+def make_response(status_code=200, payload=None, headers=None):
+    """Build a fake requests response."""
+    response = MagicMock()
+    response.status_code = status_code
+    response.headers = headers or {}
+    if status_code >= 400:
+        response.raise_for_status.side_effect = requests.exceptions.HTTPError(
+            f"{status_code} error"
+        )
+    response.json.return_value = payload
+    return response
+
+
+class TestRequestJsonRetries(unittest.TestCase):
+    """_request_json retries transient failures with capped backoff."""
+
+    def _run(self, side_effects):
+        """Run _request_json with mocked HTTP and sleep; return (result, delays)."""
+        delays = []
+        with mock.patch("requests.get", side_effect=side_effects), mock.patch.object(
+            opendota_client.time, "sleep"
+        ) as sleep:
+            sleep.side_effect = delays.append
+            result = opendota_client._request_json("https://x", params={})
+        return result, delays
+
+    def test_success_first_try_has_no_retries(self):
+        result, delays = self._run([make_response(200, {"ok": True})])
+        self.assertEqual(result, {"ok": True})
+        self.assertEqual(delays, [])
+
+    def test_429_is_retried_with_backoff(self):
+        result, delays = self._run(
+            [make_response(429), make_response(200, {"ok": True})]
+        )
+        self.assertEqual(result, {"ok": True})
+        self.assertEqual(delays, [opendota_client.INITIAL_BACKOFF_SECONDS])
+
+    def test_retry_after_header_is_honored(self):
+        """A server-provided Retry-After larger than the backoff wins."""
+        throttled = make_response(429, headers={"Retry-After": "30"})
+        _, delays = self._run([throttled, make_response(200, {"ok": True})])
+        self.assertEqual(delays, [30.0])
+
+    def test_retry_after_is_capped_at_max_backoff(self):
+        """A huge Retry-After never hangs the refresh: it is capped."""
+        throttled = make_response(429, headers={"Retry-After": "3600"})
+        _, delays = self._run([throttled, make_response(200, {"ok": True})])
+        self.assertEqual(delays, [opendota_client.MAX_BACKOFF_SECONDS])
+
+    def test_exhausted_retries_raise_open_dota_error(self):
+        """Three 429s in a row fail the request."""
+        throttled = make_response(429)
+        with self.assertRaises(opendota_client.OpenDotaError):
+            self._run([throttled, throttled, throttled, throttled])
+
+    def test_backoff_doubles_across_retries(self):
+        throttled = make_response(429)
+        with mock.patch("requests.get", return_value=throttled), mock.patch.object(
+            opendota_client.time, "sleep"
+        ) as sleep:
+            with self.assertRaises(opendota_client.OpenDotaError):
+                opendota_client._request_json("https://x")
+        self.assertEqual(
+            [call.args[0] for call in sleep.call_args_list],
+            [5.0, 10.0, 20.0],
+        )
+
+    def test_server_error_is_retried(self):
+        result, delays = self._run([make_response(503), make_response(200, [1, 2])])
+        self.assertEqual(result, [1, 2])
+        self.assertEqual(delays, [opendota_client.INITIAL_BACKOFF_SECONDS])
+
+    def test_timeout_is_retried(self):
+        result, delays = self._run(
+            [requests.exceptions.Timeout("t"), make_response(200, {"ok": 1})]
+        )
+        self.assertEqual(result, {"ok": 1})
+        self.assertEqual(delays, [opendota_client.INITIAL_BACKOFF_SECONDS])
+
+    def test_client_error_is_not_retried(self):
+        """404s are not transient: they fail immediately, no sleeping."""
+        with mock.patch(
+            "requests.get", return_value=make_response(404)
+        ) as get, mock.patch.object(opendota_client.time, "sleep") as sleep:
+            with self.assertRaises(opendota_client.OpenDotaError):
+                opendota_client._request_json("https://x")
+        self.assertEqual(get.call_count, 1)
+        sleep.assert_not_called()
+
+
+class TestFetcherRequestShapes(unittest.TestCase):
+    """Fetchers send the expected query parameters and headers."""
+
+    def test_public_matches_passes_pagination_params(self):
+        ok = make_response(200, [])
+        with mock.patch("requests.get", return_value=ok) as get:
+            opendota_client.fetch_public_matches(less_than_match_id=100, min_rank=50)
+        self.assertEqual(
+            get.call_args.kwargs["params"],
+            {"less_than_match_id": 100, "min_rank": 50},
+        )
+
+    def test_requests_identify_themselves_with_user_agent(self):
+        """OpenDota rejects bare clients with 403; the UA must be sent."""
+        ok = make_response(200, [])
+        with mock.patch("requests.get", return_value=ok) as get:
+            opendota_client.fetch_public_matches()
+        self.assertEqual(
+            get.call_args.kwargs["headers"]["User-Agent"], opendota_client.USER_AGENT
+        )
 
 
 class TestComputeTurboWinrates(unittest.TestCase):

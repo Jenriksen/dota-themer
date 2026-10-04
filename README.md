@@ -467,6 +467,7 @@ docker run -e DISCORD_TOKEN=your_token -e LOG_LEVEL=INFO dota-themer
 | `DOTA_THEMER_S3_PREFIX` | S3 key prefix for database snapshots | None | No |
 | `DOTA_THEMER_COMBO_MIN_RANK` | Minimum rank tier of matches sampled for lane duo stats (10-80; 50 = high Divine) | `50` | No |
 | `DOTA_THEMER_COMBO_PAGES` | OpenDota `publicMatches` pages (100 matches each) fetched per daily refresh | `120` | No |
+| `DOTA_THEMER_COMBO_DELAY_SECONDS` | Politeness delay between OpenDota page requests (429s are retried with backoff) | `2.0` | No |
 
 ### Discord Bot Permissions
 

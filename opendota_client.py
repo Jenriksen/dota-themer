@@ -12,6 +12,8 @@ Also fetches the numeric-id hero name map and public ranked matches
 pair winrate table for lane duo suggestions.
 """
 
+import time
+
 import logging_config
 
 logger = logging_config.get_logger(logging_config.LOGGER_CORE)
@@ -21,6 +23,14 @@ OPENDOTA_HEROES_URL = "https://api.opendota.com/api/heroes"
 OPENDOTA_PUBLIC_MATCHES_URL = "https://api.opendota.com/api/publicMatches"
 USER_AGENT = "dota-themer/1.0 (https://github.com/Jenriksen/dota-themer)"
 REQUEST_TIMEOUT_SECONDS = 15
+
+# Transient failures worth retrying: rate limiting and server errors.
+RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
+MAX_RETRIES = 3
+INITIAL_BACKOFF_SECONDS = 5.0
+# Never sleep longer than this between retries: a heavily throttled
+# run gives up and lets the next cycle retry instead of hanging.
+MAX_BACKOFF_SECONDS = 60.0
 
 # heroStats uses legacy localized names for some heroes; map them to the
 # current local display names so winrate lookups succeed.
@@ -34,18 +44,77 @@ class OpenDotaError(Exception):
     """The OpenDota API could not be reached or returned bad data."""
 
 
-def fetch_hero_stats(url=OPENDOTA_HEROSTATS_URL):
-    """Fetch the heroStats payload. Raises OpenDotaError on failure."""
+def _backoff_seconds(attempt):
+    """Backoff before retry attempt N: 5s, then doubling."""
+    return INITIAL_BACKOFF_SECONDS * (2**attempt)
+
+
+def _retry_delay(response, attempt):
+    """Delay before the next retry, honoring a Retry-After header.
+
+    The server-provided value wins when it is larger than our backoff,
+    but the delay is capped so a refresh never hangs for very long
+    (it fails gracefully and the next cycle retries).
+    """
+    delay = _backoff_seconds(attempt)
+    retry_after = (response.headers or {}).get("Retry-After")
+    if retry_after is not None:
+        try:
+            delay = max(delay, float(retry_after))
+        except ValueError:
+            pass
+    return min(delay, MAX_BACKOFF_SECONDS)
+
+
+def _request_json(url, params=None):
+    """GET a JSON payload with throttling-aware retries.
+
+    Transient failures (429 rate limiting, 5xx, timeouts) are retried
+    with capped exponential backoff, honoring a Retry-After header when
+    the API sends one. Non-retryable statuses fail immediately.
+
+    Raises OpenDotaError once retries are exhausted or the response is
+    not ok.
+    """
     import requests
 
-    try:
-        response = requests.get(
-            url, timeout=REQUEST_TIMEOUT_SECONDS, headers={"User-Agent": USER_AGENT}
-        )
-        response.raise_for_status()
-        return response.json()
-    except Exception as error:
-        raise OpenDotaError(f"heroStats request failed: {error}") from error
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            response = requests.get(
+                url,
+                params=params,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+                headers={"User-Agent": USER_AGENT},
+            )
+        except (requests.Timeout, requests.ConnectionError) as error:
+            if attempt < MAX_RETRIES:
+                delay = _backoff_seconds(attempt)
+                logger.warning(
+                    f"{url} request failed ({error}); retrying in {delay:.0f}s"
+                    f" (attempt {attempt + 1}/{MAX_RETRIES})"
+                )
+                time.sleep(delay)
+                continue
+            raise OpenDotaError(f"request to {url} failed: {error}") from error
+        if response.status_code in RETRY_STATUS_CODES and attempt < MAX_RETRIES:
+            delay = _retry_delay(response, attempt)
+            logger.warning(
+                f"{url} returned {response.status_code} (rate limited or"
+                f" unavailable); retrying in {delay:.0f}s"
+                f" (attempt {attempt + 1}/{MAX_RETRIES})"
+            )
+            time.sleep(delay)
+            continue
+        try:
+            response.raise_for_status()
+            return response.json()
+        except Exception as error:
+            raise OpenDotaError(f"request to {url} failed: {error}") from error
+
+
+def fetch_hero_stats(url=OPENDOTA_HEROSTATS_URL):
+    """Fetch the heroStats payload. Raises OpenDotaError on failure."""
+    return _request_json(url)
 
 
 def fetch_hero_names(url=OPENDOTA_HEROES_URL):
@@ -55,16 +124,8 @@ def fetch_hero_names(url=OPENDOTA_HEROES_URL):
     display names (same source as the heroStats sync), so pair stats
     keyed by these names join directly onto the hero repository.
     """
-    import requests
-
-    try:
-        response = requests.get(
-            url, timeout=REQUEST_TIMEOUT_SECONDS, headers={"User-Agent": USER_AGENT}
-        )
-        response.raise_for_status()
-        return {hero["id"]: hero["localized_name"] for hero in response.json()}
-    except Exception as error:
-        raise OpenDotaError(f"heroes request failed: {error}") from error
+    heroes = _request_json(url)
+    return {hero["id"]: hero["localized_name"] for hero in heroes}
 
 
 def fetch_public_matches(
@@ -80,24 +141,12 @@ def fetch_public_matches(
     matches can have zeroed teams until they finish; the aggregation
     skips those.
     """
-    import requests
-
     params = {}
     if less_than_match_id is not None:
         params["less_than_match_id"] = less_than_match_id
     if min_rank is not None:
         params["min_rank"] = min_rank
-    try:
-        response = requests.get(
-            url,
-            params=params,
-            timeout=REQUEST_TIMEOUT_SECONDS,
-            headers={"User-Agent": USER_AGENT},
-        )
-        response.raise_for_status()
-        return response.json()
-    except Exception as error:
-        raise OpenDotaError(f"publicMatches request failed: {error}") from error
+    return _request_json(url, params=params)
 
 
 def compute_turbo_winrates(api_hero_stats):
