@@ -437,3 +437,43 @@ class SnapshottingThemeRepository:
             logger = logging_config.get_logger("storage")
             logger.warning(f"Snapshot push failed (local data is safe): {e}")
         return result
+
+
+class SnapshottingPairStatsStore:
+    """Pair stats store wrapper that pushes an S3 snapshot after each write.
+
+    The local SQLite file stays the source of truth; a failed push is
+    logged and never breaks the write that triggered it. Pair stat saves
+    and refresh-state updates (the match cursor) both push, so a
+    deployment restoring a snapshot resumes from the cursor instead of
+    re-querying every already processed match.
+    """
+
+    def __init__(self, delegate, on_write):
+        self.delegate = delegate
+        self._on_write = on_write
+
+    def load_pair_stats(self):
+        return self.delegate.load_pair_stats()
+
+    def save_pair_stats(self, rows):
+        result = self.delegate.save_pair_stats(rows)
+        self._push()
+        return result
+
+    def get_state(self, key, default=None):
+        return self.delegate.get_state(key, default)
+
+    def set_state(self, key, value):
+        result = self.delegate.set_state(key, value)
+        self._push()
+        return result
+
+    def _push(self):
+        try:
+            self._on_write()
+        except Exception as e:
+            import logging_config
+
+            logger = logging_config.get_logger("storage")
+            logger.warning(f"Snapshot push failed (local data is safe): {e}")

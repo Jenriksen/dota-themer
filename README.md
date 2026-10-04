@@ -463,7 +463,7 @@ docker run -e DISCORD_TOKEN=your_token -e LOG_LEVEL=INFO dota-themer
 | `LOG_FILE` | Log file path | None | No |
 | `ENV` | Environment name | `development` | No |
 | `DOTA_THEMER_DATA_DIR` | Directory for `dota.db` and the JSON seed files | `./data` | No |
-| `DOTA_THEMER_S3_BUCKET` | S3 bucket for database snapshots (enables snapshot push/pull) | None | No |
+| `DOTA_THEMER_S3_BUCKET` | S3 bucket for database snapshots (pull at startup, pushed on theme and pair stats writes; makes pair stats survive deployments) | None | No |
 | `DOTA_THEMER_S3_PREFIX` | S3 key prefix for database snapshots | None | No |
 | `DOTA_THEMER_COMBO_MIN_RANK` | Minimum rank tier of matches sampled for lane duo stats (10-80; 50 = high Divine) | `50` | No |
 | `DOTA_THEMER_COMBO_PAGES` | OpenDota `publicMatches` pages (100 matches each) fetched per daily refresh | `120` | No |

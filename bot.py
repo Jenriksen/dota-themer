@@ -5,6 +5,7 @@ Provides theme suggestions via Discord commands.
 
 import asyncio
 import os
+import threading
 from datetime import timedelta
 from typing import Optional
 
@@ -35,6 +36,17 @@ _data_dir = core.resolve_data_dir()
 _db_path = _data_dir / snapshot.DB_FILENAME
 _hero_repo, _theme_repo = storage.create_repositories(_data_dir)
 
+# Snapshot pushes can come from the event loop (theme saves) and the
+# combo refresh executor thread at the same time; the lock keeps one
+# complete upload of the database file at a time.
+_snapshot_push_lock = threading.Lock()
+
+
+def _push_snapshot_locked():
+    """Upload the database snapshot, serialized across threads."""
+    with _snapshot_push_lock:
+        snapshot.push_snapshot(_snapshot_config.db_path, _snapshot_config)
+
 
 def _maybe_wrap_snapshots(repo):
     """Push an S3 snapshot after every theme save when S3 is configured."""
@@ -42,9 +54,21 @@ def _maybe_wrap_snapshots(repo):
         return repo
     return storage.SnapshottingThemeRepository(
         repo,
-        on_save=lambda themes: snapshot.push_snapshot(
-            _snapshot_config.db_path, _snapshot_config
-        ),
+        on_save=lambda themes: _push_snapshot_locked(),
+    )
+
+
+def _maybe_wrap_pair_stats_snapshots(store):
+    """Push an S3 snapshot after every pair stats write when S3 is configured.
+
+    Pair stats saves and cursor updates push too, so a deployment
+    restoring a snapshot never re-queries already processed matches.
+    """
+    if _snapshot_config is None:
+        return store
+    return storage.SnapshottingPairStatsStore(
+        store,
+        on_write=lambda: _push_snapshot_locked(),
     )
 
 
@@ -60,8 +84,10 @@ SESSION_STATE = session_state.SessionState(
 VOTE_LOCK_POLICY = session_state.VoteLockPolicy()
 
 # Hero pair winrates for lane duo suggestions, persisted to the same
-# SQLite database as the rest of the bot state.
-COMBO_STATS = storage.SqlitePairStatsStore(_db_path)
+# SQLite database as the rest of the bot state; every write pushes an
+# S3 snapshot when configured, keeping deployments from rebuilding the
+# table from scratch.
+COMBO_STATS = _maybe_wrap_pair_stats_snapshots(storage.SqlitePairStatsStore(_db_path))
 
 # Configure bot
 intents = discord.Intents.default()
