@@ -705,9 +705,7 @@ def get_theme_suggestions(
             {
                 "theme": theme["name"],
                 "description": theme.get("description", ""),
-                "heroes": format_hero_list(
-                    matching_heroes, link_heroes=link_heroes
-                ),
+                "heroes": format_hero_list(matching_heroes, link_heroes=link_heroes),
                 "hero_count": len(matching_heroes),
                 "feedback_score": theme.get("feedback_score", 0),
             }

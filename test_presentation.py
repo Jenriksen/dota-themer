@@ -127,7 +127,10 @@ class TestRenderSuggestionEmbedData(unittest.TestCase):
         self.assertEqual(data["title"], "Undead Heroes")
         self.assertIn("Undead or skeletal heroes", data["description"])
         self.assertIn("1 heroes match this theme", data["description"])
-        self.assertEqual(data["fields"][0], ("Heroes", "- [Axe](https://www.dota2.com/hero/axe) (pos 3,4)", False))
+        self.assertEqual(
+            data["fields"][0],
+            ("Heroes", "- [Axe](https://www.dota2.com/hero/axe) (pos 3,4)", False),
+        )
         self.assertIn("Feedback: 5", data["footer"])
         self.assertIn("Theme of the day for 2026-10-24 (UTC)", data["footer"])
         self.assertTrue(data["thumbnail"].endswith("/axe.png"))
