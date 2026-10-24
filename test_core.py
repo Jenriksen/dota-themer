@@ -3,6 +3,7 @@ Unit tests for Dota Themer core functionality.
 Ensures functionality survives through refactorings.
 """
 
+import datetime
 import json
 import sqlite3
 import sys
@@ -1460,6 +1461,139 @@ class TestHeroResolver(unittest.TestCase):
         resolver.resolve("Axe")
         resolver.resolve("zuus")
         self.assertEqual(repo.load_calls, 1)
+
+
+class TestM43EnhancedUserExperience(unittest.TestCase):
+    """Tests for M4.3: hero links, multiple suggestions, daily theme."""
+
+    def setUp(self):
+        self.hero_repo = InMemoryHeroRepository(
+            [
+                {"id": "axe", "name": "Axe", "positions": [3, 4]},
+                {"id": "lina", "name": "Lina", "positions": [2]},
+                {"id": "crystal_maiden", "name": "Crystal Maiden", "positions": [5]},
+            ]
+        )
+        self.theme_repo = InMemoryThemeRepository(
+            [
+                {"name": "Red", "hero_ids": ["axe"]},
+                {"name": "Blue", "hero_ids": ["lina", "crystal_maiden"]},
+                {"name": "Hidden", "hero_ids": ["axe"], "is_hidden": True},
+            ]
+        )
+
+    def test_get_hero_page_url(self):
+        """Hero page URLs follow the official dota2.com hero page format."""
+        hero = {"id": "ancient_apparition", "name": "Ancient Apparition"}
+        self.assertEqual(
+            core.get_hero_page_url(hero),
+            "https://www.dota2.com/hero/ancient_apparition",
+        )
+
+    def test_get_hero_page_url_requires_id(self):
+        """Heroes without an id have no page URL."""
+        self.assertIsNone(core.get_hero_page_url({"name": "Unknown"}))
+        self.assertIsNone(core.get_hero_page_url({"id": "", "name": "Unknown"}))
+
+    def test_format_hero_list_links_heroes_on_demand(self):
+        """link_heroes=True renders names as markdown links; default stays plain."""
+        heroes = [{"id": "axe", "name": "Axe", "positions": [3, 4]}]
+        linked = core.format_hero_list(heroes, link_heroes=True)
+        self.assertEqual(
+            linked, "- [Axe](https://www.dota2.com/hero/axe) (pos 3,4)"
+        )
+        self.assertEqual(core.format_hero_list(heroes), "- Axe (pos 3,4)")
+
+    def test_format_hero_list_links_hero_without_id_stays_plain(self):
+        """A hero without an id renders a plain name even with link_heroes."""
+        heroes = [{"name": "Unknown", "positions": [3]}]
+        self.assertEqual(
+            core.format_hero_list(heroes, link_heroes=True), "- Unknown (pos 3)"
+        )
+
+    def test_get_theme_suggestions_returns_distinct_themes(self):
+        """Multiple suggestions contain no duplicate themes."""
+        suggestions = core.get_theme_suggestions(
+            count=2,
+            party_size=1,
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+            link_heroes=True,
+        )
+        self.assertEqual(len(suggestions), 2)
+        names = [s["theme"] for s in suggestions]
+        self.assertEqual(len(names), len(set(names)))
+        self.assertNotIn("Hidden", names)
+
+    def test_get_theme_suggestions_caps_at_available_themes(self):
+        """Requesting more themes than exist returns all qualifying themes."""
+        suggestions = core.get_theme_suggestions(
+            count=5,
+            party_size=1,
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertEqual(len(suggestions), 2)
+
+    def test_get_theme_suggestions_links_heroes(self):
+        """Suggestion hero lists contain markdown links to hero pages."""
+        suggestions = core.get_theme_suggestions(
+            count=1,
+            party_size=1,
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+            link_heroes=True,
+        )
+        self.assertIn("](https://www.dota2.com/hero/", suggestions[0]["heroes"])
+
+    def test_get_daily_theme_is_deterministic_per_day(self):
+        """The same UTC day always yields the same daily theme."""
+        day = datetime.date(2026, 10, 24)
+        first = core.get_daily_theme(
+            party_size=1, today=day, hero_repo=self.hero_repo, theme_repo=self.theme_repo
+        )
+        second = core.get_daily_theme(
+            party_size=1, today=day, hero_repo=self.hero_repo, theme_repo=self.theme_repo
+        )
+        self.assertEqual(first["theme"], second["theme"])
+        self.assertEqual(first["date"], "2026-10-24")
+
+    def test_get_daily_theme_rolls_over_across_days(self):
+        """Across many days every qualifying theme appears at least once."""
+        picked = set()
+        for offset in range(60):
+            day = datetime.date(2026, 1, 1) + datetime.timedelta(days=offset)
+            picked.add(
+                core.get_daily_theme(
+                    party_size=1,
+                    today=day,
+                    hero_repo=self.hero_repo,
+                    theme_repo=self.theme_repo,
+                )["theme"]
+            )
+        self.assertEqual(picked, {"Red", "Blue"})
+
+    def test_get_daily_theme_skips_hidden_themes(self):
+        """Hidden themes never become the daily theme."""
+        for offset in range(30):
+            day = datetime.date(2026, 2, 1) + datetime.timedelta(days=offset)
+            daily = core.get_daily_theme(
+                party_size=1,
+                today=day,
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+            self.assertNotEqual(daily["theme"], "Hidden")
+
+    def test_get_daily_theme_links_heroes(self):
+        """Daily theme hero lists link to hero pages."""
+        daily = core.get_daily_theme(
+            party_size=1,
+            today=datetime.date(2026, 10, 24),
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
+        self.assertIn("](https://www.dota2.com/hero/", daily["heroes"])
 
 
 class TestTypedResults(unittest.TestCase):

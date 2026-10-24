@@ -71,14 +71,47 @@ class TestBotCommands(unittest.TestCase):
         self.assertIn('help="Get a theme suggestion', bot_content)
 
     def test_theme_command_has_default_party_size(self):
-        """theme command has default party size of 2."""
+        """theme command defaults to party size 2."""
         bot_content = read_bot_file()
-        self.assertIn("party_size: int = 2", bot_content)
+        self.assertIn("DEFAULT_PARTY_SIZE = 2", bot_content)
+        self.assertIn("party_size: str = None", bot_content)
 
     def test_theme_command_validates_party_size(self):
         """theme command validates party size."""
         bot_content = read_bot_file()
-        self.assertIn("party_size < 1 or party_size > 5", bot_content)
+        self.assertIn("size < 1 or size > 5", bot_content)
+
+    def test_theme_command_supports_help_word(self):
+        """!theme help shows in-context assistance (M4.3)."""
+        bot_content = read_bot_file()
+        self.assertIn("HELP_WORDS", bot_content)
+        self.assertIn("send_command_help(ctx)", bot_content)
+
+    def test_theme_command_supports_multiple_suggestions(self):
+        """!theme [size] [count] rolls several distinct themes (M4.3)."""
+        bot_content = read_bot_file()
+        self.assertIn("core.get_theme_suggestions(", bot_content)
+
+    def test_daily_theme_command(self):
+        """!dailytheme shows the deterministic theme of the day (M4.3)."""
+        bot_content = read_bot_file()
+        self.assertIn('name="dailytheme"', bot_content)
+        self.assertIn("core.get_daily_theme(", bot_content)
+
+    def test_suggestions_use_rich_embeds(self):
+        """Theme suggestions are sent as embeds with hero art (M4.3)."""
+        bot_content = read_bot_file()
+        self.assertIn("build_suggestion_embed(", bot_content)
+        self.assertIn("ctx.send(embed=embed)", bot_content)
+        self.assertIn("set_thumbnail", bot_content)
+
+    def test_hero_names_link_to_hero_pages(self):
+        """Hero names link to the official Dota 2 hero page (M4.3)."""
+        bot_content = read_bot_file()
+        self.assertIn("link_heroes=True", bot_content)
+        with open("core.py", encoding="utf-8") as f:
+            core_content = f.read()
+        self.assertIn("https://www.dota2.com/hero/{hero_id}", core_content)
 
     def test_has_alias_commands(self):
         """Bot has alias commands like !tr."""
@@ -93,11 +126,11 @@ class TestBotCommands(unittest.TestCase):
     def test_formats_response_correctly(self):
         """Bot formats response via the presentation module."""
         bot_content = read_bot_file()
-        self.assertIn("presentation.render_theme_suggestion(", bot_content)
+        self.assertIn("presentation.render_suggestion_embed_data(", bot_content)
         with open("presentation.py", encoding="utf-8") as f:
             presentation_content = f.read()
-        self.assertIn("**Theme:**", presentation_content)
-        self.assertIn("**Heroes:**", presentation_content)
+        self.assertIn('"Heroes"', presentation_content)
+        self.assertIn("render_theme_suggestion", presentation_content)
 
 
 class TestWinrateRefresh(unittest.TestCase):

@@ -111,5 +111,55 @@ class TestRenderLaneDuoSuggestions(unittest.TestCase):
         self.assertNotIn("Suggested lane duos", msg)
 
 
+class TestRenderSuggestionEmbedData(unittest.TestCase):
+    """render_suggestion_embed_data produces embed fields for M4.3."""
+
+    def test_embed_data_structure(self):
+        data = presentation.render_suggestion_embed_data(
+            theme_name="Undead Heroes",
+            description="Undead or skeletal heroes",
+            heroes_display="- [Axe](https://www.dota2.com/hero/axe) (pos 3,4)",
+            hero_count=1,
+            feedback_score=5,
+            thumbnail_url="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/axe.png",
+            footer="Theme of the day for 2026-10-24 (UTC)",
+        )
+        self.assertEqual(data["title"], "Undead Heroes")
+        self.assertIn("Undead or skeletal heroes", data["description"])
+        self.assertIn("1 heroes match this theme", data["description"])
+        self.assertEqual(data["fields"][0], ("Heroes", "- [Axe](https://www.dota2.com/hero/axe) (pos 3,4)", False))
+        self.assertIn("Feedback: 5", data["footer"])
+        self.assertIn("Theme of the day for 2026-10-24 (UTC)", data["footer"])
+        self.assertTrue(data["thumbnail"].endswith("/axe.png"))
+
+    def test_embed_data_without_optional_parts(self):
+        data = presentation.render_suggestion_embed_data(
+            theme_name="T",
+            description="",
+            heroes_display="Axe (pos 3,4)",
+            hero_count=1,
+            feedback_score=0,
+        )
+        self.assertEqual(data["title"], "T")
+        self.assertNotIn("Theme of the day", data["footer"])
+        self.assertIsNone(data["thumbnail"])
+        self.assertEqual(len(data["fields"]), 1)
+
+    def test_embed_data_includes_lane_duos_field(self):
+        data = presentation.render_suggestion_embed_data(
+            theme_name="T",
+            description="",
+            heroes_display="Axe (pos 3,4)",
+            hero_count=1,
+            feedback_score=0,
+            lane_duos_display="**Suggested lane duos:**\nOfflane: Axe + Chen (55% over ~22 games)",
+        )
+        self.assertEqual(len(data["fields"]), 2)
+        self.assertEqual(data["fields"][1][0], "Suggested lane duos")
+        self.assertEqual(
+            data["fields"][1][1], "Offlane: Axe + Chen (55% over ~22 games)"
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

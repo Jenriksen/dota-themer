@@ -59,6 +59,13 @@
 - [x] Fetch per-hero Turbo winrates from the OpenDota API at startup and weekly
 - [x] Show Turbo winrate per hero in theme suggestion output
 
+### Enhanced User Experience (ROADMAP M4.3)
+- [x] Rich embed formatting for theme suggestions (hero art thumbnail, fields, footer)
+- [x] Hero name hyperlinks to https://www.dota2.com/hero/{id}
+- [x] Multiple theme suggestions per request (`!theme [party_size] [count]`)
+- [x] Daily theme (`!dailytheme` / `!dt`, deterministic per UTC day)
+- [x] In-context help via `!theme help`
+
 ---
 
 ## Next Steps (Priority Order)
@@ -89,11 +96,13 @@
   - [ ] Permissions: No permission system (any user can modify themes)
   - [ ] Audit Log: No logging of who created/modified themes
 - [ ] Theme categories (visual, lore, mechanical)
-- [ ] Winrate-based position recommendations (next up — ROADMAP M4.2)
+- [ ] Winrate-based position recommendations (deferred — ROADMAP M4.2 MVP shipped)
 - [x] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md); implemented: pair winrates from OpenDota publicMatches, suggested on theme posts)
 - [ ] Team composition validation
-- [ ] Multiple theme suggestions per request
-- [ ] Theme rotation / daily themes
+- [x] Multiple theme suggestions per request (`!theme [size] [count]`, ROADMAP M4.3)
+- [x] Theme rotation / daily themes (`!dailytheme` / `!dt`, ROADMAP M4.3)
+- [x] Rich embed formatting with hero images (ROADMAP M4.3)
+- [x] Hero name hyperlinks in output (link to dota2.com/hero/{id}, ROADMAP M4.3)
 - [ ] Hero name hyperlinks in output (underline name, link to dota2.com/hero/{id})
 - [x] Theme feedback via reactions (:thumbsup: +1, :thumbsdown: -1, persisted in themes.json)
   - [x] Add feedback_score field to themes.json
@@ -103,7 +112,7 @@
   - [x] Add description about reactions in theme message
 - [ ] Theme modification guide with suggestions
   - [ ] Research and add common Dota2 hero abbreviations to aliases field in heroes.json
-- [ ] Help command via `!theme help` for in-context assistance
+- [x] Help command via `!theme help` for in-context assistance (ROADMAP M4.3)
 
 ---
 

@@ -37,13 +37,22 @@
 - Turbo winrate shown per hero in theme suggestions (runtime OpenDota sync, weekly refresh)
 - Lane duo suggestions on theme posts (hero pair winrates from OpenDota publicMatches, daily refresh)
 
-### 🚧 In Progress — Next Milestone: M4.2 Intelligent Recommendations
-- Winrate-based position recommendations
+### 🚧 In Progress — Next Milestone: M4.3 Enhanced User Experience
+- Multiple theme suggestions per request (`!theme [size] [count]`) ✅
+- Rich embed formatting with hero images ✅
+- Hero name hyperlinks to dota2.com hero pages ✅
+- Help command `!theme help` ✅
+- Theme rotation / daily themes (`!dailytheme`) ✅
 
-### 📋 Backlog
+### ✅ Completed — M4.2 Intelligent Recommendations (MVP)
+- Turbo winrate data integrated and shown per hero in theme suggestions
+- Lane duo suggestions from OpenDota publicMatches pair winrates
+- Remaining items (winrate-based position recommendations, synergy detection, counter-picking, team validation) deferred to the backlog
+
+### 📌 Backlog
 - Additional themes (visual, lore, mechanical)
 - Hero data curation from Liquipedia
-- Advanced features (winrate recommendations, team validation)
+- Advanced features (winrate-based position recommendations, synergy detection, counter-picking, team validation)
 
 ---
 
@@ -161,37 +170,37 @@
   - Input validation prevents invalid themes
   - Users can see how to modify themes when a theme is posted
 
-**Milestone M4.2: Intelligent Recommendations** 🚧 (CURRENT)
+**Milestone M4.2: Intelligent Recommendations** ✅ (MVP complete)
 - **Timeline**: Week 9-10
 - **Goals**: Provide smarter hero suggestions
 - **Deliverables**:
   - [x] Turbo winrate data integrated and shown per hero in theme suggestions (runtime OpenDota sync, weekly refresh)
-  - [ ] Winrate-based position recommendations (next up)
   - [x] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md); implemented: pair winrates from OpenDota publicMatches, suggested on theme posts)
-  - [ ] Synergy detection between heroes
-  - [ ] Counter-picking suggestions
-  - [ ] Team composition validation
+  - [ ] Winrate-based position recommendations (deferred to backlog)
+  - [ ] Synergy detection between heroes (deferred to backlog)
+  - [ ] Counter-picking suggestions (deferred to backlog)
+  - [ ] Team composition validation (deferred to backlog)
 - **Success Criteria**:
-  - Suggestions consider hero synergy
   - Winrate data integrated (via API or static) ✅
-  - Composition warnings for imbalanced teams
+  - Suggestions consider hero synergy (deferred)
+  - Composition warnings for imbalanced teams (deferred)
 
-**Milestone M4.3: Enhanced User Experience** 🎯
+**Milestone M4.3: Enhanced User Experience** 🚧 (CURRENT)
 - **Timeline**: Week 10-11
 - **Goals**: Improve output and interaction
 - **Deliverables**:
-  - [ ] Multiple theme suggestions per request
-  - [ ] Theme rotation / daily themes
-  - [ ] Rich embed formatting for Discord
-  - [ ] Hero images in suggestions
-  - [ ] Hero name hyperlinks (underline name, link to https://www.dota2.com/hero/{id})
-  - [ ] Help command `!theme help` for in-context assistance
+  - [x] Multiple theme suggestions per request (`!theme [party_size] [count]`, up to 5 distinct themes)
+  - [x] Theme rotation / daily themes (`!dailytheme` / `!dt`, deterministic per UTC day, same for all servers)
+  - [x] Rich embed formatting for Discord
+  - [x] Hero images in suggestions (embed thumbnail from official Dota 2 hero art)
+  - [x] Hero name hyperlinks (link to https://www.dota2.com/hero/{id})
+  - [x] Help command `!theme help` for in-context assistance
 - **Success Criteria**:
-  - Users can request multiple themes at once
-  - Daily theme feature functional
-  - Discord messages use rich embeds
-  - Hero names are clickable links to dota2.com hero pages
-  - Users can get help via `!theme help` command
+  - Users can request multiple themes at once ✅
+  - Daily theme feature functional ✅
+  - Discord messages use rich embeds ✅
+  - Hero names are clickable links to dota2.com hero pages ✅
+  - Users can get help via `!theme help` command ✅
 
 ---
 
@@ -323,6 +332,7 @@
 |------|--------|--------|
 | 2024-XX-XX | Initial roadmap created | Vibe Code |
 | 2026-10-03 | Mark Discord deployment complete (3 servers); record Turbo winrate display; set M4.2 as next milestone; add lane-combo winrate research item | Jesper |
+| 2026-10-24 | Mark M4.2 complete as MVP (Turbo winrate display + lane duo suggestions shipped; remaining items deferred to backlog); implement M4.3: rich embeds with hero art, hero name links to dota2.com, multiple suggestions per request, `!dailytheme`, `!theme help` | Jesper |
 
 ---
 
