@@ -3,6 +3,7 @@ Dota Themer - Core functionality
 Suggests a theme and lists matching heroes with their positions.
 """
 
+import datetime
 import json
 import os
 import random
@@ -38,6 +39,17 @@ OFFLANE_POSITIONS = {3, 4}  # Offlaner + Soft Support
 
 # Lane names for display
 LANE_NAMES = {1: "Safelane", 2: "Mid", 3: "Offlane", 4: "Offlane", 5: "Safelane"}
+
+# Official Dota 2 hero page (M4.3): hero names link here in Discord output
+HERO_PAGE_URL_TEMPLATE = "https://www.dota2.com/hero/{hero_id}"
+
+
+def get_hero_page_url(hero):
+    """Dota 2 hero page URL for a hero, or None when the hero has no id."""
+    hero_id = hero.get("id")
+    if not hero_id:
+        return None
+    return HERO_PAGE_URL_TEMPLATE.format(hero_id=hero_id)
 
 
 class ThemeError(Exception):
@@ -180,17 +192,24 @@ def get_positions_display(positions):
     return ",".join(map(str, sorted(positions)))
 
 
-def format_hero_list(heroes):
+def format_hero_list(heroes, link_heroes=False):
     """Format heroes as a line-based list with positions and turbo winrate.
 
     Each hero renders on its own line as a markdown bullet:
         - Axe (pos 3,4) - winrate 51.2%
 
     The winrate segment is omitted for heroes without turbo_winrate data.
+    With link_heroes=True the hero name becomes a markdown link to the
+    official Dota 2 hero page (M4.3); heroes without an id stay plain.
     """
     lines = []
     for hero in heroes:
-        line = f"- {hero['name']} (pos {get_positions_display(hero['positions'])})"
+        name = hero["name"]
+        if link_heroes:
+            url = get_hero_page_url(hero)
+            if url:
+                name = f"[{name}]({url})"
+        line = f"- {name} (pos {get_positions_display(hero['positions'])})"
         winrate = hero.get("turbo_winrate")
         if winrate is not None:
             line += f" - winrate {winrate:.1f}%"
@@ -579,6 +598,7 @@ def get_theme_suggestion(
     require_position_coverage=False,
     hero_repo=None,
     theme_repo=None,
+    link_heroes=False,
 ):
     """
     Get a theme suggestion for a given party size.
@@ -587,6 +607,7 @@ def get_theme_suggestion(
         party_size: Number of players (1-5)
         use_weighted: If True, use weighted random selection (favors themes with more heroes)
         require_position_coverage: If True, only select themes with heroes in all positions 1-5
+        link_heroes: If True, hero names link to the official Dota 2 hero page
 
     Returns:
         dict: {"theme": theme_name, "description": theme_desc, "heroes": formatted_hero_list, "hero_count": int}
@@ -628,9 +649,116 @@ def get_theme_suggestion(
     return {
         "theme": theme["name"],
         "description": theme.get("description", ""),
-        "heroes": format_hero_list(matching_heroes),
+        "heroes": format_hero_list(matching_heroes, link_heroes=link_heroes),
         "hero_count": len(matching_heroes),
         "feedback_score": theme.get("feedback_score", 0),
+    }
+
+
+def get_theme_suggestions(
+    count=1,
+    party_size=2,
+    use_weighted=False,
+    require_position_coverage=False,
+    hero_repo=None,
+    theme_repo=None,
+    link_heroes=False,
+):
+    """
+    Get multiple distinct theme suggestions for a party size (M4.3).
+
+    Themes are drawn without replacement; when fewer themes qualify than
+    requested, all qualifying themes are returned.
+
+    Returns:
+        list[dict]: Suggestion dicts from get_theme_suggestion
+    """
+    hero_repo = hero_repo or _default_hero_repo()
+    theme_repo = theme_repo or _default_theme_repo()
+    heroes = hero_repo.load_heroes()
+    themes = theme_repo.load_themes(include_hidden=False)
+
+    filtered = filter_themes(
+        themes,
+        heroes,
+        party_size=party_size,
+        require_position_coverage=require_position_coverage,
+        include_hidden=False,
+    )
+    if not filtered:
+        filtered = [t for t in themes if not t.get("is_hidden", False)]
+
+    count = max(1, count)
+    if len(filtered) <= count:
+        chosen = list(filtered)
+    else:
+        chosen = random.sample(filtered, count)
+
+    hero_map = {h["id"]: h for h in heroes}
+    suggestions = []
+    for theme in chosen:
+        matching_heroes = sorted(
+            (hero_map[hid] for hid in theme["hero_ids"] if hid in hero_map),
+            key=lambda h: h["name"],
+        )
+        suggestions.append(
+            {
+                "theme": theme["name"],
+                "description": theme.get("description", ""),
+                "heroes": format_hero_list(
+                    matching_heroes, link_heroes=link_heroes
+                ),
+                "hero_count": len(matching_heroes),
+                "feedback_score": theme.get("feedback_score", 0),
+            }
+        )
+    return suggestions
+
+
+def get_daily_theme(party_size=2, today=None, hero_repo=None, theme_repo=None):
+    """
+    Get the deterministic theme of the day (M4.3).
+
+    The same UTC calendar day always yields the same theme, so everyone
+    in every server plays the same daily theme; the selection rolls over
+    at midnight UTC.
+
+    Args:
+        today: Date override for testing (datetime.date); defaults to UTC today
+
+    Returns:
+        dict: Suggestion dict from get_theme_suggestion for the daily theme
+    """
+    hero_repo = hero_repo or _default_hero_repo()
+    theme_repo = theme_repo or _default_theme_repo()
+    heroes = hero_repo.load_heroes()
+    themes = theme_repo.load_themes(include_hidden=False)
+
+    if today is None:
+        today = datetime.datetime.now(datetime.timezone.utc).date()
+
+    filtered = filter_themes(
+        themes,
+        heroes,
+        party_size=party_size,
+        include_hidden=False,
+    )
+    if not filtered:
+        filtered = [t for t in themes if not t.get("is_hidden", False)]
+
+    seed = f"{today.isoformat()}|{len(filtered)}"
+    rng = random.Random(seed)
+    theme = rng.choice(filtered)
+
+    matching_heroes = get_heroes_by_ids(theme["hero_ids"], heroes)
+    matching_heroes.sort(key=lambda h: h["name"])
+    return {
+        "theme": theme["name"],
+        "description": theme.get("description", ""),
+        "heroes": format_hero_list(matching_heroes, link_heroes=True),
+        "hero_count": len(matching_heroes),
+        "feedback_score": theme.get("feedback_score", 0),
+        "date": today.isoformat(),
     }
 
 

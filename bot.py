@@ -96,6 +96,109 @@ intents.reactions = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# Suggestion command defaults and limits (M4.3)
+DEFAULT_PARTY_SIZE = 2
+MAX_SUGGESTION_COUNT = 5
+HELP_WORDS = {"help", "?"}
+
+# Official Dota 2 hero art, used as the suggestion embed thumbnail (M4.3)
+HERO_IMAGE_URL_TEMPLATE = (
+    "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/"
+    "{hero_id}.png"
+)
+
+
+def _parse_party_size(raw):
+    """Parse an optional party-size argument; None means the default of 2.
+
+    Raises ValueError for anything that is not an integer 1-5.
+    """
+    if raw is None:
+        return DEFAULT_PARTY_SIZE
+    size = int(raw)
+    if size < 1 or size > 5:
+        raise ValueError(f"Party size must be between 1 and 5, got {raw}")
+    return size
+
+
+def _parse_suggestion_count(raw):
+    """Parse an optional suggestion-count argument; None means 1.
+
+    Raises ValueError for anything that is not an integer.
+    """
+    if raw is None:
+        return 1
+    count = int(raw)
+    if count < 1 or count > MAX_SUGGESTION_COUNT:
+        raise ValueError(
+            f"Suggestion count must be between 1 and {MAX_SUGGESTION_COUNT}, got {raw}"
+        )
+    return count
+
+
+def hero_thumbnail_for_theme(theme_name):
+    """Hero art URL for a theme's first hero, or None when unavailable."""
+    try:
+        themes = THEME_REPO.load_themes(include_hidden=True)
+        theme = next(t for t in themes if t["name"] == theme_name)
+        heroes = core.get_heroes_by_ids(theme["hero_ids"], HERO_REPO.load_heroes())
+        heroes.sort(key=lambda h: h["name"])
+        if not heroes:
+            return None
+        return HERO_IMAGE_URL_TEMPLATE.format(hero_id=heroes[0]["id"])
+    except Exception as e:
+        logger.warning(f"Failed to build hero thumbnail for '{theme_name}': {e}")
+        return None
+
+
+def build_suggestion_embed(suggestion, lane_duos_display="", footer=None):
+    """Build the rich Discord embed for a theme suggestion (M4.3)."""
+    data = presentation.render_suggestion_embed_data(
+        theme_name=suggestion["theme"],
+        description=suggestion["description"],
+        heroes_display=suggestion["heroes"],
+        hero_count=suggestion["hero_count"],
+        feedback_score=suggestion["feedback_score"],
+        lane_duos_display=lane_duos_display,
+        thumbnail_url=hero_thumbnail_for_theme(suggestion["theme"]),
+        footer=footer,
+    )
+    embed = discord.Embed(
+        title=data["title"], description=data["description"], color=0xC23C22
+    )
+    if data["thumbnail"]:
+        embed.set_thumbnail(url=data["thumbnail"])
+    for name, value, inline in data["fields"]:
+        embed.add_field(name=name, value=value, inline=inline)
+    embed.set_footer(text=data["footer"])
+    return embed
+
+
+async def send_theme_suggestion(ctx, suggestion, footer=None):
+    """Send one theme suggestion as an embed with voting reactions."""
+    embed = build_suggestion_embed(
+        suggestion,
+        lane_duos_display=lane_duos_for_theme(suggestion["theme"]),
+        footer=footer,
+    )
+    sent_message = await ctx.send(embed=embed)
+
+    # Store the message_id with metadata for reaction handling
+    SESSION_STATE.register_suggestion(
+        message_id=sent_message.id, theme_name=suggestion["theme"]
+    )
+
+    # Add bot's own reactions to make it easier for users
+    # Note: Bot's own reactions are explicitly excluded in on_reaction_add
+    try:
+        await sent_message.add_reaction("\U0001F44D")
+        await sent_message.add_reaction("\U0001F44E")
+        await sent_message.add_reaction("\u2753")
+    except Exception as e:
+        logger.warning(f"Failed to add reactions to message: {e}")
+        # Clean up tracking if reactions couldn't be added
+        SESSION_STATE.remove_suggestion(sent_message.id)
+
 
 @tasks.loop(hours=7 * 24)  # Weekly (tasks.loop has no weeks parameter)
 async def winrate_refresh_task():
@@ -291,7 +394,7 @@ async def refresh_suggestion_display(message, theme_name):
     so the vote that was already persisted is unaffected.
     """
     try:
-        await message.edit(content=render_suggestion_for_theme(theme_name))
+        await message.edit(embed=render_suggestion_for_theme(theme_name))
     except Exception as e:
         logger.warning(f"Failed to update suggestion display: {e}")
 
@@ -485,19 +588,26 @@ async def end_modification_session(message, thread_id):
         logger.warning(f"Failed to end modification session: {e}")
 
 
-def render_suggestion_for_theme(theme_name):
-    """Re-render a theme's suggestion text from the current store (#51)."""
+def render_suggestion_data_for_theme(theme_name):
+    """Re-render a theme's suggestion embed data from the current store (#51)."""
     themes = THEME_REPO.load_themes(include_hidden=True)
     theme = next(t for t in themes if t["name"] == theme_name)
     matching_heroes = core.get_heroes_by_ids(theme["hero_ids"], HERO_REPO.load_heroes())
     matching_heroes.sort(key=lambda h: h["name"])
-    return presentation.render_theme_suggestion(
-        theme_name=theme["name"],
-        description=theme.get("description", ""),
-        heroes_display=core.format_hero_list(matching_heroes),
-        hero_count=len(matching_heroes),
-        feedback_score=theme.get("feedback_score", 0),
-        lane_duos_display=lane_duos_for_theme(theme_name),
+    return {
+        "theme": theme["name"],
+        "description": theme.get("description", ""),
+        "heroes": core.format_hero_list(matching_heroes, link_heroes=True),
+        "hero_count": len(matching_heroes),
+        "feedback_score": theme.get("feedback_score", 0),
+    }
+
+
+def render_suggestion_for_theme(theme_name):
+    """Re-render a theme's suggestion embed from the current store (#51)."""
+    data = render_suggestion_data_for_theme(theme_name)
+    return build_suggestion_embed(
+        data, lane_duos_display=lane_duos_for_theme(theme_name)
     )
 
 
@@ -508,58 +618,54 @@ async def refresh_original_suggestion(message, theme_name):
         if original_message is not None and SESSION_STATE.has_suggestion(
             original_message.id
         ):
-            new_response = render_suggestion_for_theme(theme_name)
-            await original_message.edit(content=new_response)
+            new_embed = render_suggestion_for_theme(theme_name)
+            await original_message.edit(embed=new_embed)
     except Exception as e:
         logger.warning(f"Failed to update original message: {e}")
 
 
 @bot.command(name="theme", help="Get a theme suggestion for hero selection")
-async def theme_command(ctx, party_size: int = 2):
+async def theme_command(ctx, party_size: str = None, count: str = None):
     """
-    Get a theme suggestion.
+    Get one or more theme suggestions.
 
     Usage:
-    !theme - Default party size of 2
+    !theme - Default party size of 2, one suggestion
     !theme 3 - For a party of 3 players
+    !theme 3 3 - Party of 3, three different theme suggestions
+    !theme help - In-context assistance
 
     Args:
-        party_size: Number of players (1-5)
+        party_size: Number of players (1-5), "help", or omitted
+        count: Optional number of suggestions (1-5)
     """
-    if party_size < 1 or party_size > 5:
-        await ctx.send("Party size must be between 1 and 5.")
+    if party_size is not None and party_size.lower() in HELP_WORDS:
+        await send_command_help(ctx)
+        return
+
+    try:
+        size = _parse_party_size(party_size)
+        suggestion_count = _parse_suggestion_count(count)
+    except ValueError as e:
+        await ctx.send(str(e))
+        return
+
+    if suggestion_count > 1:
+        suggestions = core.get_theme_suggestions(
+            count=suggestion_count,
+            party_size=size,
+            hero_repo=HERO_REPO,
+            theme_repo=THEME_REPO,
+            link_heroes=True,
+        )
+        for suggestion in suggestions:
+            await send_theme_suggestion(ctx, suggestion)
         return
 
     suggestion = core.get_theme_suggestion(
-        party_size, hero_repo=HERO_REPO, theme_repo=THEME_REPO
+        size, hero_repo=HERO_REPO, theme_repo=THEME_REPO, link_heroes=True
     )
-
-    response = presentation.render_theme_suggestion(
-        theme_name=suggestion["theme"],
-        description=suggestion["description"],
-        heroes_display=suggestion["heroes"],
-        hero_count=suggestion["hero_count"],
-        feedback_score=suggestion["feedback_score"],
-        lane_duos_display=lane_duos_for_theme(suggestion["theme"]),
-    )
-
-    sent_message = await ctx.send(response)
-
-    # Store the message_id with metadata for reaction handling
-    SESSION_STATE.register_suggestion(
-        message_id=sent_message.id, theme_name=suggestion["theme"]
-    )
-
-    # Add bot's own reactions to make it easier for users
-    # Note: Bot's own reactions are explicitly excluded in on_reaction_add
-    try:
-        await sent_message.add_reaction("👍")
-        await sent_message.add_reaction("👎")
-        await sent_message.add_reaction("❓")
-    except Exception as e:
-        logger.warning(f"Failed to add reactions to message: {e}")
-        # Clean up tracking if reactions couldn't be added
-        SESSION_STATE.remove_suggestion(sent_message.id)
+    await send_theme_suggestion(ctx, suggestion)
 
 
 @bot.command(
@@ -567,9 +673,63 @@ async def theme_command(ctx, party_size: int = 2):
     aliases=["tr"],
     help="Get a new theme suggestion (alias for !theme)",
 )
-async def themeroll_command(ctx, party_size: int = 2):
+async def themeroll_command(ctx, party_size: str = None, count: str = None):
     """Alias for !theme command."""
-    await theme_command.callback(ctx, party_size=party_size)
+    await theme_command.callback(ctx, party_size=party_size, count=count)
+
+
+@bot.command(
+    name="dailytheme",
+    aliases=["dt"],
+    help="Get today's theme of the day (same for everyone, rolls over at midnight UTC)",
+)
+async def daily_theme_command(ctx, party_size: str = None):
+    """
+    Get the theme of the day.
+
+    Usage:
+    !dailytheme - Theme of the day for the default party size of 2
+    !dailytheme 5 - Theme of the day for a full party
+    """
+    try:
+        size = _parse_party_size(party_size)
+    except ValueError as e:
+        await ctx.send(str(e))
+        return
+
+    try:
+        suggestion = core.get_daily_theme(
+            party_size=size, hero_repo=HERO_REPO, theme_repo=THEME_REPO
+        )
+    except Exception as e:
+        logger.error(f"Failed to build daily theme: {e}")
+        await ctx.send("\u274c Failed to load the daily theme. Please try again later.")
+        return
+
+    await send_theme_suggestion(
+        ctx, suggestion, footer=f"Theme of the day for {suggestion['date']} (UTC)"
+    )
+
+
+async def send_command_help(ctx):
+    """Send the in-context !theme help message (M4.3)."""
+    await ctx.send(
+        "**Theme Suggestions:**\n"
+        "`!theme [party_size] [count]` - Get theme suggestions\n"
+        "- `party_size`: players in your party, 1-5 (default: 2)\n"
+        "- `count`: how many different themes to roll, 1-5 (default: 1)\n"
+        "\n"
+        "**Examples:**\n"
+        "`!theme` - One theme for 2 players\n"
+        "`!theme 3` - One theme for a party of 3\n"
+        "`!theme 5 3` - Three different themes for a full party\n"
+        "`!tr 4` - Same as !theme (short alias)\n"
+        "`!dailytheme` - Today's theme, the same for everyone (rolls over at midnight UTC)\n"
+        "\n"
+        "React with \U0001F44D to upvote a theme or \U0001F44E to downvote it, "
+        "or ❓ to modify it in a thread.\n"
+        "Use `!helptheme` for all commands."
+    )
 
 
 @bot.command(name="helptheme", help="Show help for theme commands")
@@ -579,8 +739,10 @@ async def help_theme_command(ctx):
     **Dota Themer Bot Commands:**
     
     **Theme Suggestions:**
-    `!theme [party_size]` - Get a theme suggestion (default: 2 players)
-    `!tr [party_size]` - Same as !theme (short alias)
+    `!theme [party_size] [count]` - Get theme suggestions (default: 2 players, 1 theme)
+    `!tr [party_size] [count]` - Same as !theme (short alias)
+    `!dailytheme [party_size]` - Today's theme, the same for everyone (alias: !dt)
+    `!theme help` - In-context help for theme suggestions
     React with 👍 to upvote or 👎 to downvote a theme suggestion
     
     **Theme Management:**
@@ -620,8 +782,8 @@ async def theme_error_handler(ctx, error):
 
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("""
-            Usage: `!theme [party_size]` - Party size is optional (default: 2)
-            For additional help, use `!helptheme` to see all commands and usage.
+            Usage: `!theme [party_size] [count]` - Party size is optional (default: 2)
+            For additional help, use `!theme help` or `!helptheme`.
             """)
     elif isinstance(error, commands.BadArgument):
         await ctx.send("Party size must be a number between 1 and 5.")

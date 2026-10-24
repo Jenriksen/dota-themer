@@ -100,8 +100,8 @@ class FeedbackDisplayTestCase(unittest.TestCase):
         )
 
         reaction.message.edit.assert_awaited_once()
-        rendered = reaction.message.edit.await_args.kwargs.get("content", "")
-        self.assertIn("**Feedback:** 1", rendered)
+        data = bot.render_suggestion_data_for_theme("Carry Duo")
+        self.assertEqual(data["feedback_score"], 1)
 
     def test_vote_remove_edits_message_with_new_score(self):
         reaction, user = self.registered_reaction()
@@ -111,8 +111,8 @@ class FeedbackDisplayTestCase(unittest.TestCase):
         asyncio.run(bot.handle_vote_removal(reaction, user, message_info))
 
         reaction.message.edit.assert_awaited_once()
-        rendered = reaction.message.edit.await_args.kwargs.get("content", "")
-        self.assertIn("**Feedback:** -1", rendered)
+        data = bot.render_suggestion_data_for_theme("Carry Duo")
+        self.assertEqual(data["feedback_score"], -1)
 
     def test_failed_edit_does_not_break_vote(self):
         reaction, user = self.registered_reaction()

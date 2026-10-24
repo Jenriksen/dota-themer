@@ -70,6 +70,58 @@ def render_lane_duo_suggestions(duos):
     return "\n".join(lines)
 
 
+def render_suggestion_embed_data(
+    theme_name,
+    description,
+    heroes_display,
+    hero_count,
+    feedback_score,
+    lane_duos_display="",
+    thumbnail_url=None,
+    footer=None,
+):
+    """Render a theme suggestion as data for a Discord embed (M4.3).
+
+    Args:
+        theme_name: Display name of the theme
+        description: Theme description (line omitted when empty)
+        heroes_display: Pre-formatted hero list (e.g. "Axe (3), Zeus (2)")
+        hero_count: Number of matching heroes
+        feedback_score: Current feedback score
+        lane_duos_display: Pre-formatted lane duo block ("" to omit)
+        thumbnail_url: Hero art URL for the embed thumbnail (None to omit)
+        footer: Extra footer text prepended to the default footer
+
+    Returns:
+        dict: {"title", "description", "fields", "thumbnail", "footer"}
+    """
+    description_lines = []
+    if description:
+        description_lines.append(description)
+    description_lines.append(f"{hero_count} heroes match this theme")
+
+    fields = [("Heroes", heroes_display, False)]
+    if lane_duos_display:
+        duos_value = lane_duos_display.split("\n", 1)[1] if "\n" in lane_duos_display else lane_duos_display
+        fields.append(("Suggested lane duos", duos_value, False))
+
+    footer_text = f"Feedback: {feedback_score} {UP_VOTE}{DOWN_VOTE}"
+    if footer:
+        footer_text = f"{footer} \u2022 {footer_text}"
+    footer_text += (
+        f" \u2022 React {UP_VOTE}/{DOWN_VOTE} to vote (locks after 2 hours)"
+        f" \u2022 React \u2753 to modify"
+    )
+
+    return {
+        "title": theme_name,
+        "description": "\n".join(description_lines),
+        "fields": fields,
+        "thumbnail": thumbnail_url,
+        "footer": footer_text,
+    }
+
+
 def render_modification_instructions(theme_name, heroes_list):
     """Render the how-to message posted in a modification thread.
 

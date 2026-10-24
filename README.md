@@ -19,7 +19,7 @@ See [TODOs.md](TODOs.md) for detailed task tracking.
 - **Visual Attributes**: Heroes include color schemes, features, and visual characteristics for better theme matching
 - **Lane Duo Suggestions**: Theme suggestions include the best hero duo per lane (safelane/offlane), based on pair winrates built from OpenDota public matches
 - **Structured Logging**: JSON and text format logging with configurable levels
-- **Discord Bot**: `!theme [party_size]` command for Discord integration
+- **Discord Bot**: `!theme [party_size] [count]` command for Discord integration
 
 ## Data Structure
 
@@ -111,8 +111,10 @@ python bot.py
 ```
 
 **Discord Commands:**
-- `!theme [party_size]` - Get a theme suggestion (party size 1-5, default: 2)
-- `!tr [party_size]` - Short alias for `!theme` (also defaults to party size 2)
+- `!theme [party_size] [count]` - Get theme suggestions (party size 1-5, default: 2; count 1-5 distinct themes, default: 1)
+- `!theme help` - In-context help for theme suggestions
+- `!tr [party_size] [count]` - Short alias for `!theme`
+- `!dailytheme [party_size]` - Today's theme, the same for everyone (alias: `!dt`; rolls over at midnight UTC)
 - `!helptheme` - Show help information
 - `!addtheme <name> [description] <hero1> [hero2] ...` - Create a new theme
 - `!updatetheme <name> add|remove <hero1> [hero2] ...` - Add or remove heroes from a theme
