@@ -74,7 +74,7 @@ class TestBotCommands(unittest.TestCase):
         """theme command defaults to party size 2."""
         bot_content = read_bot_file()
         self.assertIn("DEFAULT_PARTY_SIZE = 2", bot_content)
-        self.assertIn("party_size: str = None", bot_content)
+        self.assertIn("party_size: Optional[str] = None", bot_content)
 
     def test_theme_command_validates_party_size(self):
         """theme command validates party size."""

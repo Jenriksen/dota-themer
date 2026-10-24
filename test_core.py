@@ -1499,9 +1499,7 @@ class TestM43EnhancedUserExperience(unittest.TestCase):
         """link_heroes=True renders names as markdown links; default stays plain."""
         heroes = [{"id": "axe", "name": "Axe", "positions": [3, 4]}]
         linked = core.format_hero_list(heroes, link_heroes=True)
-        self.assertEqual(
-            linked, "- [Axe](https://www.dota2.com/hero/axe) (pos 3,4)"
-        )
+        self.assertEqual(linked, "- [Axe](https://www.dota2.com/hero/axe) (pos 3,4)")
         self.assertEqual(core.format_hero_list(heroes), "- Axe (pos 3,4)")
 
     def test_format_hero_list_links_hero_without_id_stays_plain(self):
@@ -1550,10 +1548,16 @@ class TestM43EnhancedUserExperience(unittest.TestCase):
         """The same UTC day always yields the same daily theme."""
         day = datetime.date(2026, 10, 24)
         first = core.get_daily_theme(
-            party_size=1, today=day, hero_repo=self.hero_repo, theme_repo=self.theme_repo
+            party_size=1,
+            today=day,
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
         )
         second = core.get_daily_theme(
-            party_size=1, today=day, hero_repo=self.hero_repo, theme_repo=self.theme_repo
+            party_size=1,
+            today=day,
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
         )
         self.assertEqual(first["theme"], second["theme"])
         self.assertEqual(first["date"], "2026-10-24")

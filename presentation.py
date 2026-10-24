@@ -102,7 +102,11 @@ def render_suggestion_embed_data(
 
     fields = [("Heroes", heroes_display, False)]
     if lane_duos_display:
-        duos_value = lane_duos_display.split("\n", 1)[1] if "\n" in lane_duos_display else lane_duos_display
+        duos_value = (
+            lane_duos_display.split("\n", 1)[1]
+            if "\n" in lane_duos_display
+            else lane_duos_display
+        )
         fields.append(("Suggested lane duos", duos_value, False))
 
     footer_text = f"Feedback: {feedback_score} {UP_VOTE}{DOWN_VOTE}"

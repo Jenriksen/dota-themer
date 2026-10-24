@@ -191,8 +191,8 @@ async def send_theme_suggestion(ctx, suggestion, footer=None):
     # Add bot's own reactions to make it easier for users
     # Note: Bot's own reactions are explicitly excluded in on_reaction_add
     try:
-        await sent_message.add_reaction("\U0001F44D")
-        await sent_message.add_reaction("\U0001F44E")
+        await sent_message.add_reaction("\U0001f44d")
+        await sent_message.add_reaction("\U0001f44e")
         await sent_message.add_reaction("\u2753")
     except Exception as e:
         logger.warning(f"Failed to add reactions to message: {e}")
@@ -625,7 +625,9 @@ async def refresh_original_suggestion(message, theme_name):
 
 
 @bot.command(name="theme", help="Get a theme suggestion for hero selection")
-async def theme_command(ctx, party_size: str = None, count: str = None):
+async def theme_command(
+    ctx, party_size: Optional[str] = None, count: Optional[str] = None
+):
     """
     Get one or more theme suggestions.
 
@@ -673,7 +675,9 @@ async def theme_command(ctx, party_size: str = None, count: str = None):
     aliases=["tr"],
     help="Get a new theme suggestion (alias for !theme)",
 )
-async def themeroll_command(ctx, party_size: str = None, count: str = None):
+async def themeroll_command(
+    ctx, party_size: Optional[str] = None, count: Optional[str] = None
+):
     """Alias for !theme command."""
     await theme_command.callback(ctx, party_size=party_size, count=count)
 
@@ -683,7 +687,7 @@ async def themeroll_command(ctx, party_size: str = None, count: str = None):
     aliases=["dt"],
     help="Get today's theme of the day (same for everyone, rolls over at midnight UTC)",
 )
-async def daily_theme_command(ctx, party_size: str = None):
+async def daily_theme_command(ctx, party_size: Optional[str] = None):
     """
     Get the theme of the day.
 
@@ -726,7 +730,7 @@ async def send_command_help(ctx):
         "`!tr 4` - Same as !theme (short alias)\n"
         "`!dailytheme` - Today's theme, the same for everyone (rolls over at midnight UTC)\n"
         "\n"
-        "React with \U0001F44D to upvote a theme or \U0001F44E to downvote it, "
+        "React with \U0001f44d to upvote a theme or \U0001f44e to downvote it, "
         "or ❓ to modify it in a thread.\n"
         "Use `!helptheme` for all commands."
     )
