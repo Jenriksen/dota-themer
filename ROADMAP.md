@@ -18,7 +18,6 @@
 - [x] 100+ heroes with accurate position data (Current: 120 ✅)
 - [x] Discord bot deployed and active in at least one server (Current: 3 servers ✅)
 - [x] 72+ unit tests passing (Current: 140 ✅)
-- [ ] Regular usage by 50+ unique users/month (Future target)
 
 ---
 
@@ -316,13 +315,11 @@
 ### Phase 4 Goals
 - [x] Custom theme creation working (`!addtheme`, `!updatetheme`)
 - [x] Turbo winrate shown per hero in theme suggestions
-- [ ] 50+ unique users/month
-- [ ] User satisfaction >4/5 stars
+- [x] Enhanced user experience (rich embeds, hero links, `!dailytheme`, `!theme help`)
 
 ### Phase 5 Goals
 - [ ] 99.9% uptime
 - [ ] <5 second response time
-- [ ] 100+ unique users/month
 
 ---
 
