@@ -191,7 +191,7 @@ class TestDataDirResolution(unittest.TestCase):
 
     def test_bot_uses_env_resolved_data_dir(self):
         """bot.py never hardcodes core.DATA_DIR for its storage wiring."""
-        content = Path(__file__).parent.joinpath("bot.py").read_text()
+        content = Path(__file__).parent.joinpath("bot.py").read_text(encoding="utf-8")
         self.assertIn("storage.create_repositories(_data_dir)", content)
         self.assertIn("SqliteSessionStore(_db_path)", content)
         self.assertNotIn("storage.create_repositories(core.DATA_DIR)", content)
