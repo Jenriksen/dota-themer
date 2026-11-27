@@ -245,10 +245,21 @@ class TestUpdateThemeCommand(BotCommandTestCase):
         self.assertIn("updated successfully", sent_texts(ctx))
 
     def test_remove_heroes_directly(self):
+        """Removing one hero from a 3-hero theme succeeds."""
+        ctx = make_ctx()
+        asyncio.run(bot.update_theme_command(ctx, "Blue", "add", "axe"))
+        asyncio.run(bot.update_theme_command(ctx, "Blue", "remove", "lina"))
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Blue")
+        self.assertEqual(theme["hero_ids"], ["axe", "crystal_maiden"])
+
+    def test_remove_below_minimum_heroes_is_rejected(self):
+        """Removing heroes down to one is rejected with a friendly message."""
         ctx = make_ctx()
         asyncio.run(bot.update_theme_command(ctx, "Blue", "remove", "lina"))
         theme = next(t for t in self.theme_repo.themes if t["name"] == "Blue")
-        self.assertEqual(theme["hero_ids"], ["crystal_maiden"])
+        # The 2-hero theme is untouched; the user sees the min-heroes rule
+        self.assertEqual(theme["hero_ids"], ["lina", "crystal_maiden"])
+        self.assertIn("at least 2", sent_texts(ctx))
 
     def test_invalid_action_is_rejected(self):
         ctx = make_ctx()
