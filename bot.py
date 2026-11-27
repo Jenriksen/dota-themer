@@ -162,6 +162,50 @@ def hero_thumbnail_for_theme(theme_name):
         return None
 
 
+def user_is_theme_manager(author):
+    """True when the author can modify any theme (Manage Server/Admin)."""
+    perms = getattr(author, "guild_permissions", None)
+    if perms is None:
+        return False
+    return bool(
+        getattr(perms, "manage_guild", False) or getattr(perms, "administrator", False)
+    )
+
+
+def find_theme_by_name(theme_name):
+    """Look up a theme by (case-insensitive) name, or None."""
+    try:
+        themes = THEME_REPO.load_themes(include_hidden=True)
+    except Exception:
+        return None
+    for theme in themes:
+        if theme["name"].lower() == theme_name.strip().lower():
+            return theme
+    return None
+
+
+async def send_denial(ctx, theme_name):
+    """Send the permission denial for a theme the author may not modify.
+
+    Returns True (and messages the channel) when the modification is not
+    permitted; a missing theme returns False so the core mutation can
+    raise its own ThemeNotFoundError instead.
+    """
+    theme = find_theme_by_name(theme_name)
+    if theme is None:
+        return False
+    allowed, reason = core.can_modify_theme(
+        theme,
+        user_id=ctx.author.id,
+        has_manage_server=user_is_theme_manager(ctx.author),
+    )
+    if allowed:
+        return False
+    await ctx.send(f"\u274c {reason}")
+    logger.info(f"Denied theme modification of '{theme_name}' for {ctx.author}")
+    return True
+
+
 def build_suggestion_embed(suggestion, lane_duos_display="", footer=None):
     """Build the rich Discord embed for a theme suggestion (M4.3)."""
     data = presentation.render_suggestion_embed_data(
@@ -519,6 +563,22 @@ async def on_message(message):
     thread_id = message.channel.id
     thread_info = SESSION_STATE.get_thread(thread_id=thread_id)
     theme_name = thread_info["theme_name"]
+
+    # Only the user who opened the thread (or a moderator) may apply
+    # modifications inside it
+    if message.author.id != thread_info["user_id"] and not user_is_theme_manager(
+        message.author
+    ):
+        logger.info(
+            f"Ignoring modification from {message.author} in thread "
+            f"{thread_id}: not the thread owner"
+        )
+        await message.channel.send(
+            "\u274c Only the member who opened this thread or a user "
+            "with Manage Server permission can modify this theme."
+        )
+        return
+
     content = message.content.strip()
 
     if thread_commands.is_exit_command(content):
@@ -543,11 +603,17 @@ async def on_message(message):
     try:
         if parsed.action == "add":
             message_text = core.update_theme(
-                theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
+                theme_name,
+                add_hero_ids=hero_ids,
+                theme_repo=THEME_REPO,
+                acting_user=message.author.id,
             )
         else:
             message_text = core.update_theme(
-                theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
+                theme_name,
+                remove_hero_ids=hero_ids,
+                theme_repo=THEME_REPO,
+                acting_user=message.author.id,
             )
     except core.ThemeError as e:
         await message.channel.send(f"\u274c {e}")
@@ -854,6 +920,11 @@ async def help_theme_command(ctx):
     `!hidetheme "My Custom Theme"` - Hide from suggestions
     `!unhidetheme "My Custom Theme"` - Show in suggestions again
     
+    **Permissions:**
+    Everyone can create themes with `!addtheme` and vote on suggestions
+    Theme mutations (`!updatetheme`, `!hidetheme`, `!unhidetheme`, modification threads) are limited to the theme's creator or users with Manage Server permission
+    Curated (built-in) themes can only be modified by users with Manage Server permission
+
     **Feedback:**
     React with 👍 to upvote a theme or 👎 to downvote it
     
@@ -931,10 +1002,14 @@ async def add_theme_command(ctx, theme_name: str, *args):
         )
         return
 
-    # Add the theme
+    # Add the theme (recording the creator for the audit trail)
     try:
         message = core.add_theme(
-            theme_name, description, hero_ids, theme_repo=THEME_REPO
+            theme_name,
+            description,
+            hero_ids,
+            theme_repo=THEME_REPO,
+            created_by=ctx.author.id,
         )
         logger.info(f"Theme added by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
@@ -956,8 +1031,13 @@ async def hide_theme_command(ctx, theme_name: str):
     """
     logger.info(f"Hide theme command from {ctx.author}: {theme_name}")
 
+    if await send_denial(ctx, theme_name):
+        return
+
     try:
-        message = core.hide_theme(theme_name, theme_repo=THEME_REPO)
+        message = core.hide_theme(
+            theme_name, theme_repo=THEME_REPO, acting_user=ctx.author.id
+        )
         logger.info(f"Theme hidden by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
     except core.ThemeError as e:
@@ -978,8 +1058,13 @@ async def unhide_theme_command(ctx, theme_name: str):
     """
     logger.info(f"Unhide theme command from {ctx.author}: {theme_name}")
 
+    if await send_denial(ctx, theme_name):
+        return
+
     try:
-        message = core.unhide_theme(theme_name, theme_repo=THEME_REPO)
+        message = core.unhide_theme(
+            theme_name, theme_repo=THEME_REPO, acting_user=ctx.author.id
+        )
         logger.info(f"Theme unhidden by {ctx.author}: {theme_name}")
         await ctx.send(f"✅ {message}")
     except core.ThemeError as e:
@@ -1008,6 +1093,9 @@ async def update_theme_command(
     !updatetheme "Red Heroes" remove bloodseeker
     """
     logger.info(f"Update theme command from {ctx.author}: {theme_name} {action} {args}")
+
+    if await send_denial(ctx, theme_name):
+        return
 
     if action is None:
         await open_interactive_modification(ctx, theme_name)
@@ -1090,11 +1178,17 @@ async def apply_direct_theme_update(ctx, theme_name, action, hero_name_args):
     try:
         if action == "add":
             message = core.update_theme(
-                theme_name, add_hero_ids=hero_ids, theme_repo=THEME_REPO
+                theme_name,
+                add_hero_ids=hero_ids,
+                theme_repo=THEME_REPO,
+                acting_user=ctx.author.id,
             )
         else:
             message = core.update_theme(
-                theme_name, remove_hero_ids=hero_ids, theme_repo=THEME_REPO
+                theme_name,
+                remove_hero_ids=hero_ids,
+                theme_repo=THEME_REPO,
+                acting_user=ctx.author.id,
             )
         logger.info(f"Theme updated by {ctx.author}: {theme_name}")
         await ctx.send(f"\u2705 {message}")
