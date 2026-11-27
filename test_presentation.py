@@ -146,7 +146,11 @@ class TestRenderSuggestionEmbedData(unittest.TestCase):
         self.assertEqual(data["title"], "T")
         self.assertNotIn("Theme of the day", data["footer"])
         self.assertIsNone(data["thumbnail"])
-        self.assertEqual(len(data["fields"]), 1)
+        # Heroes + the modification guide (M4.1)
+        self.assertEqual(len(data["fields"]), 2)
+        self.assertEqual(data["fields"][1][0], "Modify this theme")
+        self.assertIn("!updatetheme", data["fields"][1][1])
+        self.assertIn("!addtheme", data["fields"][1][1])
 
     def test_embed_data_includes_lane_duos_field(self):
         data = presentation.render_suggestion_embed_data(
@@ -157,11 +161,12 @@ class TestRenderSuggestionEmbedData(unittest.TestCase):
             feedback_score=0,
             lane_duos_display="**Suggested lane duos:**\nOfflane: Axe + Chen (55% over ~22 games)",
         )
-        self.assertEqual(len(data["fields"]), 2)
+        self.assertEqual(len(data["fields"]), 3)
         self.assertEqual(data["fields"][1][0], "Suggested lane duos")
         self.assertEqual(
             data["fields"][1][1], "Offlane: Axe + Chen (55% over ~22 games)"
         )
+        self.assertEqual(data["fields"][2][0], "Modify this theme")
 
 
 if __name__ == "__main__":
