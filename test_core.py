@@ -641,6 +641,88 @@ class TestInvalidInputs(unittest.TestCase):
         self.assertIn("theme", result)
 
 
+class TestThemePermissionsAndAudit(unittest.TestCase):
+    """Tests for theme permissions and the audit trail."""
+
+    def setUp(self):
+        self.hero_repo = InMemoryHeroRepository(
+            [
+                {"id": "axe", "name": "Axe", "positions": [3, 4]},
+                {"id": "lina", "name": "Lina", "positions": [2]},
+                {"id": "zuus", "name": "Zeus", "positions": [2]},
+                {"id": "pudge", "name": "Pudge", "positions": [4]},
+            ]
+        )
+        self.theme_repo = InMemoryThemeRepository(
+            [
+                {"name": "Curated", "hero_ids": ["axe", "lina"]},
+                {"name": "Custom", "hero_ids": ["zuus", "pudge"], "created_by": 42},
+            ]
+        )
+
+    def test_add_theme_records_creator(self):
+        """add_theme stores created_by for the audit trail."""
+        core.add_theme(
+            "New",
+            hero_ids=["axe", "zuus"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+            created_by=7,
+        )
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "New")
+        self.assertEqual(theme["created_by"], 7)
+
+    def test_update_theme_records_last_modified_by(self):
+        """update_theme stamps last_modified_by."""
+        core.update_theme(
+            "Custom",
+            add_hero_ids=["axe"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+            acting_user=99,
+        )
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Custom")
+        self.assertEqual(theme["last_modified_by"], 99)
+
+    def test_hide_and_unhide_record_last_modified_by(self):
+        """hide_theme/unhide_theme stamp last_modified_by."""
+        core.hide_theme("Custom", theme_repo=self.theme_repo, acting_user=7)
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Custom")
+        self.assertEqual(theme["last_modified_by"], 7)
+        core.unhide_theme("Custom", theme_repo=self.theme_repo, acting_user=8)
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Custom")
+        self.assertEqual(theme["last_modified_by"], 8)
+
+    def test_creator_can_modify_own_theme(self):
+        """The creator may modify their own theme."""
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Custom")
+        allowed, reason = core.can_modify_theme(theme, user_id=42)
+        self.assertTrue(allowed)
+        self.assertEqual(reason, "")
+
+    def test_non_creator_cannot_modify_foreign_theme(self):
+        """A stranger cannot modify a theme someone else created."""
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Custom")
+        allowed, reason = core.can_modify_theme(theme, user_id=1)
+        self.assertFalse(allowed)
+        self.assertIn("creator", reason)
+
+    def test_curated_themes_require_manage_server(self):
+        """Themes without created_by (curated) are moderator-only."""
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Curated")
+        allowed, reason = core.can_modify_theme(theme, user_id=42)
+        self.assertFalse(allowed)
+        self.assertIn("Manage Server", reason)
+        allowed, _ = core.can_modify_theme(theme, user_id=42, has_manage_server=True)
+        self.assertTrue(allowed)
+
+    def test_moderator_can_modify_any_theme(self):
+        """Manage Server permission allows modifying any theme."""
+        theme = next(t for t in self.theme_repo.themes if t["name"] == "Custom")
+        allowed, _ = core.can_modify_theme(theme, user_id=1, has_manage_server=True)
+        self.assertTrue(allowed)
+
+
 class TestDataConsistencyEdgeCases(unittest.TestCase):
     """Tests for data consistency edge cases."""
 

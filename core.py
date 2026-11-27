@@ -761,7 +761,12 @@ def get_daily_theme(party_size=2, today=None, hero_repo=None, theme_repo=None):
 
 
 def add_theme(
-    theme_name, description="", hero_ids=None, hero_repo=None, theme_repo=None
+    theme_name,
+    description="",
+    hero_ids=None,
+    hero_repo=None,
+    theme_repo=None,
+    created_by=None,
 ):
     """
     Add a new theme via the theme repository.
@@ -836,6 +841,7 @@ def add_theme(
         "name": theme_name,
         "description": description.strip() if description else "",
         "hero_ids": validated_hero_ids,
+        "created_by": created_by,
     }
 
     # Add to themes
@@ -864,6 +870,7 @@ def update_theme(
     new_description=None,
     hero_repo=None,
     theme_repo=None,
+    acting_user=None,
 ):
     """
     Update an existing theme by adding/removing heroes or changing description.
@@ -932,6 +939,9 @@ def update_theme(
     if new_description is not None:
         theme["description"] = new_description.strip()
 
+    # Audit trail: who last modified this theme
+    theme["last_modified_by"] = acting_user
+
     # Update hero IDs
     theme["hero_ids"] = sorted(list(current_hero_ids))
 
@@ -949,7 +959,36 @@ def update_theme(
         raise ThemeDataError(f"Failed to save theme: {str(e)}") from e
 
 
-def hide_theme(theme_name, theme_repo=None):
+def can_modify_theme(theme, user_id=None, has_manage_server=False):
+    """Decide whether a user may modify a theme.
+
+    Themes are community content, so the rule is:
+    - users with Manage Server permission can modify any theme;
+    - other users can modify themes they created themselves;
+    - curated themes (no created_by) are moderator-only.
+
+    Returns:
+        tuple: (allowed: bool, reason: str) - reason explains a denial
+    """
+    if has_manage_server:
+        return True, ""
+    created_by = theme.get("created_by")
+    if created_by is None:
+        return (
+            False,
+            f"Theme '{theme['name']}' is a curated theme; only users with "
+            "Manage Server permission can modify it.",
+        )
+    if user_id is not None and user_id == created_by:
+        return True, ""
+    return (
+        False,
+        f"Theme '{theme['name']}' was created by someone else; only its "
+        "creator or a user with Manage Server permission can modify it.",
+    )
+
+
+def hide_theme(theme_name, theme_repo=None, acting_user=None):
     """
     Hide a theme (mark as hidden so it doesn't appear in suggestions).
 
@@ -990,6 +1029,7 @@ def hide_theme(theme_name, theme_repo=None):
 
     # Hide the theme
     themes[theme_index]["is_hidden"] = True
+    themes[theme_index]["last_modified_by"] = acting_user
 
     # Sort themes by name
     themes.sort(key=lambda t: t["name"])
@@ -1005,7 +1045,7 @@ def hide_theme(theme_name, theme_repo=None):
         raise ThemeDataError(f"Failed to save theme: {str(e)}") from e
 
 
-def unhide_theme(theme_name, theme_repo=None):
+def unhide_theme(theme_name, theme_repo=None, acting_user=None):
     """
     Unhide a theme (mark as visible so it appears in suggestions).
 
@@ -1051,6 +1091,7 @@ def unhide_theme(theme_name, theme_repo=None):
 
     # Unhide the theme
     themes[theme_index]["is_hidden"] = False
+    themes[theme_index]["last_modified_by"] = acting_user
 
     # Sort themes by name
     themes.sort(key=lambda t: t["name"])

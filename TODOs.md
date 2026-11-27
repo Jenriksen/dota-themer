@@ -93,8 +93,8 @@
   - [ ] Error Messages: Could be more user-friendly
   - [x] Hide/UnHide Themes: Implemented via `!hidetheme`/`!unhidetheme` (users cannot delete, only hide from suggestions)
   - [ ] Categories: Theme categories not yet implemented (mentioned in ROADMAP)
-  - [ ] Permissions: No permission system (any user can modify themes)
-  - [ ] Audit Log: No logging of who created/modified themes
+  - [x] Permissions: Theme mutations gated to the creator or users with Manage Server permission; curated themes are moderator-only (core.can_modify_theme, bot send_denial)
+  - [x] Audit Log: themes store created_by / last_modified_by; mutations log the acting user
 - [ ] Theme categories (visual, lore, mechanical)
 - [ ] Winrate-based position recommendations (deferred — ROADMAP M4.2 MVP shipped)
 - [x] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md); implemented: pair winrates from OpenDota publicMatches, suggested on theme posts)

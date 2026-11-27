@@ -92,6 +92,25 @@ class TestBotCommands(unittest.TestCase):
         bot_content = read_bot_file()
         self.assertIn("core.get_theme_suggestions(", bot_content)
 
+    def test_theme_permission_gates(self):
+        """Theme mutations are gated by creator-or-moderator checks."""
+        bot_content = read_bot_file()
+        self.assertIn("core.can_modify_theme(", bot_content)
+        self.assertIn("user_is_theme_manager(", bot_content)
+        self.assertIn("await send_denial(ctx, theme_name)", bot_content)
+
+    def test_addtheme_records_creator(self):
+        """!addtheme stores the creator id for the audit trail."""
+        bot_content = read_bot_file()
+        self.assertIn("created_by=ctx.author.id", bot_content)
+        self.assertIn("acting_user=ctx.author.id", bot_content)
+
+    def test_thread_modifications_are_owner_gated(self):
+        """Only the thread owner or a moderator may modify inside a thread."""
+        bot_content = read_bot_file()
+        self.assertIn('message.author.id != thread_info["user_id"]', bot_content)
+        self.assertIn("acting_user=message.author.id", bot_content)
+
     def test_daily_theme_command(self):
         """!dailytheme shows the deterministic theme of the day (M4.3)."""
         bot_content = read_bot_file()
