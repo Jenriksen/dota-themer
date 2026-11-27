@@ -15,6 +15,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 # every command with a mock, so the mock's Bot.command()/Bot.event()
 # decorators pass the original coroutine through (with .callback/.error
 # attributes the bot code relies on).
+
 if "bot" not in sys.modules:
 
     class _PassthroughCommand:
