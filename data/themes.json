@@ -2,6 +2,7 @@
   {
     "name": "Agility Heroes",
     "description": "Heroes with Agility as primary attribute",
+    "category": "mechanical",
     "hero_ids": [
       "antimage",
       "arc_warden",
@@ -44,6 +45,7 @@
   {
     "name": "Animal Companions",
     "description": "Heroes that have animal companions or summons",
+    "category": "lore",
     "hero_ids": [
       "beastmaster",
       "chen",
@@ -58,6 +60,7 @@
   {
     "name": "Beards",
     "description": "Heroes with facial hair",
+    "category": "visual",
     "hero_ids": [
       "axe",
       "bristleback",
@@ -72,6 +75,7 @@
   {
     "name": "Black Heroes",
     "description": "Heroes with predominantly black or dark color schemes",
+    "category": "visual",
     "hero_ids": [
       "abaddon",
       "antimage",
@@ -86,6 +90,7 @@
   {
     "name": "Blue Heroes",
     "description": "Heroes with predominantly blue color schemes",
+    "category": "visual",
     "hero_ids": [
       "zuus",
       "crystal_maiden",
@@ -97,6 +102,7 @@
   {
     "name": "Demonic Heroes",
     "description": "Heroes with demonic or infernal themes",
+    "category": "lore",
     "hero_ids": [
       "abaddon",
       "doombringer",
@@ -113,6 +119,7 @@
   {
     "name": "Dwarven Heroes",
     "description": "Heroes with dwarven or stout appearance",
+    "category": "visual",
     "hero_ids": [
       "bounty_hunter",
       "brewmaster",
@@ -125,6 +132,7 @@
   {
     "name": "Elven Heroes",
     "description": "Heroes with elven appearance",
+    "category": "visual",
     "hero_ids": [
       "drow_ranger",
       "luna",
@@ -136,6 +144,7 @@
   {
     "name": "Giant Heroes",
     "description": "Large or giant heroes",
+    "category": "visual",
     "hero_ids": [
       "centaur",
       "earthshaker",
@@ -151,6 +160,7 @@
   {
     "name": "Glowing Heroes",
     "description": "Heroes with glowing or magical auras",
+    "category": "visual",
     "hero_ids": [
       "crystal_maiden",
       "dazzle",
@@ -166,6 +176,7 @@
   {
     "name": "Green Heroes",
     "description": "Heroes with predominantly green color schemes",
+    "category": "visual",
     "hero_ids": [
       "clinkz",
       "invoker",
@@ -181,6 +192,7 @@
   {
     "name": "Hooded Heroes",
     "description": "Heroes that wear hoods or cloaks",
+    "category": "visual",
     "hero_ids": [
       "clinkz",
       "drow_ranger",
@@ -199,6 +211,7 @@
   {
     "name": "Horns",
     "description": "Heroes with visible horns",
+    "category": "visual",
     "hero_ids": [
       "alchemist",
       "beastmaster",
@@ -220,6 +233,7 @@
   {
     "name": "Intelligence Heroes",
     "description": "Heroes with Intelligence as primary attribute",
+    "category": "mechanical",
     "hero_ids": [
       "ancient_apparition",
       "bane",
@@ -261,6 +275,7 @@
   {
     "name": "Masked Heroes",
     "description": "Heroes that wear masks",
+    "category": "visual",
     "hero_ids": [
       "batrider",
       "bounty_hunter",
@@ -283,6 +298,7 @@
   {
     "name": "Melee Heroes",
     "description": "Heroes with melee attacks",
+    "category": "mechanical",
     "hero_ids": [
       "abaddon",
       "alchemist",
@@ -336,6 +352,7 @@
   {
     "name": "Melee Strength",
     "description": "Heroes that are melee and have strength as primary attribute",
+    "category": "mechanical",
     "hero_ids": [
       "axe",
       "bristleback",
@@ -359,6 +376,7 @@
   {
     "name": "Poor Eyesight",
     "description": "Heroes wearing glasses or with vision-related lore",
+    "category": "lore",
     "hero_ids": [
       "dazzle",
       "enigma",
@@ -371,6 +389,7 @@
   {
     "name": "Purple Heroes",
     "description": "Heroes with predominantly purple color schemes",
+    "category": "visual",
     "hero_ids": [
       "death_prophet",
       "disruptor",
@@ -385,6 +404,7 @@
   {
     "name": "Ranged Agility",
     "description": "Heroes that are ranged and have agility as primary attribute",
+    "category": "mechanical",
     "hero_ids": [
       "bloodseeker",
       "drow_ranger",
@@ -402,6 +422,7 @@
   {
     "name": "Ranged Heroes",
     "description": "Heroes with ranged attacks",
+    "category": "mechanical",
     "hero_ids": [
       "ancient_apparition",
       "bane",
@@ -449,6 +470,7 @@
   {
     "name": "Red Heroes",
     "description": "Heroes with predominantly red color schemes",
+    "category": "visual",
     "hero_ids": [
       "bloodseeker",
       "juggernaut",
@@ -463,6 +485,7 @@
   {
     "name": "Rides a Steed",
     "description": "Heroes that ride mounts or animals into battle",
+    "category": "visual",
     "hero_ids": [
       "batrider",
       "chaos_knight",
@@ -475,6 +498,7 @@
   {
     "name": "Strength Heroes",
     "description": "Heroes with Strength as primary attribute",
+    "category": "mechanical",
     "hero_ids": [
       "abaddon",
       "alchemist",
@@ -517,6 +541,7 @@
   {
     "name": "Support Heroes",
     "description": "Heroes with Support as primary role",
+    "category": "mechanical",
     "hero_ids": [
       "bane",
       "crystal_maiden",
@@ -539,6 +564,7 @@
   {
     "name": "Tails",
     "description": "Heroes with tails",
+    "category": "visual",
     "hero_ids": [
       "broodmother",
       "clinkz",
@@ -562,6 +588,7 @@
   {
     "name": "Undead Heroes",
     "description": "Undead or skeletal heroes",
+    "category": "lore",
     "hero_ids": [
       "abaddon",
       "clinkz",
@@ -578,6 +605,7 @@
   {
     "name": "Visible Teeth",
     "description": "Heroes that show their teeth prominently",
+    "category": "visual",
     "hero_ids": [
       "bloodseeker",
       "largo",
@@ -594,6 +622,7 @@
   {
     "name": "White Heroes",
     "description": "Heroes with predominantly white or light color schemes",
+    "category": "visual",
     "hero_ids": [
       "ancient_apparition",
       "crystal_maiden",
@@ -606,6 +635,7 @@
   {
     "name": "Wings",
     "description": "Heroes with wings",
+    "category": "visual",
     "hero_ids": [
       "ancient_apparition",
       "drow_ranger",
@@ -622,6 +652,7 @@
   {
     "name": "Has a Hat",
     "description": "Heroes that wear fabulous hats",
+    "category": "visual",
     "hero_ids": [
       "batrider",
       "chen",
@@ -638,6 +669,7 @@
   {
     "name": "Bald Heroes",
     "description": "Heroes with no hair at all",
+    "category": "visual",
     "hero_ids": [
       "antimage",
       "earthshaker",
@@ -653,6 +685,7 @@
   {
     "name": "Cape Wearers",
     "description": "Heroes rocking capes like superheroes",
+    "category": "visual",
     "hero_ids": [
       "legion_commander",
       "phantom_lancer",
@@ -667,6 +700,7 @@
   {
     "name": "One-Eyed Heroes",
     "description": "Heroes with an eye patch or missing an eye",
+    "category": "visual",
     "hero_ids": [
       "kunkka",
       "tidehunter",
@@ -677,6 +711,7 @@
   {
     "name": "Tiny Heroes",
     "description": "Heroes that are surprisingly small",
+    "category": "visual",
     "hero_ids": [
       "meepo",
       "pugna",
@@ -689,6 +724,7 @@
   {
     "name": "Scary Faces",
     "description": "Heroes with terrifying visages",
+    "category": "visual",
     "hero_ids": [
       "abaddon",
       "doombringer",
@@ -705,6 +741,7 @@
   {
     "name": "Robots and Machines",
     "description": "Mechanical heroes and constructs",
+    "category": "visual",
     "hero_ids": [
       "rattletrap",
       "tinker",
@@ -716,6 +753,7 @@
   {
     "name": "Fire Themed",
     "description": "Heroes associated with fire and flames",
+    "category": "mechanical",
     "hero_ids": [
       "batrider",
       "doombringer",
@@ -731,6 +769,7 @@
   {
     "name": "Ice Themed",
     "description": "Heroes associated with ice and frost",
+    "category": "mechanical",
     "hero_ids": [
       "crystal_maiden",
       "ancient_apparition",
@@ -742,6 +781,7 @@
   {
     "name": "Nature Themed",
     "description": "Heroes connected to nature and plants",
+    "category": "mechanical",
     "hero_ids": [
       "natures_prophet",
       "treant",
@@ -756,6 +796,7 @@
   {
     "name": "Has a Sword",
     "description": "Heroes that wield swords",
+    "category": "visual",
     "hero_ids": [
       "chaos_knight",
       "dragon_knight",
@@ -772,6 +813,7 @@
   {
     "name": "Has a Staff",
     "description": "Heroes that use staffs or staves",
+    "category": "visual",
     "hero_ids": [
       "crystal_maiden",
       "lichen",
@@ -786,6 +828,7 @@
   {
     "name": "Flying Heroes",
     "description": "Heroes that can fly or have flight abilities",
+    "category": "mechanical",
     "hero_ids": [
       "batrider",
       "drow_ranger",
@@ -800,6 +843,7 @@
   {
     "name": "Invisible Heroes",
     "description": "Heroes with stealth or invisibility abilities",
+    "category": "mechanical",
     "hero_ids": [
       "clinkz",
       "bounty_hunter",
@@ -811,6 +855,7 @@
   {
     "name": "Summoners",
     "description": "Heroes that can summon units",
+    "category": "mechanical",
     "hero_ids": [
       "beastmaster",
       "broodmother",
@@ -827,6 +872,7 @@
   {
     "name": "Healers",
     "description": "Heroes with healing abilities",
+    "category": "mechanical",
     "hero_ids": [
       "abaddon",
       "chen",
@@ -841,6 +887,7 @@
   {
     "name": "Tanky Heroes",
     "description": "Heroes that can take a beating",
+    "category": "mechanical",
     "hero_ids": [
       "abaddon",
       "alchemist",
@@ -859,6 +906,7 @@
   {
     "name": "Squishy Heroes",
     "description": "Heroes that die easily",
+    "category": "mechanical",
     "hero_ids": [
       "crystal_maiden",
       "lina",
@@ -873,6 +921,7 @@
   {
     "name": "Fast Heroes",
     "description": "Heroes known for their speed",
+    "category": "mechanical",
     "hero_ids": [
       "ember_spirit",
       "storm_spirit",
@@ -887,6 +936,7 @@
   {
     "name": "Slow Heroes",
     "description": "Heroes that are... not so fast",
+    "category": "mechanical",
     "hero_ids": [
       "tidehunter",
       "wraith_king",
@@ -900,6 +950,7 @@
   {
     "name": "Cool as Ice",
     "description": "Heroes that keep their cool",
+    "category": "lore",
     "hero_ids": [
       "crystal_maiden",
       "ancient_apparition",
@@ -910,6 +961,7 @@
   {
     "name": "Hats Off to You",
     "description": "Heroes who prefer to go hatless",
+    "category": "visual",
     "hero_ids": [
       "juggernaut",
       "antimage",

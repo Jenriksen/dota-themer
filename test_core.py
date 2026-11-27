@@ -721,6 +721,133 @@ class TestThemePermissionsAndAudit(unittest.TestCase):
         theme = next(t for t in self.theme_repo.themes if t["name"] == "Custom")
         allowed, _ = core.can_modify_theme(theme, user_id=1, has_manage_server=True)
         self.assertTrue(allowed)
+def load_themes_json():
+    """Load the themes.json seed file directly (data integrity tests)."""
+    path = Path(__file__).parent / "data" / "themes.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+class TestThemeCategories(unittest.TestCase):
+    """Tests for theme categories (M3.2)."""
+
+    def setUp(self):
+        self.heroes = [
+            {"id": "axe", "name": "Axe", "positions": [3, 4]},
+            {"id": "lina", "name": "Lina", "positions": [2]},
+            {"id": "crystal_maiden", "name": "Crystal Maiden", "positions": [5]},
+            {"id": "zuus", "name": "Zeus", "positions": [2]},
+            {"id": "pudge", "name": "Pudge", "positions": [4]},
+        ]
+        self.themes = [
+            {"name": "Red", "hero_ids": ["axe", "pudge"], "category": "visual"},
+            {"name": "Lore", "hero_ids": ["zuus", "lina"], "category": "lore"},
+            {"name": "Melee", "hero_ids": ["axe", "pudge"], "category": "mechanical"},
+            {"name": "Uncategorized", "hero_ids": ["axe", "lina"]},
+        ]
+
+    def test_filter_themes_by_category(self):
+        """filter_themes returns only themes in the requested category."""
+        visual = core.filter_themes(self.themes, self.heroes, category="visual")
+        self.assertEqual([t["name"] for t in visual], ["Red"])
+
+    def test_filter_themes_without_category_returns_all(self):
+        """No category filter keeps all themes, categorized or not."""
+        all_themes = core.filter_themes(self.themes, self.heroes)
+        self.assertEqual(len(all_themes), 4)
+
+    def test_uncategorized_theme_never_matches_category_filter(self):
+        """A theme without a category is excluded from any category filter."""
+        for category in core.THEME_CATEGORIES:
+            names = [
+                t["name"]
+                for t in core.filter_themes(self.themes, self.heroes, category=category)
+            ]
+            self.assertNotIn("Uncategorized", names)
+
+    def test_seed_themes_all_have_valid_category(self):
+        """Every curated theme in themes.json carries a valid category."""
+        for theme in load_themes_json():
+            self.assertIn(
+                theme.get("category"),
+                core.THEME_CATEGORIES,
+                f"Theme '{theme['name']}' has an invalid or missing category",
+            )
+
+    def test_get_theme_suggestion_respects_category(self):
+        """Suggestions with a category only draw from that category."""
+        hero_repo = InMemoryHeroRepository(self.heroes)
+        theme_repo = InMemoryThemeRepository(self.themes)
+        for _ in range(10):
+            suggestion = core.get_theme_suggestion(
+                party_size=1,
+                hero_repo=hero_repo,
+                theme_repo=theme_repo,
+                category="lore",
+            )
+            self.assertEqual(suggestion["theme"], "Lore")
+
+    def test_theme_categories_constant(self):
+        """The category vocabulary is exactly visual, lore, mechanical."""
+        self.assertEqual(core.THEME_CATEGORIES, ("visual", "lore", "mechanical"))
+def load_heroes_json():
+    """Load the heroes.json seed file directly (data integrity tests)."""
+    path = Path(__file__).parent / "data" / "heroes.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+class TestHeroAliases(unittest.TestCase):
+    """Tests for hero abbreviations in the aliases field (M4.1/TODOs)."""
+
+    def test_aliases_are_unique_across_heroes(self):
+        """No abbreviation is claimed by two heroes (would break resolution)."""
+        heroes = load_heroes_json()
+        seen = {}
+        for hero in heroes:
+            for alias in hero.get("aliases", []):
+                low = alias.lower()
+                self.assertNotIn(
+                    low,
+                    seen,
+                    f"Alias '{alias}' is claimed by both "
+                    f"'{seen.get(low)}' and '{hero['id']}'",
+                )
+                seen[low] = hero["id"]
+
+    def test_aliases_do_not_collide_with_other_hero_names(self):
+        """An alias must not match another hero's id or display name."""
+        heroes = load_heroes_json()
+        for hero in heroes:
+            for alias in hero.get("aliases", []):
+                low = alias.lower()
+                for other in heroes:
+                    if other["id"] == hero["id"]:
+                        continue
+                    self.assertNotEqual(
+                        low,
+                        other["id"].lower(),
+                        f"Alias '{alias}' collides with hero id '{other['id']}'",
+                    )
+                    self.assertNotEqual(
+                        low,
+                        other["name"].lower(),
+                        f"Alias '{alias}' collides with '{other['name']}'",
+                    )
+
+    def test_resolver_matches_common_abbreviations(self):
+        """Common Dota 2 abbreviations resolve to the right hero."""
+        resolver = core.HeroResolver(InMemoryHeroRepository(load_heroes_json()))
+        expectations = {
+            "ta": "templar_assassin",
+            "io": "wisp",
+            "cw": "rattletrap",
+            "ck": "chaos_knight",
+            "ls": "life_stealer",
+            "potm": "mirana",
+            "mk": "monkey_king",
+            "magnus": "magnataur",
+        }
+        for alias, expected in expectations.items():
+            self.assertEqual(resolver.resolve(alias), expected, f"alias {alias}")
 
 
 class TestDataConsistencyEdgeCases(unittest.TestCase):
@@ -1216,6 +1343,12 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_update_theme_remove_heroes(self):
         """update_theme removes heroes from existing theme."""
+        core.update_theme(
+            "Carry Duo",
+            add_hero_ids=["zuus"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
         message = core.update_theme(
             "Carry Duo",
             remove_hero_ids=["antimage"],
@@ -1227,7 +1360,23 @@ class TestThemeManagement(unittest.TestCase):
         theme = next(
             (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
         )
-        self.assertEqual(theme["hero_ids"], ["juggernaut"])
+        self.assertEqual(theme["hero_ids"], ["juggernaut", "zuus"])
+
+    def test_update_theme_cannot_drop_below_minimum_heroes(self):
+        """Removing heroes below MIN_THEME_HEROES is rejected, not saved."""
+        with self.assertRaises(core.TooFewHeroesError):
+            core.update_theme(
+                "Carry Duo",
+                remove_hero_ids=["antimage", "juggernaut"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+
+        theme = next(
+            (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
+        )
+        # The rejected update leaves the theme untouched
+        self.assertEqual(theme["hero_ids"], ["antimage", "juggernaut"])
 
     def test_update_theme_nonexistent(self):
         """update_theme rejects nonexistent theme."""
@@ -1325,7 +1474,7 @@ class TestRepositoryInjection(unittest.TestCase):
         message = core.add_theme(
             "New Theme",
             description="d",
-            hero_ids=["lina"],
+            hero_ids=["axe", "lina"],
             hero_repo=hero_repo,
             theme_repo=theme_repo,
         )
@@ -1690,16 +1839,21 @@ class TestTypedResults(unittest.TestCase):
             [
                 {"id": "axe", "name": "Axe", "positions": [3]},
                 {"id": "zuus", "name": "Zeus", "positions": [2]},
+                {"id": "pudge", "name": "Pudge", "positions": [4]},
             ]
         )
         self.theme_repo = InMemoryThemeRepository(
-            [{"name": "Existing", "description": "", "hero_ids": ["axe"]}]
+            [{"name": "Existing", "description": "", "hero_ids": ["axe", "zuus"]}]
         )
 
     def test_add_theme_success_returns_message(self):
         """Successful add_theme returns the success message string."""
         message = core.add_theme(
-            "New", "d", ["zuus"], hero_repo=self.hero_repo, theme_repo=self.theme_repo
+            "New",
+            "d",
+            ["axe", "pudge"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
         )
         self.assertIsInstance(message, str)
         self.assertIn("added successfully", message)
@@ -1724,6 +1878,13 @@ class TestTypedResults(unittest.TestCase):
         with self.assertRaises(core.DuplicateHeroSetError):
             core.add_theme(
                 "Dup Set",
+                hero_ids=["axe", "zuus"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+        with self.assertRaises(core.TooFewHeroesError):
+            core.add_theme(
+                "Too Few",
                 hero_ids=["axe"],
                 hero_repo=self.hero_repo,
                 theme_repo=self.theme_repo,
@@ -1752,6 +1913,7 @@ class TestTypedResults(unittest.TestCase):
             core.DuplicateHeroSetError,
             core.ThemeNotFoundError,
             core.ThemeDataError,
+            core.TooFewHeroesError,
         ):
             self.assertTrue(issubclass(exc, core.ThemeError))
         try:
