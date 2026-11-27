@@ -115,7 +115,12 @@ def _parse_party_size(raw):
     """
     if raw is None:
         return DEFAULT_PARTY_SIZE
-    size = int(raw)
+    try:
+        size = int(raw)
+    except ValueError:
+        raise ValueError(
+            f"Party size must be a number between 1 and 5, got {raw}"
+        ) from None
     if size < 1 or size > 5:
         raise ValueError(f"Party size must be between 1 and 5, got {raw}")
     return size
@@ -128,7 +133,13 @@ def _parse_suggestion_count(raw):
     """
     if raw is None:
         return 1
-    count = int(raw)
+    try:
+        count = int(raw)
+    except ValueError:
+        raise ValueError(
+            f"Suggestion count must be a number between 1 and "
+            f"{MAX_SUGGESTION_COUNT}, got {raw}"
+        ) from None
     if count < 1 or count > MAX_SUGGESTION_COUNT:
         raise ValueError(
             f"Suggestion count must be between 1 and {MAX_SUGGESTION_COUNT}, got {raw}"
