@@ -58,7 +58,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["alch"]
   },
   {
     "id": "ancient_apparition",
@@ -152,7 +152,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["aw", "zet"]
   },
   {
     "id": "axe",
@@ -347,7 +347,7 @@
       "has_staff": false,
       "has_sword": true
     },
-    "aliases": []
+    "aliases": ["bh", "gondar"]
   },
   {
     "id": "brewmaster",
@@ -411,7 +411,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["bb"]
   },
   {
     "id": "broodmother",
@@ -476,7 +476,7 @@
       "has_staff": false,
       "has_sword": true
     },
-    "aliases": []
+    "aliases": ["cent", "warrunner"]
   },
   {
     "id": "chaos_knight",
@@ -508,7 +508,7 @@
       "has_staff": false,
       "has_sword": true
     },
-    "aliases": []
+    "aliases": ["ck"]
   },
   {
     "id": "chen",
@@ -573,7 +573,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["bone"]
   },
   {
     "id": "rattletrap",
@@ -605,7 +605,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["cw"]
   },
   {
     "id": "crystal_maiden",
@@ -669,7 +669,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["ds"]
   },
   {
     "id": "dark_willow",
@@ -930,7 +930,7 @@
       "has_staff": false,
       "has_sword": true
     },
-    "aliases": []
+    "aliases": ["drow", "dr"]
   },
   {
     "id": "earth_spirit",
@@ -962,7 +962,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["kaolin"]
   },
   {
     "id": "earthshaker",
@@ -1026,7 +1026,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["et"]
   },
   {
     "id": "ember_spirit",
@@ -1059,7 +1059,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["xin"]
   },
   {
     "id": "enchantress",
@@ -1356,7 +1356,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["karl", "kael"]
   },
   {
     "id": "wisp",
@@ -1389,7 +1389,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["io"]
   },
   {
     "id": "jakiro",
@@ -1422,7 +1422,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["thd"]
   },
   {
     "id": "juggernaut",
@@ -1554,7 +1554,7 @@
       "has_staff": false,
       "has_sword": true
     },
-    "aliases": []
+    "aliases": ["admiral", "coco"]
   },
   {
     "id": "largo",
@@ -1717,7 +1717,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["ls", "naix"]
   },
   {
     "id": "lina",
@@ -1816,7 +1816,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["ld", "sylla", "syllabear"]
   },
   {
     "id": "luna",
@@ -2075,7 +2075,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["potm"]
   },
   {
     "id": "monkey_king",
@@ -2108,7 +2108,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["mk", "wukong"]
   },
   {
     "id": "morphling",
@@ -2140,7 +2140,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["morph"]
   },
   {
     "id": "muerta",
@@ -2334,7 +2334,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["ogre"]
   },
   {
     "id": "omniknight",
@@ -2366,7 +2366,7 @@
       "has_staff": false,
       "has_sword": true
     },
-    "aliases": []
+    "aliases": ["omni"]
   },
   {
     "id": "oracle",
@@ -2658,7 +2658,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["butcher"]
   },
   {
     "id": "pugna",
@@ -2886,7 +2886,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["sk"]
   },
   {
     "id": "shadow_demon",
@@ -2918,7 +2918,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["sd"]
   },
   {
     "id": "shadow_fiend",
@@ -3016,7 +3016,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["sil"]
   },
   {
     "id": "skywrath_mage",
@@ -3049,7 +3049,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["swm", "skywrath"]
   },
   {
     "id": "slardar",
@@ -3147,7 +3147,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["snap"]
   },
   {
     "id": "sniper",
@@ -3211,7 +3211,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["spec"]
   },
   {
     "id": "spirit_breaker",
@@ -3276,7 +3276,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["storm", "raijin"]
   },
   {
     "id": "sven",
@@ -3374,7 +3374,7 @@
       "has_staff": false,
       "has_sword": true
     },
-    "aliases": []
+    "aliases": ["ta", "lanaya"]
   },
   {
     "id": "terrorblade",
@@ -3503,7 +3503,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["boush"]
   },
   {
     "id": "tiny",
@@ -3601,7 +3601,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["troll"]
   },
   {
     "id": "tusk",
@@ -3665,7 +3665,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["pitlord", "azgalor"]
   },
   {
     "id": "undying",
@@ -3698,7 +3698,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["dirge"]
   },
   {
     "id": "ursa",
@@ -3925,7 +3925,7 @@
       "has_staff": true,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["demnok"]
   },
   {
     "id": "weaver",
@@ -3958,7 +3958,7 @@
       "has_staff": false,
       "has_sword": false
     },
-    "aliases": []
+    "aliases": ["skitskurr"]
   },
   {
     "id": "windranger",

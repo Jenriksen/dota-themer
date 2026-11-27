@@ -88,7 +88,7 @@
 
 ### 4. Advanced Features (Backlog)
 - [x] Custom theme creation via Discord commands (`!addtheme`, `!updatetheme`)
-  - [ ] Bot Command Tests: No tests for the bot commands themselves (only core functions are tested)
+  - [x] Bot Command Tests: Behavioral tests for the bot commands (test_bot_commands.py: add/hide/unhide/update/list/theme/dailytheme against in-memory repos; friendly parse errors added)
   - [ ] Input Validation: Could improve hero name matching (fuzzy matching?)
   - [ ] Error Messages: Could be more user-friendly
   - [x] Hide/UnHide Themes: Implemented via `!hidetheme`/`!unhidetheme` (users cannot delete, only hide from suggestions)
@@ -103,7 +103,6 @@
 - [x] Theme rotation / daily themes (`!dailytheme` / `!dt`, ROADMAP M4.3)
 - [x] Rich embed formatting with hero images (ROADMAP M4.3)
 - [x] Hero name hyperlinks in output (link to dota2.com/hero/{id}, ROADMAP M4.3)
-- [ ] Hero name hyperlinks in output (underline name, link to dota2.com/hero/{id})
 - [x] Theme feedback via reactions (:thumbsup: +1, :thumbsdown: -1, persisted in themes.json)
   - [x] Add feedback_score field to themes.json
   - [x] Implement on_reaction_add event handler in bot.py
@@ -111,7 +110,7 @@
   - [x] Display feedback score in theme suggestion messages
   - [x] Add description about reactions in theme message
 - [x] Theme modification guide with suggestions ("Modify this theme" field on suggestion embeds — M4.1)
-  - [ ] Research and add common Dota2 hero abbreviations to aliases field in heroes.json
+  - [x] Research and add common Dota2 hero abbreviations to aliases field in heroes.json (39 heroes: TA, IO, CW, CK, POTM, LS, MK, ...; integrity tests added)
 - [x] Help command via `!theme help` for in-context assistance (ROADMAP M4.3)
 
 ---

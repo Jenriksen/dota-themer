@@ -641,6 +641,67 @@ class TestInvalidInputs(unittest.TestCase):
         self.assertIn("theme", result)
 
 
+def load_heroes_json():
+    """Load the heroes.json seed file directly (data integrity tests)."""
+    path = Path(__file__).parent / "data" / "heroes.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+class TestHeroAliases(unittest.TestCase):
+    """Tests for hero abbreviations in the aliases field (M4.1/TODOs)."""
+
+    def test_aliases_are_unique_across_heroes(self):
+        """No abbreviation is claimed by two heroes (would break resolution)."""
+        heroes = load_heroes_json()
+        seen = {}
+        for hero in heroes:
+            for alias in hero.get("aliases", []):
+                low = alias.lower()
+                self.assertNotIn(
+                    low,
+                    seen,
+                    f"Alias '{alias}' is claimed by both "
+                    f"'{seen.get(low)}' and '{hero['id']}'",
+                )
+                seen[low] = hero["id"]
+
+    def test_aliases_do_not_collide_with_other_hero_names(self):
+        """An alias must not match another hero's id or display name."""
+        heroes = load_heroes_json()
+        for hero in heroes:
+            for alias in hero.get("aliases", []):
+                low = alias.lower()
+                for other in heroes:
+                    if other["id"] == hero["id"]:
+                        continue
+                    self.assertNotEqual(
+                        low,
+                        other["id"].lower(),
+                        f"Alias '{alias}' collides with hero id '{other['id']}'",
+                    )
+                    self.assertNotEqual(
+                        low,
+                        other["name"].lower(),
+                        f"Alias '{alias}' collides with '{other['name']}'",
+                    )
+
+    def test_resolver_matches_common_abbreviations(self):
+        """Common Dota 2 abbreviations resolve to the right hero."""
+        resolver = core.HeroResolver(InMemoryHeroRepository(load_heroes_json()))
+        expectations = {
+            "ta": "templar_assassin",
+            "io": "wisp",
+            "cw": "rattletrap",
+            "ck": "chaos_knight",
+            "ls": "life_stealer",
+            "potm": "mirana",
+            "mk": "monkey_king",
+            "magnus": "magnataur",
+        }
+        for alias, expected in expectations.items():
+            self.assertEqual(resolver.resolve(alias), expected, f"alias {alias}")
+
+
 class TestDataConsistencyEdgeCases(unittest.TestCase):
     """Tests for data consistency edge cases."""
 
