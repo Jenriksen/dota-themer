@@ -143,12 +143,12 @@
 - **Goals**: Grow theme library to 20+
 - **Deliverables**:
   - [x] Add 12+ new themes (52 themes available)
-  - [ ] Theme categories (visual, lore, mechanical)
+  - [x] Theme categories (visual, lore, mechanical) - all 52 curated themes categorized; `!categories` and `!themecategory` (`!tc`) commands
   - [x] Theme validation scripts (test suite enforces theme/hero integrity)
 - **Success Criteria**:
   - ✅ 20+ themes available (52 themes)
   - Each theme has 5+ matching heroes
-  - Themes cover diverse categories
+  - Themes cover diverse categories ✅ (28 visual, 19 mechanical, 5 lore)
 
 ---
 

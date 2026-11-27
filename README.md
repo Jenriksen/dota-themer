@@ -115,6 +115,8 @@ python bot.py
 - `!theme help` - In-context help for theme suggestions
 - `!tr [party_size] [count]` - Short alias for `!theme`
 - `!dailytheme [party_size]` - Today's theme, the same for everyone (alias: `!dt`; rolls over at midnight UTC)
+- `!categories` - List theme categories (visual, lore, mechanical)
+- `!themecategory <category> [party_size]` - Suggestion from one category (alias: `!tc`)
 - `!helptheme` - Show help information
 - `!addtheme <name> [description] <hero1> [hero2] ...` - Create a new theme
 - `!updatetheme <name> add|remove <hero1> [hero2] ...` - Add or remove heroes from a theme

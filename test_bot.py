@@ -92,6 +92,19 @@ class TestBotCommands(unittest.TestCase):
         bot_content = read_bot_file()
         self.assertIn("core.get_theme_suggestions(", bot_content)
 
+    def test_categories_command(self):
+        """!categories lists the theme categories with counts (M3.2)."""
+        bot_content = read_bot_file()
+        self.assertIn('name="categories"', bot_content)
+        self.assertIn("core.THEME_CATEGORIES", bot_content)
+
+    def test_theme_category_command(self):
+        """!themecategory restricts suggestions to one category (M3.2)."""
+        bot_content = read_bot_file()
+        self.assertIn('name="themecategory"', bot_content)
+        self.assertIn('aliases=["tc"]', bot_content)
+        self.assertIn("category=category", bot_content)
+
     def test_daily_theme_command(self):
         """!dailytheme shows the deterministic theme of the day (M4.3)."""
         bot_content = read_bot_file()
