@@ -103,7 +103,6 @@
 - [x] Theme rotation / daily themes (`!dailytheme` / `!dt`, ROADMAP M4.3)
 - [x] Rich embed formatting with hero images (ROADMAP M4.3)
 - [x] Hero name hyperlinks in output (link to dota2.com/hero/{id}, ROADMAP M4.3)
-- [ ] Hero name hyperlinks in output (underline name, link to dota2.com/hero/{id})
 - [x] Theme feedback via reactions (:thumbsup: +1, :thumbsdown: -1, persisted in themes.json)
   - [x] Add feedback_score field to themes.json
   - [x] Implement on_reaction_add event handler in bot.py
