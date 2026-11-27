@@ -6,14 +6,15 @@ effects) is covered without discord.py or a live connection.
 """
 
 import asyncio
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
+
 # Mock discord before importing bot, keeping the command functions intact.
 # A plain MagicMock would swallow the @bot.command decorators and replace
 # every command with a mock, so the mock's Bot.command()/Bot.event()
 # decorators pass the original coroutine through (with .callback/.error
 # attributes the bot code relies on).
-import sys
-import unittest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 if "bot" not in sys.modules:
 
