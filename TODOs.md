@@ -88,7 +88,7 @@
 
 ### 4. Advanced Features (Backlog)
 - [x] Custom theme creation via Discord commands (`!addtheme`, `!updatetheme`)
-  - [ ] Bot Command Tests: No tests for the bot commands themselves (only core functions are tested)
+  - [x] Bot Command Tests: Behavioral tests for the bot commands (test_bot_commands.py: add/hide/unhide/update/list/theme/dailytheme against in-memory repos; friendly parse errors added)
   - [ ] Input Validation: Could improve hero name matching (fuzzy matching?)
   - [ ] Error Messages: Could be more user-friendly
   - [x] Hide/UnHide Themes: Implemented via `!hidetheme`/`!unhidetheme` (users cannot delete, only hide from suggestions)
