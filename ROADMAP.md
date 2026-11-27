@@ -162,7 +162,7 @@
   - [x] Theme persistence (save to themes.json)
   - [x] Theme validation (minimum heroes, unique names)
   - [x] List custom themes command
-  - [ ] Theme modification guide displayed with theme suggestions
+  - [x] Theme modification guide displayed with theme suggestions ("Modify this theme" field on suggestion embeds)
 - **Success Criteria**:
   - Users can create themes via Discord
   - Custom themes persist across bot restarts

@@ -42,6 +42,10 @@ LANE_NAMES = {1: "Safelane", 2: "Mid", 3: "Offlane", 4: "Offlane", 5: "Safelane"
 
 # Theme categories (M3.2): every curated theme belongs to exactly one
 THEME_CATEGORIES = ("visual", "lore", "mechanical")
+# Themes need at least this many heroes to be meaningful: the default
+# party size is 2, so a theme that cannot field a pair can never be
+# suggested. Guards !addtheme/!updatetheme from zero/one-hero themes.
+MIN_THEME_HEROES = 2
 
 # Official Dota 2 hero page (M4.3): hero names link here in Discord output
 HERO_PAGE_URL_TEMPLATE = "https://www.dota2.com/hero/{hero_id}"
@@ -77,6 +81,10 @@ class DuplicateHeroSetError(ThemeError):
 
 class ThemeNotFoundError(ThemeError):
     """No theme with the given name exists."""
+
+
+class TooFewHeroesError(ThemeError):
+    """A theme mutation would leave the theme below MIN_THEME_HEROES."""
 
 
 class ThemeDataError(ThemeError):
@@ -836,6 +844,19 @@ def add_theme(
     else:
         validated_hero_ids = []
 
+    # A theme below MIN_THEME_HEROES can never be suggested for the
+    # default party of 2, so reject it instead of saving dead data
+    if len(validated_hero_ids) < MIN_THEME_HEROES:
+        logger.warning(
+            f"Theme '{theme_name}' has {len(validated_hero_ids)} heroes, "
+            f"minimum is {MIN_THEME_HEROES}"
+        )
+        raise TooFewHeroesError(
+            f"Theme '{theme_name}' needs at least {MIN_THEME_HEROES} valid "
+            f"heroes, got {len(validated_hero_ids)}. "
+            f'Usage: !addtheme "<name>" [description] <hero1> <hero2> ...'
+        )
+
     # Check for duplicate hero-set (identical sets would skew weighted
     # selection probabilities, see issue #5)
     if validated_hero_ids:
@@ -945,6 +966,19 @@ def update_theme(
     if remove_hero_ids:
         removals = set(remove_hero_ids) & current_hero_ids
         current_hero_ids.difference_update(removals)
+
+    # A removal that drops the theme below MIN_THEME_HEROES would leave
+    # a theme that can never be suggested; reject before saving
+    if len(current_hero_ids) < MIN_THEME_HEROES:
+        logger.warning(
+            f"Update would leave theme '{theme_name}' with "
+            f"{len(current_hero_ids)} heroes, minimum is {MIN_THEME_HEROES}"
+        )
+        raise TooFewHeroesError(
+            f"Cannot update theme '{theme_name}': it would be left with "
+            f"{len(current_hero_ids)} heroes, but themes need at least "
+            f"{MIN_THEME_HEROES}."
+        )
 
     # Update description if provided
     if new_description is not None:
