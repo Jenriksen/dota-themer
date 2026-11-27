@@ -68,6 +68,7 @@ Each hero's positions reflect their viable roles, with primary position first.
 - Theme selection: Weighted random, favoring themes with more heroes (`select_theme()` in core.py)
 - Party size validation: Themes are filtered to those with enough heroes for the party size (`filter_themes()` in core.py)
 - Position coverage: Themes can be filtered to require full position coverage (`has_position_coverage()` in core.py)
+- Theme size: A theme must keep at least MIN_THEME_HEROES (2) heroes; `add_theme`/`update_theme` reject mutations below it (`TooFewHeroesError` in core.py)
 
 ## Open Questions
 

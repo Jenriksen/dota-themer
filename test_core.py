@@ -1195,6 +1195,12 @@ class TestThemeManagement(unittest.TestCase):
 
     def test_update_theme_remove_heroes(self):
         """update_theme removes heroes from existing theme."""
+        core.update_theme(
+            "Carry Duo",
+            add_hero_ids=["zuus"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
+        )
         message = core.update_theme(
             "Carry Duo",
             remove_hero_ids=["antimage"],
@@ -1206,7 +1212,23 @@ class TestThemeManagement(unittest.TestCase):
         theme = next(
             (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
         )
-        self.assertEqual(theme["hero_ids"], ["juggernaut"])
+        self.assertEqual(theme["hero_ids"], ["juggernaut", "zuus"])
+
+    def test_update_theme_cannot_drop_below_minimum_heroes(self):
+        """Removing heroes below MIN_THEME_HEROES is rejected, not saved."""
+        with self.assertRaises(core.TooFewHeroesError):
+            core.update_theme(
+                "Carry Duo",
+                remove_hero_ids=["antimage", "juggernaut"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+
+        theme = next(
+            (t for t in self.theme_repo.themes if t["name"] == "Carry Duo"), None
+        )
+        # The rejected update leaves the theme untouched
+        self.assertEqual(theme["hero_ids"], ["antimage", "juggernaut"])
 
     def test_update_theme_nonexistent(self):
         """update_theme rejects nonexistent theme."""
@@ -1304,7 +1326,7 @@ class TestRepositoryInjection(unittest.TestCase):
         message = core.add_theme(
             "New Theme",
             description="d",
-            hero_ids=["lina"],
+            hero_ids=["axe", "lina"],
             hero_repo=hero_repo,
             theme_repo=theme_repo,
         )
@@ -1669,16 +1691,21 @@ class TestTypedResults(unittest.TestCase):
             [
                 {"id": "axe", "name": "Axe", "positions": [3]},
                 {"id": "zuus", "name": "Zeus", "positions": [2]},
+                {"id": "pudge", "name": "Pudge", "positions": [4]},
             ]
         )
         self.theme_repo = InMemoryThemeRepository(
-            [{"name": "Existing", "description": "", "hero_ids": ["axe"]}]
+            [{"name": "Existing", "description": "", "hero_ids": ["axe", "zuus"]}]
         )
 
     def test_add_theme_success_returns_message(self):
         """Successful add_theme returns the success message string."""
         message = core.add_theme(
-            "New", "d", ["zuus"], hero_repo=self.hero_repo, theme_repo=self.theme_repo
+            "New",
+            "d",
+            ["axe", "pudge"],
+            hero_repo=self.hero_repo,
+            theme_repo=self.theme_repo,
         )
         self.assertIsInstance(message, str)
         self.assertIn("added successfully", message)
@@ -1703,6 +1730,13 @@ class TestTypedResults(unittest.TestCase):
         with self.assertRaises(core.DuplicateHeroSetError):
             core.add_theme(
                 "Dup Set",
+                hero_ids=["axe", "zuus"],
+                hero_repo=self.hero_repo,
+                theme_repo=self.theme_repo,
+            )
+        with self.assertRaises(core.TooFewHeroesError):
+            core.add_theme(
+                "Too Few",
                 hero_ids=["axe"],
                 hero_repo=self.hero_repo,
                 theme_repo=self.theme_repo,
@@ -1731,6 +1765,7 @@ class TestTypedResults(unittest.TestCase):
             core.DuplicateHeroSetError,
             core.ThemeNotFoundError,
             core.ThemeDataError,
+            core.TooFewHeroesError,
         ):
             self.assertTrue(issubclass(exc, core.ThemeError))
         try:
