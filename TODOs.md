@@ -110,7 +110,7 @@
   - [x] Add update_theme_feedback() function in core.py
   - [x] Display feedback score in theme suggestion messages
   - [x] Add description about reactions in theme message
-- [ ] Theme modification guide with suggestions
+- [x] Theme modification guide with suggestions ("Modify this theme" field on suggestion embeds — M4.1)
   - [ ] Research and add common Dota2 hero abbreviations to aliases field in heroes.json
 - [x] Help command via `!theme help` for in-context assistance (ROADMAP M4.3)
 

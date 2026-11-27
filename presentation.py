@@ -108,6 +108,15 @@ def render_suggestion_embed_data(
             else lane_duos_display
         )
         fields.append(("Suggested lane duos", duos_value, False))
+    fields.append(
+        (
+            "Modify this theme",
+            "React \u2753 to open a modification thread (reply Add/Remove HeroName, "
+            'then Done) \u2022 `!updatetheme "<name>" add|remove <hero>` \u2022 '
+            "Create your own with `!addtheme <name> [description] <hero1> <hero2> ...`",
+            False,
+        )
+    )
 
     footer_text = f"Feedback: {feedback_score} {UP_VOTE}{DOWN_VOTE}"
     if footer:
