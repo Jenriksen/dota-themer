@@ -88,6 +88,7 @@
 
 ### 4. Advanced Features (Backlog)
 - [x] Custom theme creation via Discord commands (`!addtheme`, `!updatetheme`)
+  - [x] Theme size guard: `add_theme`/`update_theme` enforce MIN_THEME_HEROES (2) via TooFewHeroesError — zero/one-hero themes are rejected instead of silently saved
   - [ ] Bot Command Tests: No tests for the bot commands themselves (only core functions are tested)
   - [ ] Input Validation: Could improve hero name matching (fuzzy matching?)
   - [ ] Error Messages: Could be more user-friendly
