@@ -726,6 +726,79 @@ async def daily_theme_command(ctx, party_size: Optional[str] = None):
     )
 
 
+@bot.command(
+    name="categories",
+    help="List theme categories with theme counts",
+)
+async def categories_command(ctx):
+    """List the available theme categories and how many themes each has."""
+    logger.info(f"Categories command from {ctx.author}")
+    try:
+        themes = THEME_REPO.load_themes(include_hidden=False)
+    except Exception as e:
+        logger.error(f"Failed to load themes for categories: {e}")
+        await ctx.send("\u274c Failed to load theme data. Please try again later.")
+        return
+
+    lines = ["**Theme Categories:**"]
+    for category in core.THEME_CATEGORIES:
+        count = sum(1 for t in themes if t.get("category") == category)
+        lines.append(f"- **{category.title()}** - {count} themes")
+    uncategorized = sum(1 for t in themes if not t.get("category"))
+    if uncategorized:
+        lines.append(f"- *{uncategorized} themes have no category yet*")
+    lines.append("")
+    lines.append(
+        "Use `!themecategory <category> [party_size]` "
+        "(alias `!tc`) to get a suggestion from one category."
+    )
+    await ctx.send("\n".join(lines))
+
+
+@bot.command(
+    name="themecategory",
+    aliases=["tc"],
+    help="Get a theme suggestion from one category (visual, lore, mechanical)",
+)
+async def theme_category_command(
+    ctx, category: Optional[str] = None, party_size: Optional[str] = None
+):
+    """
+    Get a theme suggestion restricted to one category.
+
+    Usage:
+    !themecategory visual - One visual theme for the default party of 2
+    !tc lore 5 - One lore theme for a full party
+    """
+    if category is None:
+        await categories_command.callback(ctx)
+        return
+
+    category = category.strip().lower()
+    if category not in core.THEME_CATEGORIES:
+        await ctx.send(
+            f"\u26a0\ufe0f Unknown category: '{category}'. "
+            f"Valid categories: {', '.join(core.THEME_CATEGORIES)}. "
+            f"Use `!categories` to see them with theme counts."
+        )
+        return
+
+    try:
+        size = _parse_party_size(party_size)
+    except ValueError as e:
+        await ctx.send(str(e))
+        return
+
+    suggestion = core.get_theme_suggestion(
+        size,
+        hero_repo=HERO_REPO,
+        theme_repo=THEME_REPO,
+        link_heroes=True,
+        category=category,
+    )
+    await send_theme_suggestion(ctx, suggestion, footer=f"{category.title()} category")
+
+
 async def send_command_help(ctx):
     """Send the in-context !theme help message (M4.3)."""
     await ctx.send(
@@ -758,6 +831,8 @@ async def help_theme_command(ctx):
     `!tr [party_size] [count]` - Same as !theme (short alias)
     `!dailytheme [party_size]` - Today's theme, the same for everyone (alias: !dt)
     `!theme help` - In-context help for theme suggestions
+    `!categories` - List theme categories (visual, lore, mechanical)
+    `!themecategory <category> [party_size]` - Suggestion from one category (alias: !tc)
     React with 👍 to upvote or 👎 to downvote a theme suggestion
     
     **Theme Management:**

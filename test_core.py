@@ -641,6 +641,74 @@ class TestInvalidInputs(unittest.TestCase):
         self.assertIn("theme", result)
 
 
+def load_themes_json():
+    """Load the themes.json seed file directly (data integrity tests)."""
+    path = Path(__file__).parent / "data" / "themes.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+class TestThemeCategories(unittest.TestCase):
+    """Tests for theme categories (M3.2)."""
+
+    def setUp(self):
+        self.heroes = [
+            {"id": "axe", "name": "Axe", "positions": [3, 4]},
+            {"id": "lina", "name": "Lina", "positions": [2]},
+            {"id": "crystal_maiden", "name": "Crystal Maiden", "positions": [5]},
+            {"id": "zuus", "name": "Zeus", "positions": [2]},
+            {"id": "pudge", "name": "Pudge", "positions": [4]},
+        ]
+        self.themes = [
+            {"name": "Red", "hero_ids": ["axe", "pudge"], "category": "visual"},
+            {"name": "Lore", "hero_ids": ["zuus", "lina"], "category": "lore"},
+            {"name": "Melee", "hero_ids": ["axe", "pudge"], "category": "mechanical"},
+            {"name": "Uncategorized", "hero_ids": ["axe", "lina"]},
+        ]
+
+    def test_filter_themes_by_category(self):
+        """filter_themes returns only themes in the requested category."""
+        visual = core.filter_themes(self.themes, self.heroes, category="visual")
+        self.assertEqual([t["name"] for t in visual], ["Red"])
+
+    def test_filter_themes_without_category_returns_all(self):
+        """No category filter keeps all themes, categorized or not."""
+        all_themes = core.filter_themes(self.themes, self.heroes)
+        self.assertEqual(len(all_themes), 4)
+
+    def test_uncategorized_theme_never_matches_category_filter(self):
+        """A theme without a category is excluded from any category filter."""
+        for category in core.THEME_CATEGORIES:
+            names = [
+                t["name"]
+                for t in core.filter_themes(self.themes, self.heroes, category=category)
+            ]
+            self.assertNotIn("Uncategorized", names)
+
+    def test_seed_themes_all_have_valid_category(self):
+        """Every curated theme in themes.json carries a valid category."""
+        for theme in load_themes_json():
+            self.assertIn(
+                theme.get("category"),
+                core.THEME_CATEGORIES,
+                f"Theme '{theme['name']}' has an invalid or missing category",
+            )
+
+    def test_get_theme_suggestion_respects_category(self):
+        """Suggestions with a category only draw from that category."""
+        hero_repo = InMemoryHeroRepository(self.heroes)
+        theme_repo = InMemoryThemeRepository(self.themes)
+        for _ in range(10):
+            suggestion = core.get_theme_suggestion(
+                party_size=1,
+                hero_repo=hero_repo,
+                theme_repo=theme_repo,
+                category="lore",
+            )
+            self.assertEqual(suggestion["theme"], "Lore")
+
+    def test_theme_categories_constant(self):
+        """The category vocabulary is exactly visual, lore, mechanical."""
+        self.assertEqual(core.THEME_CATEGORIES, ("visual", "lore", "mechanical"))
 def load_heroes_json():
     """Load the heroes.json seed file directly (data integrity tests)."""
     path = Path(__file__).parent / "data" / "heroes.json"

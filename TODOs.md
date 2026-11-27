@@ -93,10 +93,10 @@
   - [ ] Input Validation: Could improve hero name matching (fuzzy matching?)
   - [ ] Error Messages: Could be more user-friendly
   - [x] Hide/UnHide Themes: Implemented via `!hidetheme`/`!unhidetheme` (users cannot delete, only hide from suggestions)
-  - [ ] Categories: Theme categories not yet implemented (mentioned in ROADMAP)
+  - [x] Categories: Theme categories implemented (visual/lore/mechanical on all 52 curated themes; `!categories` and `!themecategory`/`!tc` commands)
   - [ ] Permissions: No permission system (any user can modify themes)
   - [ ] Audit Log: No logging of who created/modified themes
-- [ ] Theme categories (visual, lore, mechanical)
+- [x] Theme categories (visual, lore, mechanical) - seed data categorized, category filtering, `!categories`/`!themecategory` commands
 - [ ] Winrate-based position recommendations (deferred — ROADMAP M4.2 MVP shipped)
 - [x] Figure out how to find the hero combinations with the highest winrate in a lane and provide them as suggestions for a theme (research: [drafts/hero_combo_winrates.md](drafts/hero_combo_winrates.md); implemented: pair winrates from OpenDota publicMatches, suggested on theme posts)
 - [ ] Team composition validation

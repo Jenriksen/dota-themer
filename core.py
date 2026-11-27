@@ -40,6 +40,8 @@ OFFLANE_POSITIONS = {3, 4}  # Offlaner + Soft Support
 # Lane names for display
 LANE_NAMES = {1: "Safelane", 2: "Mid", 3: "Offlane", 4: "Offlane", 5: "Safelane"}
 
+# Theme categories (M3.2): every curated theme belongs to exactly one
+THEME_CATEGORIES = ("visual", "lore", "mechanical")
 # Themes need at least this many heroes to be meaningful: the default
 # party size is 2, so a theme that cannot field a pair can never be
 # suggested. Guards !addtheme/!updatetheme from zero/one-hero themes.
@@ -265,6 +267,7 @@ def filter_themes(
     min_heroes=None,
     require_position_coverage=False,
     include_hidden=True,
+    category=None,
 ):
     """
     Filter themes based on criteria.
@@ -276,6 +279,7 @@ def filter_themes(
         min_heroes: Minimum number of heroes required (overrides party_size)
         require_position_coverage: If True, filter themes with full position coverage
         include_hidden: If False, filter out themes with is_hidden=True
+        category: If provided, only themes whose "category" matches
 
     Returns:
         list: Filtered list of theme dicts
@@ -284,6 +288,10 @@ def filter_themes(
     for theme in themes:
         # Skip hidden themes if requested
         if not include_hidden and theme.get("is_hidden", False):
+            continue
+        # Filter by category when requested (uncategorized themes never
+        # match a category filter)
+        if category is not None and theme.get("category") != category:
             continue
         matching_heroes = get_heroes_by_ids(theme["hero_ids"], all_heroes)
         hero_count = len(matching_heroes)
@@ -309,7 +317,12 @@ def filter_themes(
 
 
 def select_theme(
-    themes, heroes, party_size=None, use_weighted=False, require_position_coverage=False
+    themes,
+    heroes,
+    party_size=None,
+    use_weighted=False,
+    require_position_coverage=False,
+    category=None,
 ):
     """
     Select a theme.
@@ -342,6 +355,7 @@ def select_theme(
         party_size=party_size,
         require_position_coverage=require_position_coverage,
         include_hidden=False,
+        category=category,
     )
 
     if not filtered_themes:
@@ -608,6 +622,7 @@ def get_theme_suggestion(
     hero_repo=None,
     theme_repo=None,
     link_heroes=False,
+    category=None,
 ):
     """
     Get a theme suggestion for a given party size.
@@ -617,6 +632,7 @@ def get_theme_suggestion(
         use_weighted: If True, use weighted random selection (favors themes with more heroes)
         require_position_coverage: If True, only select themes with heroes in all positions 1-5
         link_heroes: If True, hero names link to the official Dota 2 hero page
+        category: If provided, restrict the suggestion to this category
 
     Returns:
         dict: {"theme": theme_name, "description": theme_desc, "heroes": formatted_hero_list, "hero_count": int}
@@ -641,6 +657,7 @@ def get_theme_suggestion(
         party_size=party_size,
         use_weighted=use_weighted,
         require_position_coverage=require_position_coverage,
+        category=category,
     )
 
     logger.debug(f"Selected theme: {theme['name']}")
